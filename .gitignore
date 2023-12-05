@@ -1,0 +1,27 @@
+# Cache directories
+.cache/webpack  
+.cache/babel
+
+# Coverage reports
+coverage/*.lcov
+coverage/*.txt
+
+# Generated documentation
+dist/docs/*     
+!dist/index.html
+
+# Package manager lock files
+package-lock.json
+yarn.lock
+npm-lock.json
+
+# OS-generated files
+*.DS_Store      
+.*Spotlight-V100 
+Thumbs.db        
+ehthumbs.db    
+
+# Miscellaneous files
+node_modules    
+*.log            
+.env            
