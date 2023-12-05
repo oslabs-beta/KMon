@@ -6,7 +6,8 @@
 coverage/*.lcov
 coverage/*.txt
 
-# Generated documentation
+# Generated output
+dist
 dist/docs/*     
 !dist/index.html
 
