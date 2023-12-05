@@ -7,7 +7,7 @@ coverage/*.lcov
 coverage/*.txt
 
 # Generated output
-dist
+dist/
 dist/docs/*     
 !dist/index.html
 
