@@ -1,3 +1,4 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,7 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 
 const drawerWidth = 240;
 
-export default function NavBar() {
+function Sidebar() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -47,4 +48,6 @@ export default function NavBar() {
       </Box>
     </Box>
   )
-}
+};
+
+export default Sidebar;

@@ -1,3 +1,4 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 
-export default function TopBar() {
+function Header() {
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -33,3 +34,5 @@ export default function TopBar() {
     </Box>
     )
 };
+
+export default Header;
