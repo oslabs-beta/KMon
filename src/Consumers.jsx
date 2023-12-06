@@ -4,7 +4,7 @@ const Consumers = () => {
 
   return (
     <div>
-      <h1>Here we are in the Consumers Page</h1>
+      <h1>Consumers</h1>
     </div>
   );
 };
