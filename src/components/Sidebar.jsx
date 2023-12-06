@@ -7,33 +7,44 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import { Link } from 'react-router-dom';
+import { styled } from '@mui/system';
 
 const drawerWidth = 240;
 
 function Sidebar() {
+  const linkStyles = {
+    textDecoration: 'none',
+    color: 'black'
+  }
+
+  const StyledDrawer = styled(Drawer)({
+    width: drawerWidth,
+    flexShrink: 0,
+    '& .MuiDrawer-paper': {
+      width: drawerWidth,
+      boxSizing: 'border-box',
+      marginTop: '70px',
+      }
+    });
+
+    const StyledListItem = styled(ListItem)({
+      textDecoration: 'none',
+      color: 'black',
+    });
+
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' , marginRight: '0px'}}>
       <CssBaseline />
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { 
-            width: drawerWidth, 
-            boxSizing: 'border-box',
-            marginTop: '70px'
-          },
-        }}
-      >
+      <StyledDrawer variant="permanent" anchor ="left">
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {['Overview', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
-              <ListItem key={text} disablePadding>
+              <StyledListItem key={text} component={Link} to={"/" + text} disablePadding>
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>
-              </ListItem>
+              </StyledListItem>
             ))}
           </List>
           <Divider />
@@ -47,7 +58,7 @@ function Sidebar() {
             ))}
           </List>
         </Box>
-      </Drawer>
+      </StyledDrawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       </Box>
     </Box>

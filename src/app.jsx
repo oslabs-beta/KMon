@@ -1,32 +1,27 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Sidebar from "./Sidebar.jsx"
-import Header from "./Header.jsx"
-import Alerts from './Alerts.jsx';
-import Brokers from './Brokers.jsx';
-import Producers from './Producers.jsx';
-import Consumers from './Consumers.jsx';
-import Overview from './Overview.jsx';
-import { createTheme, ThemeProvider } from '@mui/material';
-
-// const theme = createTheme({
-
-// });
+import React from "react";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import Sidebar from "./components/Sidebar.jsx";
+import Header from "./components/Header.jsx";
+import Alerts from "./pages/Alerts.jsx";
+import Brokers from "./pages/Brokers.jsx";
+import Producers from "./pages/Producers.jsx";
+import Consumers from "./pages/Consumers.jsx";
+import Overview from "./pages/Overview.jsx";
 
 function App() {
-    return (
-      <Router>
-        <Header />
-        <Sidebar />
-            <Routes>
-            <Route  path="/consumers" element={<Overview />} />
-            <Route  path="/alerts" element={<Alerts />} />
-            <Route  path="/brokers" element={<Brokers />} />
-            <Route  path="/producers" element={<Producers />} />
-            <Route  path="/consumers" element={<Consumers />} />
-            </Routes>
-      </Router>
-    );
-  }
+  return (
+    <HashRouter>
+      <Header />
+      <Sidebar />
+        <Routes>
+          <Route path="*" element={<Overview />} />
+          <Route path="/Alerts" element={<Alerts />} />
+          <Route path="/Brokers" element={<Brokers />} />
+          <Route path="/Producers" element={<Producers />} />
+          <Route path="/Consumers" element={<Consumers />} />
+        </Routes>
+    </HashRouter>
+  );
+}
 
-export default App
+export default App;
