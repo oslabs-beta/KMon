@@ -1,11 +1,12 @@
 import React from 'react';
+import Box from '@mui/system/Box';
 
 const Overview = () => {
 
   return (
-    <div>
-      <h1>Overview</h1>
-    </div>
+    <Box>
+      <h1>Here we are in the Overview Page</h1>
+    </Box>
   );
 };
 

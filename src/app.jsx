@@ -14,7 +14,7 @@ function App() {
         <Header />
         <Sidebar />
             <Routes>
-            <Route  path="/consumers" element={<Overview />} />
+            <Route  path="*" element={<Overview />} />
             <Route  path="/alerts" element={<Alerts />} />
             <Route  path="/brokers" element={<Brokers />} />
             <Route  path="/producers" element={<Producers />} />
