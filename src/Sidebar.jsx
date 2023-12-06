@@ -7,10 +7,13 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -28,10 +31,10 @@ function Sidebar() {
       >
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Overview', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
-              <ListItem key={text} disablePadding>
+            {[['Overview', '/'], ['Brokers', '/brokers'], ['Producers', '/producers'], ['Consumers', '/consumers']].map((topic, index) => (
+              <ListItem key={topic[0]} disablePadding>
                 <ListItemButton>
-                  <ListItemText primary={text} />
+                  <ListItemText primary={topic[0]} onClick={() => navigate(topic[1])}/>
                 </ListItemButton>
               </ListItem>
             ))}

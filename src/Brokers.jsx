@@ -4,7 +4,7 @@ const Brokers = () => {
 
   return (
     <div>
-      <h1>Brokers</h1>
+      <h1>Here we are in the Brokers page</h1>
     </div>
   );
 };
