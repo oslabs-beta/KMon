@@ -7,6 +7,7 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -29,7 +30,7 @@ function Sidebar() {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {['Overview', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
-              <ListItem key={text} disablePadding>
+              <ListItem key={text} component={Link} to={"/" + text} disablePadding>
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import Sidebar from "./Sidebar.jsx"
 import Header from "./Header.jsx"
 import Alerts from './Alerts.jsx';
@@ -10,17 +10,17 @@ import Overview from './Overview.jsx';
 
 function App() {
     return (
-      <Router>
+      <HashRouter>
         <Header />
         <Sidebar />
             <Routes>
-            <Route  path="/consumers" element={<Overview />} />
-            <Route  path="/alerts" element={<Alerts />} />
-            <Route  path="/brokers" element={<Brokers />} />
-            <Route  path="/producers" element={<Producers />} />
-            <Route  path="/consumers" element={<Consumers />} />
+            <Route  path="*" element={<Overview />} />
+            <Route  path="/Alerts" element={<Alerts />} />
+            <Route  path="/Brokers" element={<Brokers />} />
+            <Route  path="/Producers" element={<Producers />} />
+            <Route  path="/Consumers" element={<Consumers />} />
             </Routes>
-      </Router>
+      </HashRouter>
     );
   }
 
