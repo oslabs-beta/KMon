@@ -4,7 +4,7 @@ const Brokers = () => {
 
   return (
     <div>
-      <h1>Brokers</h1>
+      <h1>This is the Brokers Page</h1>
     </div>
   );
 };

@@ -4,7 +4,7 @@ const Overview = () => {
 
   return (
     <div>
-      <h1>Overview hey hey hey hey</h1>
+      <h1>This is the Overview Page</h1>
     </div>
   );
 };

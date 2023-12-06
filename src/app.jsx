@@ -1,12 +1,12 @@
 import React from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import Sidebar from "./Sidebar.jsx"
-import Header from "./Header.jsx"
-import Alerts from './Alerts.jsx';
-import Brokers from './Brokers.jsx';
-import Producers from './Producers.jsx';
-import Consumers from './Consumers.jsx';
-import Overview from './Overview.jsx';
+import Sidebar from "./components/Sidebar.jsx"
+import Header from "./components/Header.jsx"
+import Alerts from './pages/Alerts.jsx';
+import Brokers from './pages/Brokers.jsx';
+import Producers from './pages/Producers.jsx';
+import Consumers from './pages/Consumers.jsx';
+import Overview from './pages/Overview.jsx';
 
 function App() {
     return (
