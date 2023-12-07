@@ -34,7 +34,7 @@ function Sidebar() {
       >
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Overview', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
+            {['Overview', 'Connections', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
               <ListItem key={text} component={Link} to={"/" + text} sx={linkStyles} disablePadding>
                 <ListItemButton>
                   <ListItemText primary={text} />
