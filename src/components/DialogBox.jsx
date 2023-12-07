@@ -7,51 +7,45 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 
 export default function MaxWidthDialog() {
-  // unpack state 
+  // unpack state
   // const {
   //   state: { connectionState, appState }, actions: { setConnectionState, setAppState },
   // } = useContext(appContext);
   //   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = React.useState({
     serverURI: '',
-    apiKey: '', 
-    apiSecret: '', 
+    apiKey: '',
+    apiSecret: '',
   });
   // handle change for form input
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value,
-      }));
+      ...prevFormData,
+      [name]: value,
+    }));
   }
 
-    // handle submit
+  // handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch('/api/createConnection', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           serverURI: formData.serverURI,
           apiKey: formData.apiKey,
           apiSecret: formData.apiSecret,
-        })
+        }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         // setAppState((prevState) => {
@@ -66,11 +60,9 @@ export default function MaxWidthDialog() {
       setSubmitting(false);
       setFormData({ serverURI: '', apiKey: '', apiSecret: '' });
     }
-  }  
+  };
 
   const [open, setOpen] = React.useState(false);
-  const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState('sm');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -80,62 +72,49 @@ export default function MaxWidthDialog() {
     setOpen(false);
   };
 
-  const handleMaxWidthChange = (event) => {
-    setMaxWidth(
-      // @ts-expect-error autofill of arbitrary value is not handled.
-      event.target.value,
-    );
-  };
-
-  const handleFullWidthChange = (event) => {
-    setFullWidth(event.target.checked);
-  };
-
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
         Create a new connection
       </Button>
       <Dialog
-        fullWidth={fullWidth}
-        maxWidth={maxWidth}
         open={open}
         onClose={handleClose}
       >
         <DialogTitle>New Connection</DialogTitle>
         <DialogContent>
           <DialogContentText>
-                      <form onSubmit={handleSubmit}>
-                        <TextField
-                          id="uri-input"
-                          name="serverURI"
-                          required
-                          label="Kafka Server URI:"
-                          variant="filled"
-                          onChange={handleChange}
-                          value={formData.serverURI}
-                        />
-                        <TextField
-                          name="apiKey"
-                          required
-                          id="api-key-input"
-                          label="API Key:"
-                          variant="filled"
-                          onChange={handleChange}
-                          value={formData.apiKey}
-                        />
-                        <TextField
-                          name="apiSecret"
-                          required
-                          id="api-secret-input"
-                          label="API Secret:"
-                          type="password"
-                          variant="filled"
-                          onChange={handleChange}
-                          value={formData.apiSecret}
-                        />
-                        <button type="submit">Submit</button>
-                      </form>
+            <form onSubmit={handleSubmit}>
+              <TextField
+                id="uri-input"
+                name="serverURI"
+                required
+                label="Kafka Server URI:"
+                variant="filled"
+                onChange={handleChange}
+                value={formData.serverURI}
+              />
+              <TextField
+                name="apiKey"
+                required
+                id="api-key-input"
+                label="API Key:"
+                variant="filled"
+                onChange={handleChange}
+                value={formData.apiKey}
+              />
+              <TextField
+                name="apiSecret"
+                required
+                id="api-secret-input"
+                label="API Secret:"
+                type="password"
+                variant="filled"
+                onChange={handleChange}
+                value={formData.apiSecret}
+              />
+              <button type="submit">Submit</button>
+            </form>
           </DialogContentText>
           <Box
             noValidate
@@ -146,8 +125,7 @@ export default function MaxWidthDialog() {
               m: 'auto',
               width: 'fit-content',
             }}
-          >
-          </Box>
+          ></Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>
