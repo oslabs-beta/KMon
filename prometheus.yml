@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # Scrape Prometheus itself
+  - job_name: prometheus
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  # Scrape Node Exporter
+  - job_name: node_exporter
+    static_configs:
+      - targets: ['node_exporter:9100']
+
+  # # Scrape additional services (modify this section)
+  # - job_name: service1
+  #   static_configs:
+  #     - targets: ['service1:9101']
+  # - job_name: service2
+  #   static_configs:
+  #     - targets: ['service2:9102']
+
+alerting:
+  alertmanagers:
+  - static_configs:
+      - targets: ['alertmanager:9093']
+
+rule_files:
+  # Load Prometheus alerting rules
+  - /etc/prometheus/rules/*.yaml

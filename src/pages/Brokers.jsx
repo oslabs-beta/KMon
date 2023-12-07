@@ -1,6 +1,6 @@
 import React from 'react';
-import { Container } from '@mui/material';
-
+import { Container } from '@mui/material'
+import BrokerContainer from '../GraphContainers/BrokerContainer.jsx';
 const Brokers = () => {
   const containerStyle = {
     marginLeft: '240px',
@@ -9,8 +9,11 @@ const Brokers = () => {
 
   return (
     <Container sx={containerStyle}>
-      <h1>This is the Brokers Page</h1>
-    </Container>
+    <h1>This is the Brokers Page</h1>
+
+      <BrokerContainer/>
+
+  </Container>
   );
 };
 
