@@ -1,12 +1,14 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -14,8 +16,8 @@ const drawerWidth = 240;
 function Sidebar() {
   const linkStyles = {
     textDecoration: 'none',
-    color: 'black'
-  }
+    color: 'black',
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -25,17 +27,29 @@ function Sidebar() {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { 
-            width: drawerWidth, 
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
             boxSizing: 'border-box',
-            marginTop: '70px'
+            marginTop: '70px',
           },
         }}
       >
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Overview', 'Connections', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
-              <ListItem key={text} component={Link} to={"/" + text} sx={linkStyles} disablePadding>
+            {[
+              'Overview',
+              'Connections',
+              'Brokers',
+              'Producers',
+              'Consumers',
+            ].map((text, index) => (
+              <ListItem
+                key={text}
+                component={Link}
+                to={'/' + text}
+                sx={linkStyles}
+                disablePadding
+              >
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>
@@ -54,10 +68,9 @@ function Sidebar() {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      </Box>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
     </Box>
-  )
-};
+  );
+}
 
 export default Sidebar;

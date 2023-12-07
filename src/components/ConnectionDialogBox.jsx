@@ -1,33 +1,38 @@
 import * as React from 'react';
 // import { appContext } from './App';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Stack,
+  TextField,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
-export default function MaxWidthDialog() {
+const ConnectionDialogBox = () => {
   // unpack state
   // const {
   //   state: { connectionState, appState }, actions: { setConnectionState, setAppState },
   // } = useContext(appContext);
   //   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = React.useState({
+    clusterName: '',
     serverURI: '',
     apiKey: '',
     apiSecret: '',
   });
   // handle change for form input
-  function handleChange(event) {
+  const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
-  }
+  };
 
   // handle submit
   const handleSubmit = async (e) => {
@@ -40,6 +45,7 @@ export default function MaxWidthDialog() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          clusterName: formData.clusterName,
           serverURI: formData.serverURI,
           apiKey: formData.apiKey,
           apiSecret: formData.apiSecret,
@@ -58,7 +64,12 @@ export default function MaxWidthDialog() {
       console.log('Error in CredentialForm: ', error);
     } finally {
       setSubmitting(false);
-      setFormData({ serverURI: '', apiKey: '', apiSecret: '' });
+      setFormData({
+        clusterName: '',
+        serverURI: '',
+        apiKey: '',
+        apiSecret: '',
+      });
     }
   };
 
@@ -75,44 +86,56 @@ export default function MaxWidthDialog() {
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Create a new connection
+        <AddIcon></AddIcon>
       </Button>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>New Connection</DialogTitle>
         <DialogContent>
           <DialogContentText>
             <form onSubmit={handleSubmit}>
-              <TextField
-                id="uri-input"
-                name="serverURI"
-                required
-                label="Kafka Server URI:"
-                variant="filled"
-                onChange={handleChange}
-                value={formData.serverURI}
-              />
-              <TextField
-                name="apiKey"
-                required
-                id="api-key-input"
-                label="API Key:"
-                variant="filled"
-                onChange={handleChange}
-                value={formData.apiKey}
-              />
-              <TextField
-                name="apiSecret"
-                required
-                id="api-secret-input"
-                label="API Secret:"
-                type="password"
-                variant="filled"
-                onChange={handleChange}
-                value={formData.apiSecret}
-              />
+              <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+                <TextField
+                  id="cluster-name"
+                  name="clusterName"
+                  required
+                  label="Cluster Name:"
+                  variant="filled"
+                  onChange={handleChange}
+                  value={formData.clusterName}
+                />
+              </Stack>
+              <Stack spacing={2} direction="column" sx={{ marginBottom: 4 }}>
+                <TextField
+                  id="uri-input"
+                  name="serverURI"
+                  required
+                  label="Kafka Server URI:"
+                  variant="filled"
+                  onChange={handleChange}
+                  value={formData.serverURI}
+                />
+              </Stack>
+              <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+                <TextField
+                  name="apiKey"
+                  required
+                  id="api-key-input"
+                  label="API Key:"
+                  variant="filled"
+                  onChange={handleChange}
+                  value={formData.apiKey}
+                />
+                <TextField
+                  name="apiSecret"
+                  required
+                  id="api-secret-input"
+                  label="API Secret:"
+                  type="password"
+                  variant="filled"
+                  onChange={handleChange}
+                  value={formData.apiSecret}
+                />
+              </Stack>
               <button type="submit">Submit</button>
             </form>
           </DialogContentText>
@@ -133,4 +156,6 @@ export default function MaxWidthDialog() {
       </Dialog>
     </React.Fragment>
   );
-}
+};
+
+export default ConnectionDialogBox;

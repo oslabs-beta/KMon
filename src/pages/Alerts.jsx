@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Alerts = () => {
-
   return (
     <div>
       <h1>Alerts</h1>
