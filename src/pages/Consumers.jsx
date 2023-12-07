@@ -5,7 +5,7 @@ import ConsumerContainer from '../GraphContainers/ConsumerContainer.jsx';
 const Consumers = () => {
   const containerStyle = {
     marginLeft: '240px',
-    marginTop: '30px'
+    marginTop: '30px',
   };
 
   return (

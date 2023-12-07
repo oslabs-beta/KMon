@@ -4,7 +4,7 @@ import BrokerContainer from '../GraphContainers/BrokerContainer.jsx';
 const Brokers = () => {
   const containerStyle = {
     marginLeft: '240px',
-    marginTop: '30px'
+    marginTop: '30px',
   };
 
   return (

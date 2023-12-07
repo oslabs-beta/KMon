@@ -4,7 +4,7 @@ import ProducerContainer from '../GraphContainers/ProducerContainer.jsx';
 const Producers = () => {
   const containerStyle = {
     marginLeft: '240px',
-    marginTop: '30px'
+    marginTop: '30px',
   };
 
   return (
