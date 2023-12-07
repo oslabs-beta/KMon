@@ -1,7 +1,6 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
-import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -15,6 +14,7 @@ function Header() {
     const StyledBox = styled('div')({
         display: 'flex',
         flexDirection: 'row',
+        
       });
 
       const StyledAppBar = styled(AppBar)({
@@ -35,7 +35,6 @@ function Header() {
 
     return (
     <StyledBox>
-        <CssBaseline />
         <StyledAppBar position="fixed" >
             <StyledToolbar >
             <Typography variant="h6" noWrap component="div">
