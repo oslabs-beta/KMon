@@ -1,9 +1,9 @@
 import React from 'react';
-import { Container } from '@mui/material'
+import { Container } from '@mui/material';
 const Overview = () => {
   const containerStyle = {
     marginLeft: '240px',
-    marginTop: '30px'
+    marginTop: '30px',
   };
 
   return (

@@ -39,7 +39,7 @@ function Sidebar() {
       <StyledDrawer variant="permanent" anchor ="left">
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Overview', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
+            {['Overview', 'Connections', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
               <StyledListItem key={text} component={Link} to={"/" + text} disablePadding>
                 <ListItemButton>
                   <ListItemText primary={text} />
