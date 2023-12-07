@@ -8,9 +8,26 @@ import Producers from "./pages/Producers.jsx";
 import Consumers from "./pages/Consumers.jsx";
 import Connections from './pages/Connections.jsx';
 import Overview from "./pages/Overview.jsx";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { deepPurple } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+      primary: {
+        main: deepPurple[800],
+      },
+    },
+  typography: {
+      fontFamily: 'Helvetica Neue',
+    },
+    Button: {
+      borderRadius: '8px'
+  }
+})
 
 function App() {
   return (
+    <ThemeProvider theme={theme}>
     <HashRouter>
       <Header />
       <Sidebar />
@@ -23,6 +40,7 @@ function App() {
         <Route path="/Consumers" element={<Consumers />} />
       </Routes>
     </HashRouter>
+    </ThemeProvider>
   );
 }
 

@@ -17,6 +17,7 @@ function Header() {
     const StyledBox = styled('div')({
         display: 'flex',
         flexDirection: 'row',
+        
       });
 
       const StyledAppBar = styled(AppBar)({
@@ -37,7 +38,6 @@ function Header() {
 
     return (
     <StyledBox>
-        <CssBaseline />
         <StyledAppBar position="fixed" >
             <StyledToolbar >
             <Typography variant="h6" noWrap component="div">
