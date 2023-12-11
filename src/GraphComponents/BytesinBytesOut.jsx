@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-function BytesInBytesOut() {
+function BytesInBytesOut({ active }) {
   return (
     <div>
       <iframe
@@ -8,6 +8,7 @@ function BytesInBytesOut() {
         width='450'
         height='200'
         frameborder='0'
+        // style={{pointerEvents: 'none'}}
       ></iframe>
     </div>
   );
