@@ -1,5 +1,5 @@
 import * as React from 'react';
-// import { appContext } from './App';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -13,13 +13,14 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
+const apiUrl =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.kmon.com'
+    : 'http://localhost:3010';
+
 const ConnectionDialogBox = () => {
-  // unpack state
-  // const {
-  //   state: { connectionState, appState }, actions: { setConnectionState, setAppState },
-  // } = useContext(appContext);
-  //   const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = React.useState({
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
     clusterName: '',
     serverURI: '',
     apiKey: '',
@@ -35,11 +36,11 @@ const ConnectionDialogBox = () => {
   };
 
   // handle submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (event) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/createConnection', {
+      const response = await fetch(`{apiUrl}/api/createConnection`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,14 +55,11 @@ const ConnectionDialogBox = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // setAppState((prevState) => {
-        //   return {...prevState, kafkaTopics: data, sidebarTab: true};
-        // })
       } else {
         console.log('Failed to save credentials');
       }
     } catch (error) {
-      console.log('Error in CredentialForm: ', error);
+      console.log('Error in Credential Form: ', error);
     } finally {
       setSubmitting(false);
       setFormData({
@@ -73,7 +71,7 @@ const ConnectionDialogBox = () => {
     }
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);

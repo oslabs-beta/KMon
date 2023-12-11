@@ -15,8 +15,8 @@ const drawerWidth = 240;
 function Sidebar() {
   const linkStyles = {
     textDecoration: 'none',
-    color: 'black'
-  }
+    color: 'black',
+  };
 
   const StyledDrawer = styled(Drawer)({
     width: drawerWidth,
@@ -25,22 +25,35 @@ function Sidebar() {
       width: drawerWidth,
       boxSizing: 'border-box',
       marginTop: '70px',
-      }
-    });
+    },
+  });
 
-    const StyledListItem = styled(ListItem)({
-      textDecoration: 'none',
-      color: 'black',
-    });
+  const StyledListItem = styled(ListItem)({
+    textDecoration: 'none',
+    color: 'black',
+  });
 
   return (
-    <Box sx={{ display: 'flex' , marginRight: '0px'}}>
+    <Box sx={{ display: 'flex', marginRight: '0px' }}>
       <CssBaseline />
-      <StyledDrawer variant="permanent" anchor ="left">
+      <StyledDrawer variant="permanent" anchor="left">
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Overview', 'Connections', 'Brokers', 'Producers', 'Consumers'].map((text, index) => (
-              <StyledListItem key={text} component={Link} to={"/" + text} disablePadding>
+            {[
+              'Overview',
+              'LogIn',
+              'SignUp',
+              'Connections',
+              'Brokers',
+              'Producers',
+              'Consumers',
+            ].map((text, index) => (
+              <StyledListItem
+                key={text}
+                component={Link}
+                to={'/' + text}
+                disablePadding
+              >
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>
@@ -59,10 +72,9 @@ function Sidebar() {
           </List>
         </Box>
       </StyledDrawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      </Box>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
     </Box>
-  )
-};
+  );
+}
 
 export default Sidebar;
