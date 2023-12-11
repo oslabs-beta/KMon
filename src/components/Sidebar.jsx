@@ -24,7 +24,7 @@ function Sidebar() {
     '& .MuiDrawer-paper': {
       width: drawerWidth,
       boxSizing: 'border-box',
-      marginTop: '70px',
+      marginTop: '75px',
     },
   });
 
@@ -63,11 +63,11 @@ function Sidebar() {
           <Divider />
           <List>
             {['Alerts'].map((text, index) => (
-              <ListItem key={text} disablePadding>
+              <StyledListItem key={text} component={Link} to={"/" + text} disablePadding>
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>
-              </ListItem>
+              </StyledListItem>
             ))}
           </List>
         </Box>

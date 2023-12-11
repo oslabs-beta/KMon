@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
+import validator from 'validator';
 import {
   Avatar,
   Button,
@@ -11,7 +12,6 @@ import {
   Typography,
   Container,
 } from '@mui/material';
-
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -35,11 +35,25 @@ function SignUp() {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [validateErrorMessage, setValidateErrorMessage] = useState('');
+  const [passMatch, setPassMatch] = useState(true);
+
+  useEffect(() => {
+    confirmPasswordMatch();
+  }, [formData]);
+
+  const confirmPasswordMatch = () => {
+    formData.password === formData.confirmPassword
+      ? setPassMatch(true)
+      : setPassMatch(false);
+  };
+
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
+    validatePassword();
 
     try {
       const response = await fetch(`${apiUrl}/auth/signup`, {
@@ -62,13 +76,14 @@ function SignUp() {
       console.log('Error in LogIn Form: ', error);
     } finally {
       setSubmitting(false);
-      setFormData({
+      setFormData((prevData) => ({
+        ...prevData,
         firstName: '',
         lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-      });
+      }));
     }
   };
 
@@ -78,7 +93,23 @@ function SignUp() {
       ...prevData,
       [name]: value,
     }));
+    if (name === 'password') {
+      validatePassword(value);
+      confirmPasswordMatch();
+    } else if (name === 'confirmPassword') {
+      confirmPasswordMatch();
+    }
   };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      setValidateErrorMessage('Password cannot be empty');
+    } else if (validator.isStrongPassword(value, { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+      setValidateErrorMessage('Is Strong Password');
+    } else {
+      setValidateErrorMessage('Create a strong password with a mix of letters, numbers, and symbols');
+    }
+  };  
 
   const defaultTheme = createTheme();
 
@@ -155,20 +186,36 @@ function SignUp() {
                   onChange={handleChange}
                   autoComplete="new-password"
                 />
+                  <Typography
+                      variant="body2"
+                  >
+                      {validateErrorMessage}
+                  </Typography>
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  id="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  autoComplete="new-password"
-                />
-              </Grid>
+              <TextField
+                required
+                fullWidth
+                name="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                id="confirmPassword"
+                value={formData.confirmPassword}
+                className={`form-control ${passMatch ? '' : 'input-error-border'}`}
+                error={!passMatch}
+                onChange={handleChange}
+                autoComplete="new-password"
+              />
+              <Typography variant="body2">
+                {formData.confirmPassword !== '' && (
+                  <>
+                    <div className={`input-error ${passMatch ? 'success-message' : 'error-message'}`}>
+                      {passMatch ? 'Passwords match.' : 'Those passwords didn’t match. Try again.'}
+                    </div>
+                  </>
+                )}
+              </Typography>
+            </Grid>
             </Grid>
             <Button
               type="submit"

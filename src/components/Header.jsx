@@ -14,10 +14,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 
 function Header() {
-  const StyledBox = styled('div')({
-    display: 'flex',
-    flexDirection: 'row',
-  });
+
+    const StyledBox = styled('div')({
+        display: 'flex',
+        flexDirection: 'row',
+        
+      });
 
   const StyledAppBar = styled(AppBar)({
     zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -35,15 +37,14 @@ function Header() {
 
   return (
     <StyledBox>
-      <CssBaseline />
-      <StyledAppBar position="fixed">
-        <StyledToolbar>
-          <Typography variant="h6" noWrap component="div">
-            KMon
-          </Typography>
-          <StyledNestedBox>
-            <Stack direction="row" spacing={0}>
-              {/* <IconButton aria-label="settings">
+        <StyledAppBar position="fixed" >
+            <StyledToolbar >
+            <Typography variant="h6" noWrap component="div">
+                KMon
+            </Typography>
+                <StyledNestedBox >
+                <Stack direction="row" spacing={0}>
+                    {/* <IconButton aria-label="settings">
                         <SettingsIcon />
                     </IconButton>
                     <IconButton aria-label="person">

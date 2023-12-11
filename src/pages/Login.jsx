@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 
 import {
@@ -74,8 +74,8 @@ const LogIn = () => {
   // handle change for form input
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
@@ -103,17 +103,27 @@ const LogIn = () => {
         }),
       });
       if (response.ok) {
-        const data = await response.json();
-        navigate('/dashboard');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('Login successful. Navigating to /overview...');
+          navigate('/overview');
+        } else {
+          // The response does not contain valid JSON
+          console.log('Unexpected response format. Status:', response.status);
+        }
+      } else {
+        console.log('Login failed. Status:', response.status);
       }
     } catch (error) {
       console.log('Error in LogIn Form: ', error);
     } finally {
       setIsSubmitting(false);
-      setFormData({
+      setFormData((prevData) => ({
+        ...prevData,
         email: '',
         password: '',
-      });
+      }));
     }
   };
 
