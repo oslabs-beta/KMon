@@ -13,13 +13,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 
-function Header() {
+function Header(props) {
+  const { onLogout } = props;
 
-    const StyledBox = styled('div')({
-        display: 'flex',
-        flexDirection: 'row',
-        
-      });
+  const StyledBox = styled('div')({
+      display: 'flex',
+      flexDirection: 'row',
+      
+    });
 
   const StyledAppBar = styled(AppBar)({
     zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -50,7 +51,7 @@ function Header() {
                     <IconButton aria-label="person">
                         <PersonIcon />
                     </IconButton> */}
-              <AccountMenu />
+              <AccountMenu onLogout={onLogout} />
             </Stack>
           </StyledNestedBox>
         </StyledToolbar>

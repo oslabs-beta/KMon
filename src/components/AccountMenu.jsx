@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -18,39 +19,47 @@ const apiUrl =
     : 'http://localhost:3010';
 
 const AccountMenu = (props) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const { onLogout } = props;
+
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const open = Boolean(menuAnchorEl);
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    setMenuAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setMenuAnchorEl(null);
   };
-
-  const { logout } = props;
+  
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleLoggingOut = async () => {
     try {
       const response = await fetch(`${apiUrl}/auth/logout`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({}),
       });
-
       if (response.ok) {
-        logout();
-        navigate('/login');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('Logout successful. Navigating to /Login...');
+          onLogout();
+          navigate('/Login');
+        } else {
+          console.log('Unexpected response format. Status:', response.status);
+        }
       } else {
         console.error('Logout failed:', response.statusText);
       }
     } catch (error) {
       console.error('Error in Logging Out', error);
     }
-  };
+  };  
 
   return (
     <React.Fragment>
@@ -69,7 +78,7 @@ const AccountMenu = (props) => {
         </Tooltip>
       </Box>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={menuAnchorEl}
         id="account-menu"
         open={open}
         onClose={handleClose}
@@ -77,14 +86,14 @@ const AccountMenu = (props) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleLogout}>
+        <MenuItem>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
           Settings
         </MenuItem>
 
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={handleLoggingOut}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

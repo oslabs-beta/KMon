@@ -20,12 +20,19 @@ const apiUrl =
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
 
-function SignUp() {
+function SignUp(props) {
   const containerStyle = {
     marginLeft: '240px',
     marginTop: '30px',
   };
 
+  const { onLogin } = props;
+
+  const [isError, setIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [validateErrorMessage, setValidateErrorMessage] = useState('');
+  const [passMatch, setPassMatch] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -33,10 +40,6 @@ function SignUp() {
     password: '',
     confirmPassword: '',
   });
-
-  const [submitting, setSubmitting] = useState(false);
-  const [validateErrorMessage, setValidateErrorMessage] = useState('');
-  const [passMatch, setPassMatch] = useState(true);
 
   useEffect(() => {
     confirmPasswordMatch();
@@ -52,9 +55,24 @@ function SignUp() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setSubmitting(true);
+    setIsSubmitting(true);
+    
+    if (!validator.isEmail(formData.email)) {
+      setIsError(true);
+      setEmailErrorMessage('Please enter a valid email address');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      setIsError(true);
+      setValidateErrorMessage('Password must be at least 6 characters long');
+      setIsSubmitting(false);
+      return;
+    }
+    
     validatePassword();
-
+    
     try {
       const response = await fetch(`${apiUrl}/auth/signup`, {
         method: 'POST',
@@ -69,13 +87,24 @@ function SignUp() {
         }),
       });
       if (response.ok) {
-        const data = await response.json();
-        navigate('/overview');
-      }
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('Signup successful. Navigating to /Overview...');
+          onLogin();
+          navigate('/Overview');
+      } else {
+        // The response does not contain valid JSON
+        console.log('Unexpected response format. Status:', response.status);
+      } 
+    } else {
+      setIsError(true);
+      console.log('Sign up failed. Status:', response.status);
+    }
     } catch (error) {
-      console.log('Error in LogIn Form: ', error);
+      console.log('Error in Signup Form: ', error);
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
       setFormData((prevData) => ({
         ...prevData,
         firstName: '',
@@ -104,13 +133,15 @@ function SignUp() {
   const validatePassword = (value) => {
     if (!value) {
       setValidateErrorMessage('Password cannot be empty');
-    } else if (validator.isStrongPassword(value, { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+    } else if (validator.isStrongPassword(value, { minLength: 6, minNumbers: 1, minSymbols: 1 })) {
       setValidateErrorMessage('Is Strong Password');
+    } else if (value.length < 6) {
+      setValidateErrorMessage('Password must be at least 6 characters long');
     } else {
       setValidateErrorMessage('Create a strong password with a mix of letters, numbers, and symbols');
     }
-  };  
-
+  };
+  
   const defaultTheme = createTheme();
 
   return (
@@ -173,6 +204,11 @@ function SignUp() {
                   onChange={handleChange}
                   autoComplete="email"
                 />
+                  <Typography
+                      variant="body2"
+                  >
+                      {emailErrorMessage}
+                  </Typography>
               </Grid>
               <Grid item xs={12}>
                 <TextField

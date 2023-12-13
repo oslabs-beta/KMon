@@ -1,5 +1,5 @@
-import React from 'react';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import React, { useState } from 'react';
+import { HashRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import Alerts from './pages/Alerts.jsx';
@@ -28,20 +28,41 @@ const theme = createTheme({
 });
 
 function App() {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <HashRouter>
-        <Header />
-        <Sidebar />
+        {isLoggedIn && (
+          <>
+            <Header onLogout={handleLogout} />
+            <Sidebar />
+          </>
+        )}
         <Routes>
-          <Route path="*" element={<Overview />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Signup" element={<Signup />} />
-          <Route path="/Connections" element={<Connections />} />
-          <Route path="/Alerts" element={<Alerts />} />
-          <Route path="/Brokers" element={<Brokers />} />
-          <Route path="/Producers" element={<Producers />} />
-          <Route path="/Consumers" element={<Consumers />} />
+          <Route path="/Login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
+          {isLoggedIn ? (
+            <>
+              <Route path="/Connections" element={<Connections />} />
+              <Route path="/Alerts" element={<Alerts />} />
+              <Route path="/Brokers" element={<Brokers />} />
+              <Route path="/Producers" element={<Producers />} />
+              <Route path="/Consumers" element={<Consumers />} />
+              <Route path="/Overview" element={<Overview />} />
+              <Route path="*" element={<Navigate to="/Overview" />} />
+            </>
+          ) : (
+            <Route path="*" element={<Navigate to="/Login" />} />
+          )}
         </Routes>
       </HashRouter>
     </ThemeProvider>

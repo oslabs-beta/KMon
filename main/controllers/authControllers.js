@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const authControllers = {};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 authControllers.createUser = async (req, res, next) => {
   try {
@@ -41,9 +42,9 @@ authControllers.createUser = async (req, res, next) => {
     const user = result.rows[0];
     console.log('User successfully registered with ID:', user.user_id);
     res.locals.user = user;
-    next();
+    return next();
   } catch (err) {
-    next({
+    return next({
       log: 'Error in authControllers.signup',
       status: 500,
       message: { err: 'Internal server error' },
@@ -75,7 +76,7 @@ authControllers.verifyUser = async (req, res, next) => {
         if (isAuthenticated) {
           res.locals.user = user;
           console.log('User successfully logged in with ID:', user.user_id);
-          next();
+          return next();
         } else {
           res.status(401).json({ error: 'Incorrect password' });
         }
@@ -94,63 +95,44 @@ authControllers.verifyUser = async (req, res, next) => {
 };
 
 authControllers.setSessionCookie = async (req, res, next) => {
-  const { id, first_name, last_name, user_email, authProvider } =
+  const { user_id, first_name, last_name, user_email } =
     res.locals.user;
 
   const sessionToken = jwt.sign(
-    { id, first_name, last_name, user_email, authProvider },
+    { user_id, first_name, last_name, user_email },
     JWT_SECRET
   );
-  res.cookie('KMonST', sessionToken, { httpOnly: true });
 
-  return next();
-};
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: 'strict',
+  };
 
-authControllers.verifySessionCookie = async (req, res, next) => {
-  if (!('KMonST' in req.cookies)) {
-    return next({
-      log: `ERROR - authControllers.verifySessionCookie: Failed to extract session cookie.`,
-      status: 440,
-      message: { err: 'User is not authenticated.' },
-    });
+  if (!isDevelopment) {
+    cookieOptions.secure = true;
   }
 
-  const { KMonST } = req.cookies;
-  jwt.verify(KMonST, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return next({
-        log: `ERROR - authControllers.verifySessionCookie, failed to verify session token: ${err}`,
-        status: 440,
-        message: { err: 'User is not authenticated.' },
-      });
-    }
-    res.locals.user = decoded;
-    return next();
-  });
+  res.cookie('KMonST', sessionToken, cookieOptions);
+
+  return next();
 };
 
 authControllers.clearSessionCookie = async (req, res, next) => {
-  res.clearCookie('KMonST');
-
-  return next();
+  try {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+      res.clearCookie('KMonST');
+      return next();
+    });
+  } catch (err) {
+    return next({
+      log: 'Error in authControllers.logout',
+      status: 500,
+      message: { err: 'Internal server error' },
+    });
+  }
 };
-
-// authControllers.logout = async (req, res, next) => {
-//   try {
-//     if (req.session) {
-//       req.session.destroy((err) => {
-//         if (err) {
-//           next(err);
-//         }
-//       });
-//     }
-//   } catch (err) {
-//     next({
-//       log: 'Error in authControllers.logout',
-//       status: 400,
-//       message: { err: "Logout invalid" },
-//     });
-//   }
-// };
 
 module.exports = authControllers;

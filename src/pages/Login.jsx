@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
-
+import validator from 'validator';
 import {
   Avatar,
   Alert,
@@ -38,7 +38,7 @@ const apiUrl =
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
 
-function Copyright(props) {
+const Copyright = (props) => {
   return (
     <Typography
       variant="body2"
@@ -55,16 +55,18 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-const LogIn = () => {
+const LogIn = (props) => {
   const containerStyle = {
     marginLeft: '240px',
     marginTop: '30px',
   };
 
+  const { onLogin } = props;
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validateErrorMessage, setValidateErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -81,15 +83,38 @@ const LogIn = () => {
   };
 
   const isValidLoginSubmission = (email, password) => {
-    const isValidEmail = email.length > 0;
-    const isValidPassword = password.length >= 8;
-
-    return isValidEmail && isValidPassword;
+    const isValidEmail = validator.isEmail(email);
+    const isValidPassword = password.trim().length > 0;
+  
+    return {
+      isValid: isValidEmail && isValidPassword,
+      isValidEmail,
+      isValidPassword,
+    };
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
+
+    const validation = isValidLoginSubmission(formData.email, formData.password);
+
+    if (!validation.isValid) {
+      let errorMessage = 'Enter ';
+      if (!validation.isValidEmail) {
+        errorMessage += 'an email';
+        if (!validation.isValidPassword) {
+          errorMessage += ' and password';
+        }
+      }
+      else if (!validation.isValidPassword) {
+        errorMessage = 'Enter a password';
+      }
+  
+      setValidateErrorMessage(errorMessage + '.');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${apiUrl}/auth/login`, {
@@ -106,19 +131,23 @@ const LogIn = () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log('Login successful. Navigating to /overview...');
-          navigate('/overview');
+          console.log('Login successful. Navigating to /Overview...');
+          onLogin();
+          navigate('/Overview');
         } else {
           // The response does not contain valid JSON
           console.log('Unexpected response format. Status:', response.status);
         }
       } else {
+        setIsError(true);
         console.log('Login failed. Status:', response.status);
       }
     } catch (error) {
+      setIsError(true);
       console.log('Error in LogIn Form: ', error);
     } finally {
       setIsSubmitting(false);
+      setValidateErrorMessage('')
       setFormData((prevData) => ({
         ...prevData,
         email: '',
@@ -175,7 +204,7 @@ const LogIn = () => {
                 sx={{ mt: 1 }}
               >
                 <TextField
-                  margin="dense"
+                  margin="normal"
                   fullWidth
                   id="email"
                   label="Email Address"
@@ -189,7 +218,7 @@ const LogIn = () => {
                     Password
                   </InputLabel>
                   <OutlinedInput
-                    margin="dense"
+                    margin="normal"
                     fullWidth
                     name="password"
                     label="Password"
@@ -220,8 +249,13 @@ const LogIn = () => {
                 >
                   Log In
                 </Button>
-
+                {validateErrorMessage && (
+                      <Typography variant="body2">
+                        {validateErrorMessage}
+                      </Typography>
+                    )}
                 <Typography component="h1" variant="h5">
+                  
                   ----------------------------------
                 </Typography>
 

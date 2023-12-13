@@ -20,12 +20,11 @@ router.post(
   }
 );
 
-router.get(
+router.post(
   '/logout',
-  authControllers.verifySessionCookie,
   authControllers.clearSessionCookie,
   (req, res) => {
-    res.status(200);
+    res.status(200).json({ message: 'Logout successful' });
   }
 );
 
