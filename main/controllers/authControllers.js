@@ -19,7 +19,7 @@ authControllers.createUser = async (req, res, next) => {
       return next({
         log: 'Error in authControllers.signup',
         status: 400,
-        message: { err: 'User with this email already exists' },
+        message: { error: 'Account with this email already exists.' },
       });
     }
 
@@ -39,15 +39,15 @@ authControllers.createUser = async (req, res, next) => {
 
     const result = await db.query(signupQuery, signupValues);
 
-    const user = result.rows[0];
-    console.log('User successfully registered with ID:', user.user_id);
-    res.locals.user = user;
+    const userID = result.rows[0].user_id;
+    console.log('User successfully registered with ID:', userID);
+    res.locals.user = userID;
     return next();
   } catch (err) {
     return next({
       log: 'Error in authControllers.signup',
       status: 500,
-      message: { err: 'Internal server error' },
+      message: { error: 'Internal server error' },
     });
   }
 };
@@ -62,20 +62,20 @@ authControllers.verifyUser = async (req, res, next) => {
       const userQuery =
         'SELECT user_id, user_password FROM users WHERE user_email = $1';
       const result1 = await db.query(userQuery, values);
-      console.log('this is result1:', result1);
 
       if (result1.rows.length > 0) {
-        const user = result1.rows[0];
-        console.log('this is result1.rows:', user.user_id);
+        const userID = result1.rows[0].user_id;
+        console.log('this is userID from result1.rows:', userID);
+        const userDBPassword = result1.rows[0].user_password;
 
         const isAuthenticated = await bcrypt.compare(
           user_password,
-          user.user_password
+          userDBPassword
         );
 
         if (isAuthenticated) {
-          res.locals.user = user;
-          console.log('User successfully logged in with ID:', user.user_id);
+          res.locals.user = userID;
+          console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
           res.status(401).json({ error: 'Incorrect password' });
@@ -89,32 +89,39 @@ authControllers.verifyUser = async (req, res, next) => {
         .json({ error: 'Please enter email and password details' });
     }
   } catch (err) {
-    console.error('Error in authControllers.login:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    return next({
+      log: 'Error in authControllers.verifyUser',
+      status: 500,
+      message: { error: 'Internal server error' },
+    });
   }
 };
 
 authControllers.setSessionCookie = async (req, res, next) => {
-  const { user_id, first_name, last_name, user_email } =
-    res.locals.user;
+  try {
+    const userID = res.locals.user;
 
-  const sessionToken = jwt.sign(
-    { user_id, first_name, last_name, user_email },
-    JWT_SECRET
-  );
+    const sessionToken = jwt.sign(userID, JWT_SECRET);
 
-  const cookieOptions = {
-    httpOnly: true,
-    sameSite: 'strict',
-  };
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: 'strict',
+    };
 
-  if (!isDevelopment) {
-    cookieOptions.secure = true;
+    if (!isDevelopment) {
+      cookieOptions.secure = true;
+    }
+
+    res.cookie('KMonST', sessionToken, cookieOptions);
+
+    return next();
+  } catch (err) {
+    return next({
+      log: 'Error in authControllers.setSessionCookie',
+      status: 500,
+      message: { error: 'Internal server error' },
+    });
   }
-
-  res.cookie('KMonST', sessionToken, cookieOptions);
-
-  return next();
 };
 
 authControllers.clearSessionCookie = async (req, res, next) => {
@@ -130,7 +137,7 @@ authControllers.clearSessionCookie = async (req, res, next) => {
     return next({
       log: 'Error in authControllers.logout',
       status: 500,
-      message: { err: 'Internal server error' },
+      message: { error: 'Internal server error' },
     });
   }
 };

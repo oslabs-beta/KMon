@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import validator from 'validator';
 import {
+  Alert,
   Avatar,
   Button,
   CssBaseline,
@@ -94,12 +95,18 @@ function SignUp(props) {
           onLogin();
           navigate('/Overview');
       } else {
-        // The response does not contain valid JSON
         console.log('Unexpected response format. Status:', response.status);
       } 
     } else {
+      const data = await response.json();
       setIsError(true);
       console.log('Sign up failed. Status:', response.status);
+      console.log('Server Response:', data);
+      if (data.err) {
+        setEmailErrorMessage(data.err);
+      } else {
+        setEmailErrorMessage('An error occurred during sign-up.');
+      }
     }
     } catch (error) {
       console.log('Error in Signup Form: ', error);
@@ -251,6 +258,11 @@ function SignUp(props) {
                   </>
                 )}
               </Typography>
+              {isError ? (
+                  <Alert severity="error" sx={{ marginTop: '10px' }}>
+                    {emailErrorMessage || 'An error occurred during sign-up. Please try again.'}
+                  </Alert>
+                ) : null}
             </Grid>
             </Grid>
             <Button

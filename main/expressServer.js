@@ -44,13 +44,13 @@ app.use((err, req, res, next) => {
   const defaultErr = {
     log: 'Express error handler caught unknown middleware error',
     status: 500,
-    message: { err: 'An error occured' },
+    message: { error: 'An error occured' },
   };
   const errObj = Object.assign({}, defaultErr, err);
   if (req.accepts('json')) {
     res.status(errObj.status).json(errObj.message);
   } else {
-    res.status(errObj.status).send(errObj.message.err);
+    res.status(errObj.status).send(errObj.message.error);
   }
 });
 

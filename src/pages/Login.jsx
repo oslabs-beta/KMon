@@ -249,21 +249,18 @@ const LogIn = (props) => {
                 >
                   Log In
                 </Button>
-                {validateErrorMessage && (
+                {/* {validateErrorMessage && (
                       <Typography variant="body2">
                         {validateErrorMessage}
                       </Typography>
-                    )}
-                <Typography component="h1" variant="h5">
-                  
-                  ----------------------------------
-                </Typography>
+                    )} */}
 
+                {validateErrorMessage? (
+                  <Alert severity="error" sx={{ marginTop: '10px' }}>
+                    {validateErrorMessage}
+                  </Alert>
+                ) : null}
                 {/* <GoogleSignIn /> */}
-
-                <Typography component="h1" variant="h5">
-                  ----------------------------------
-                </Typography>
 
                 {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>

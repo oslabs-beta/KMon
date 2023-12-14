@@ -40,8 +40,6 @@ function Sidebar() {
         <Box sx={{ overflow: 'auto' }}>
           <List>
             {[
-              'Login',
-              'Signup',
               'Overview',
               'Connections',
               'Brokers',
