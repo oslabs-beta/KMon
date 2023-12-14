@@ -16,6 +16,7 @@ import {
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+// TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
@@ -27,6 +28,9 @@ function SignUp(props) {
     marginTop: '30px',
   };
 
+  const navigate = useNavigate();
+
+  // Destructure the onLogin function from props for managing the login status
   const { onLogin } = props;
 
   const [isError, setIsError] = useState(false);
@@ -42,22 +46,52 @@ function SignUp(props) {
     confirmPassword: '',
   });
 
-  useEffect(() => {
-    confirmPasswordMatch();
-  }, [formData]);
+  // Handle change for form input
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    if (name === 'password') {
+      validatePassword(value);
+      confirmPasswordMatch();
+    } else if (name === 'confirmPassword') {
+      confirmPasswordMatch();
+    }
+  };
 
+  // Check to see if the Password and Confirm Password fields match
   const confirmPasswordMatch = () => {
     formData.password === formData.confirmPassword
       ? setPassMatch(true)
       : setPassMatch(false);
   };
 
-  const navigate = useNavigate();
+  // Whenever formData changes, re-execute the confirmPasswordMatch function
+  useEffect(() => {
+    confirmPasswordMatch();
+  }, [formData]);
 
+  // For validating password when signing up and setting the error message
+  const validatePassword = (value) => {
+    if (!value) {
+      setValidateErrorMessage('Password cannot be empty');
+    } else if (validator.isStrongPassword(value, { minLength: 6, minNumbers: 1, minSymbols: 1 })) {
+      setValidateErrorMessage('Is Strong Password');
+    } else if (value.length < 6) {
+      setValidateErrorMessage('Password must be at least 6 characters long');
+    } else {
+      setValidateErrorMessage('Create a strong password with a mix of letters, numbers, and symbols');
+    }
+  };
+
+  // Ensure valid submission and signup using POST API call
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
     
+    // If invalid email, set isError and the email error message
     if (!validator.isEmail(formData.email)) {
       setIsError(true);
       setEmailErrorMessage('Please enter a valid email address');
@@ -65,6 +99,7 @@ function SignUp(props) {
       return;
     }
     
+    // If invalid password, set isError and the validate error message
     if (formData.password.length < 6) {
       setIsError(true);
       setValidateErrorMessage('Password must be at least 6 characters long');
@@ -72,6 +107,7 @@ function SignUp(props) {
       return;
     }
     
+    // Validate password and if error, set the error message 
     validatePassword();
     
     try {
@@ -91,23 +127,21 @@ function SignUp(props) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log('Signup successful. Navigating to /Overview...');
+          // console.log('Signup successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');
+        }
       } else {
-        console.log('Unexpected response format. Status:', response.status);
-      } 
-    } else {
-      const data = await response.json();
-      setIsError(true);
-      console.log('Sign up failed. Status:', response.status);
-      console.log('Server Response:', data);
-      if (data.err) {
-        setEmailErrorMessage(data.err);
-      } else {
-        setEmailErrorMessage('An error occurred during sign-up.');
+        const data = await response.json();
+        setIsError(true);
+        // console.log('Sign up failed. Status:', response.status);
+        // console.log('Server Response:', data);
+        if (data.err) {
+          setEmailErrorMessage(data.err);
+        } else {
+          setEmailErrorMessage('An error occurred during sign-up.');
+        }
       }
-    }
     } catch (error) {
       console.log('Error in Signup Form: ', error);
     } finally {
@@ -120,32 +154,6 @@ function SignUp(props) {
         password: '',
         confirmPassword: '',
       }));
-    }
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-    if (name === 'password') {
-      validatePassword(value);
-      confirmPasswordMatch();
-    } else if (name === 'confirmPassword') {
-      confirmPasswordMatch();
-    }
-  };
-
-  const validatePassword = (value) => {
-    if (!value) {
-      setValidateErrorMessage('Password cannot be empty');
-    } else if (validator.isStrongPassword(value, { minLength: 6, minNumbers: 1, minSymbols: 1 })) {
-      setValidateErrorMessage('Is Strong Password');
-    } else if (value.length < 6) {
-      setValidateErrorMessage('Password must be at least 6 characters long');
-    } else {
-      setValidateErrorMessage('Create a strong password with a mix of letters, numbers, and symbols');
     }
   };
   
@@ -250,6 +258,7 @@ function SignUp(props) {
                 autoComplete="new-password"
               />
               <Typography variant="body2">
+                {/* If confirm password field is not empty, then provide feedback on whether passwords match or not */}
                 {formData.confirmPassword !== '' && (
                   <>
                     <div className={`input-error ${passMatch ? 'success-message' : 'error-message'}`}>
@@ -258,6 +267,7 @@ function SignUp(props) {
                   </>
                 )}
               </Typography>
+              {/* Conditional rendering of invalid signup error message */}
               {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
                     {emailErrorMessage || 'An error occurred during sign-up. Please try again.'}

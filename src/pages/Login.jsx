@@ -33,25 +33,11 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import loginImage from '../../assets/splash-art-gradient.jpeg';
 
+// TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
-
-const Copyright = (props) => {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit">KMon</Link> {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const defaultTheme = createTheme();
 
@@ -61,7 +47,9 @@ const LogIn = (props) => {
     marginTop: '30px',
   };
 
+  // Destructure the onLogin function from props for managing the login status
   const { onLogin } = props;
+  
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
@@ -73,7 +61,7 @@ const LogIn = (props) => {
     password: '',
   });
 
-  // handle change for form input
+  // Handle change for form input
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -82,6 +70,7 @@ const LogIn = (props) => {
     }));
   };
 
+  // Email and password validation for login submission
   const isValidLoginSubmission = (email, password) => {
     const isValidEmail = validator.isEmail(email);
     const isValidPassword = password.trim().length > 0;
@@ -93,12 +82,14 @@ const LogIn = (props) => {
     };
   };
 
+  // Ensure valid submission and login using POST API call
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
 
     const validation = isValidLoginSubmission(formData.email, formData.password);
 
+    // Customize error message depending on output of isValidLoginSubmission
     if (!validation.isValid) {
       let errorMessage = 'Enter ';
       if (!validation.isValidEmail) {
@@ -131,12 +122,9 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log('Login successful. Navigating to /Overview...');
+          // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');
-        } else {
-          // The response does not contain valid JSON
-          console.log('Unexpected response format. Status:', response.status);
         }
       } else {
         setIsError(true);
@@ -204,7 +192,7 @@ const LogIn = (props) => {
                 sx={{ mt: 1 }}
               >
                 <TextField
-                  margin="normal"
+                  margin="dense"
                   fullWidth
                   id="email"
                   label="Email Address"
@@ -218,7 +206,7 @@ const LogIn = (props) => {
                     Password
                   </InputLabel>
                   <OutlinedInput
-                    margin="normal"
+                    margin="dense"
                     fullWidth
                     name="password"
                     label="Password"
@@ -249,19 +237,17 @@ const LogIn = (props) => {
                 >
                   Log In
                 </Button>
-                {/* {validateErrorMessage && (
-                      <Typography variant="body2">
-                        {validateErrorMessage}
-                      </Typography>
-                    )} */}
 
+                {/* Conditional rendering of email and password validation error message */}
                 {validateErrorMessage? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
                     {validateErrorMessage}
                   </Alert>
                 ) : null}
+                
                 {/* <GoogleSignIn /> */}
 
+                {/* Conditional rendering of invalid login credentials error message */}
                 {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
                     Email or password is incorrect
@@ -282,7 +268,16 @@ const LogIn = (props) => {
                 </Grid>
               </Box>
             </Box>
-            <Copyright sx={{ mt: 8, mb: 4 }} />
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              align="center"
+              sx={{ mt: 8, mb: 4 }}
+            >
+              {'Copyright © '}
+              <Link color="inherit">KMon</Link> {new Date().getFullYear()}
+              {'.'}
+            </Typography>
           </Grid>
         </Grid>
       </Container>

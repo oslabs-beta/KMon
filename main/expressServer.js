@@ -8,17 +8,19 @@ const crypto = require('crypto');
 
 // Create express server
 const app = express();
+
+// Middleware before the session middleware
 app.use(cookieParser());
 app.use(cors());
-
-const secret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// TO DO: Update for production env / Generate a secret for the session
+const secret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
+
 // Inject the pool into the request object for easy access in routes
 app.use((req, res, next) => {
-  console.log('Cookies:', req.cookies);
+  // console.log('Cookies:', req.cookies);
   req.pool = pool;
   next();
 });

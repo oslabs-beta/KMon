@@ -1,13 +1,15 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
+import {
+  Box,
+  Drawer,
+  CssBaseline,
+  List,
+  Divider,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
 import { styled } from '@mui/system';
 
 const drawerWidth = 240;
@@ -61,7 +63,12 @@ function Sidebar() {
           <Divider />
           <List>
             {['Alerts'].map((text, index) => (
-              <StyledListItem key={text} component={Link} to={"/" + text} disablePadding>
+              <StyledListItem
+                key={text}
+                component={Link}
+                to={'/' + text}
+                disablePadding
+              >
                 <ListItemButton>
                   <ListItemText primary={text} />
                 </ListItemButton>

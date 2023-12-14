@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 // require('dotenv').config();
 
-// For saving the database URI in the env file instead
+// For saving the database URI in the env file instead:
 // const pool = new Pool({ connectionString: process.env.DB_URI });
 
 const pool = new Pool({

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
+// TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
@@ -26,7 +27,8 @@ const ConnectionDialogBox = () => {
     apiKey: '',
     apiSecret: '',
   });
-  // handle change for form input
+  
+  // Handle change for form input
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
@@ -35,9 +37,8 @@ const ConnectionDialogBox = () => {
     }));
   };
 
-  // handle submit
   const handleSubmit = async (event) => {
-    e.preventDefault();
+    event.preventDefault();
 
     try {
       const response = await fetch(`{apiUrl}/api/createConnection`, {

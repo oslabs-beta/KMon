@@ -13,6 +13,7 @@ import {
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 
+// TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
@@ -34,6 +35,7 @@ const AccountMenu = (props) => {
   
   const navigate = useNavigate();
 
+  // Logout using POST API call
   const handleLoggingOut = async () => {
     try {
       const response = await fetch(`${apiUrl}/auth/logout`, {
@@ -47,11 +49,9 @@ const AccountMenu = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log('Logout successful. Navigating to /Login...');
+          // console.log('Logout successful. Navigating to /Login...');
           onLogout();
           navigate('/Login');
-        } else {
-          console.log('Unexpected response format. Status:', response.status);
         }
       } else {
         console.error('Logout failed:', response.statusText);

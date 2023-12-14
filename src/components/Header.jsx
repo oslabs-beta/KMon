@@ -45,12 +45,6 @@ function Header(props) {
             </Typography>
                 <StyledNestedBox >
                 <Stack direction="row" spacing={0}>
-                    {/* <IconButton aria-label="settings">
-                        <SettingsIcon />
-                    </IconButton>
-                    <IconButton aria-label="person">
-                        <PersonIcon />
-                    </IconButton> */}
               <AccountMenu onLogout={onLogout} />
             </Stack>
           </StyledNestedBox>
