@@ -1,9 +1,14 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Express server to start when electron app is ready
 const expressServer = require('./expressServer');
 
+// Ensure .env file is included
 const env = process.env.NODE_ENV || 'development';
 
 // If dev environment, enable auto-reloading during dev

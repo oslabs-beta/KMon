@@ -5,6 +5,10 @@ const authRouters = require('./routes/authRouters.js');
 const pool = require('./models/db.js');
 const cors = require('cors');
 const crypto = require('crypto');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Create express server
 const app = express();
@@ -15,10 +19,14 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// TO DO: Update for production env / Generate a secret for the session
-const secret = process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex');
+// Ensure .env file is included / Generate a secret for the session
+const secret = process.env.NODE_ENV === 'production'
+  ? process.env.SESSION_SECRET
+  : crypto.randomBytes(64).toString('hex');
 
-// Inject the pool into the request object for easy access in routes
+/* The connection pool is defined in the ./models/db.js file.
+When using the db.query method to execute SQL queries in controllers,
+it internally calls pool.query, utilizing the connection pool for database interactions. */
 app.use((req, res, next) => {
   // console.log('Cookies:', req.cookies);
   req.pool = pool;

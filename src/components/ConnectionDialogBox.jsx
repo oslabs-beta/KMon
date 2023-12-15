@@ -37,6 +37,7 @@ const ConnectionDialogBox = () => {
     }));
   };
 
+  // TO DO: update api call
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -135,7 +136,7 @@ const ConnectionDialogBox = () => {
                   value={formData.apiSecret}
                 />
               </Stack>
-              <button type="submit">Submit</button>
+              <Button type="submit" variant="contained">Submit</Button>
             </form>
           </DialogContentText>
           <Box

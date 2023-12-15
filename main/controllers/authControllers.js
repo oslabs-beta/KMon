@@ -2,12 +2,16 @@ const Store = require('electron-store');
 const db = require('../models/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 const authControllers = {};
 // Initialize electron-store
 const store = new Store();
 
-// TO DO: For production environment, update the JWT_SECRET
+// Ensure .env file is included
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 const isDevelopment = process.env.NODE_ENV === 'development';
 

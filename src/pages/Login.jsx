@@ -43,8 +43,8 @@ const defaultTheme = createTheme();
 
 const LogIn = (props) => {
   const containerStyle = {
-    marginLeft: '240px',
-    marginTop: '30px',
+    marginLeft: 'auto',
+    marginTop: 'auto',
   };
 
   // Destructure the onLogin function from props for managing the login status

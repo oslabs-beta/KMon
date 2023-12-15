@@ -69,10 +69,10 @@ const theme = createTheme({
 
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
-  // const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
   // For development mode, isLoggedIn is set to true
-  const [isLoggedIn, setLoggedIn] = useState(true);
+  // const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -92,8 +92,6 @@ const App = () => {
           </>
         )}
         <Routes>
-          <Route path="/Login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
           {isLoggedIn ? (
             <>
               <Route path="/Connections" element={<Connections />} />
@@ -105,7 +103,11 @@ const App = () => {
               <Route path="*" element={<Navigate to="/Overview" />} />
             </>
           ) : (
-            <Route path="*" element={<Navigate to="/Login" />} />
+            <>
+              <Route path="/Login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
+              <Route path="*" element={<Navigate to="/Login" />} />
+            </>
           )}
         </Routes>
       </HashRouter>

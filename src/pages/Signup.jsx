@@ -1,3 +1,6 @@
+// SignUp.js
+// This component handles user sign-up functionality, including form validation and API calls.
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
@@ -17,6 +20,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // TO DO: confirm apiUrl for production
+// API URL setup based on the environment
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
@@ -24,19 +28,20 @@ const apiUrl =
 
 function SignUp(props) {
   const containerStyle = {
-    marginLeft: '240px',
-    marginTop: '30px',
+    marginLeft: 'auto',
+    marginTop: 'auto',
   };
 
   const navigate = useNavigate();
 
-  // Destructure the onLogin function from props for managing the login status
+  // Destructuring onLogin from props for login status management
   const { onLogin } = props;
 
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [validateErrorMessage, setValidateErrorMessage] = useState('');
+  const [apiErrorMessage, setApiErrorMessage] = useState('');
   const [passMatch, setPassMatch] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -46,7 +51,7 @@ function SignUp(props) {
     confirmPassword: '',
   });
 
-  // Handle change for form input
+  // Handle change for form input fields
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -61,7 +66,7 @@ function SignUp(props) {
     }
   };
 
-  // Check to see if the Password and Confirm Password fields match
+  // Check if Password and Confirm Password fields match
   const confirmPasswordMatch = () => {
     formData.password === formData.confirmPassword
       ? setPassMatch(true)
@@ -73,23 +78,37 @@ function SignUp(props) {
     confirmPasswordMatch();
   }, [formData]);
 
-  // For validating password when signing up and setting the error message
+  useEffect(() => {
+    setEmailErrorMessage('');
+  }, [formData.email]);
+
+  // Validate password strength and set error message
   const validatePassword = (value) => {
     if (!value) {
       setValidateErrorMessage('Password cannot be empty');
-    } else if (validator.isStrongPassword(value, { minLength: 6, minNumbers: 1, minSymbols: 1 })) {
-      setValidateErrorMessage('Is Strong Password');
-    } else if (value.length < 6) {
-      setValidateErrorMessage('Password must be at least 6 characters long');
+      return false;
+    } else if (
+      validator.isStrongPassword(value, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+      })
+    ) {
+      return true;
     } else {
-      setValidateErrorMessage('Create a strong password with a mix of letters, numbers, and symbols');
+      setValidateErrorMessage(
+        'Password must be at least 8 characters including a lowercase letter, an uppercase letter, and a number.'
+      );
+      return false;
     }
   };
 
-  // Ensure valid submission and signup using POST API call
+  // Ensure valid submission and handle sign-up using POST API call
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
+    setApiErrorMessage('');
     
     // If invalid email, set isError and the email error message
     if (!validator.isEmail(formData.email)) {
@@ -100,15 +119,12 @@ function SignUp(props) {
     }
     
     // If invalid password, set isError and the validate error message
-    if (formData.password.length < 6) {
+    if (!validatePassword(formData.password) || (passMatch === false)) {
       setIsError(true);
-      setValidateErrorMessage('Password must be at least 6 characters long');
+      setValidateErrorMessage('Invalid password');
       setIsSubmitting(false);
       return;
     }
-    
-    // Validate password and if error, set the error message 
-    validatePassword();
     
     try {
       const response = await fetch(`${apiUrl}/auth/signup`, {
@@ -136,15 +152,13 @@ function SignUp(props) {
         setIsError(true);
         // console.log('Sign up failed. Status:', response.status);
         // console.log('Server Response:', data);
-        if (data.err) {
-          setEmailErrorMessage(data.err);
-        } else {
-          setEmailErrorMessage('An error occurred during sign-up.');
-        }
+        setApiErrorMessage('Account with this email already exists.');
       }
     } catch (error) {
+      // Log any errors that occur during the signup process
       console.log('Error in Signup Form: ', error);
     } finally {
+      // Reset form data after submission
       setIsSubmitting(false);
       setFormData((prevData) => ({
         ...prevData,
@@ -157,6 +171,7 @@ function SignUp(props) {
     }
   };
   
+  // MUI Theme setup
   const defaultTheme = createTheme();
 
   return (
@@ -270,7 +285,7 @@ function SignUp(props) {
               {/* Conditional rendering of invalid signup error message */}
               {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
-                    {emailErrorMessage || 'An error occurred during sign-up. Please try again.'}
+                    {apiErrorMessage || emailErrorMessage || validateErrorMessage}
                   </Alert>
                 ) : null}
             </Grid>
