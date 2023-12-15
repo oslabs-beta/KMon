@@ -6,7 +6,7 @@ import { DragHandle, SortableItem } from './SortableItem.jsx';
 
 
 const SortableList = ({ items, onChange, active, setActive }) => {
-  // prop drilled up to Brokers.jsx
+  // prop drilled up
   // const [active, setActive] = useState(null);
 
   const renderItem = (item) => (

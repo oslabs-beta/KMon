@@ -4,11 +4,14 @@ import { Container } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
+import { useTheme } from '@mui/material/styles';
 
 const Alerts = () => {
+  const theme = useTheme();
+
   const containerStyle = {
-    marginLeft: "240px",
-    marginTop: "30px",
+    marginLeft: theme.margins.sideBarMargin,
+    marginTop: theme.margins.headerMargin,
   };
 
   const StyledForm = styled(Box)({
@@ -18,7 +21,6 @@ const Alerts = () => {
   });
 
   const StyledButton = styled(Button)({
-    borderRadius: "8px",
     marginLeft: "10px",
   });
 

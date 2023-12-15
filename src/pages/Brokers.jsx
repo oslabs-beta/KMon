@@ -10,7 +10,13 @@ import MemoryUse from '../GraphComponents/MemoryUse.jsx';
 import ProducerLatency from '../GraphComponents/ProducerLatency.jsx';
 import UnderReplication from '../GraphComponents/UnderReplication.jsx';
 
+import { styled } from '@mui/system';
+import { useTheme } from '@mui/material/styles';
+
+// SortableList implemented here as an example
 const Brokers = () => {
+  const theme = useTheme();
+
   const [active, setActive] = useState(null);
   const [items, setItems] = useState([
     {id: 1, component: <BytesInBytesOut active/>},
@@ -22,8 +28,8 @@ const Brokers = () => {
   ]);
 
   const containerStyle = {
-    marginLeft: '240px',
-    marginTop: '30px',
+    marginLeft: theme.margins.sideBarMargin,
+    marginTop: theme.margins.headerMargin,
     height: '100vh',
     // border: '1px solid blue',
     padding: '20px'
