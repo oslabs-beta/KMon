@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from '@mui/material'
 import ConsumerContainer from '../GraphContainers/ConsumerContainer.jsx';
 import { styled } from '@mui/system';
@@ -14,9 +14,8 @@ const Consumers = () => {
 
   return (
     <Container sx={containerStyle}>
-    <h1>This is the Consumers Page</h1>
-    <ConsumerContainer/>
-  </Container>
+      <h1>This is the Consumers Page</h1>
+    </Container>
   );
 };
 

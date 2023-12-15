@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from '@mui/material'
 import ProducerContainer from '../GraphContainers/ProducerContainer.jsx';
 import { styled } from '@mui/system';
@@ -15,7 +15,6 @@ const Producers = () => {
   return (
     <Container sx={containerStyle}>
     <h1>This is the Producers Page</h1>
-    <ProducerContainer/>
   </Container>
   );
 };
