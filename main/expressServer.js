@@ -24,15 +24,6 @@ const secret = process.env.NODE_ENV === 'production'
   ? process.env.SESSION_SECRET
   : crypto.randomBytes(64).toString('hex');
 
-/* The connection pool is defined in the ./models/db.js file.
-When using the db.query method to execute SQL queries in controllers,
-it internally calls pool.query, utilizing the connection pool for database interactions. */
-app.use((req, res, next) => {
-  // console.log('Cookies:', req.cookies);
-  req.pool = pool;
-  next();
-});
-
 // Create a session
 app.use(
   session({
