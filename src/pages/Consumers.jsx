@@ -1,23 +1,23 @@
-import React from 'react';
-import { Container } from '@mui/material'
-import ConsumerContainer from '../GraphContainers/ConsumerContainer.jsx';
-import { styled } from '@mui/system';
-import { useTheme } from '@mui/material/styles';
+// import React from 'react';
+// import { Container } from '@mui/material'
+// import ConsumerContainer from '../GraphContainers/ConsumerContainer.jsx';
+// import { styled } from '@mui/system';
+// import { useTheme } from '@mui/material/styles';
 
-const Consumers = () => {
-  const theme = useTheme();
+// const Consumers = () => {
+//   const theme = useTheme();
 
-  const containerStyle = {
-    marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
-  };
+//   const containerStyle = {
+//     marginLeft: theme.margins.sideBarMargin,
+//     marginTop: theme.margins.headerMargin,
+//   };
 
-  return (
-    <Container sx={containerStyle}>
-    <h1>This is the Consumers Page</h1>
-    <ConsumerContainer/>
-  </Container>
-  );
-};
+//   return (
+//     <Container sx={containerStyle}>
+//     <h1>This is the Consumers Page</h1>
+//     <ConsumerContainer/>
+//   </Container>
+//   );
+// };
 
-export default Consumers;
+// export default Consumers;

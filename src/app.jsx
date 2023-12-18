@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useState, createContext }  from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
 import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
 import Alerts from "./pages/Alerts.jsx";
 import Brokers from "./pages/Brokers.jsx";
-import Producers from "./pages/Producers.jsx";
-import Consumers from "./pages/Consumers.jsx";
+// import Producers from "./pages/Producers.jsx";
+// import Consumers from "./pages/Consumers.jsx";
 import Connections from "./pages/Connections.jsx";
-import Overview from "./pages/Overview.jsx";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
+//import Overview from "./pages/Overview.jsx";
+
 
 const theme = createTheme({
   palette: {
@@ -62,24 +63,35 @@ const theme = createTheme({
         },
       },
     },
+    
   },
 });
 
+export const AppContext = createContext()
+
 function App() {
+  
+  const [selectedGraphs, setSelectedGraphs] = useState([]);
+
   return (
     <ThemeProvider theme={theme}>
+      <AppContext.Provider value = {{
+        selectedGraphs, 
+        setSelectedGraphs
+        }}>
       <HashRouter>
         <Header />
         <Sidebar />
         <Routes>
-          <Route path="*" element={<Overview />} />
+          {/* <Route path="*" element={<Overview />} /> */}
           <Route path="/Connections" element={<Connections />} />
           <Route path="/Alerts" element={<Alerts />} />
           <Route path="/Brokers" element={<Brokers />} />
-          <Route path="/Producers" element={<Producers />} />
-          <Route path="/Consumers" element={<Consumers />} />
+          {/* <Route path="/Producers" element={<Producers />} /> */}
+          {/* <Route path="/Consumers" element={<Consumers />} /> */}
         </Routes>
       </HashRouter>
+      </AppContext.Provider>
     </ThemeProvider>
   );
 }

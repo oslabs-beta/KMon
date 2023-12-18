@@ -5,11 +5,6 @@ import TextField from "@mui/material/TextField";
 
 function DropDown() {
 
-    function displayGraph () {
-
-
-        }
-
     return (
         <Box>
             <TextField
