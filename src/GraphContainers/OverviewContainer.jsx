@@ -1,13 +1,12 @@
-// import React from "react";
-// import Box from "@mui/material/Box";
+import React from "react";
+import Box from "@mui/material/Box";
 
-// import MemoryUse from "../GraphComponents/MemoryUse.jsx";
-// function ProducerContainer(){
+function OverviewContainer(){
 
-//     return(
-//         <Box>
-//             <MemoryUse/>
-//         </Box>
-//     )
-// }
-// export default ProducerContainer;
+    return(
+        <Box>
+            <h2>This is an Overview Container Page</h2>
+        </Box>
+    )
+}
+export default OverviewContainer;

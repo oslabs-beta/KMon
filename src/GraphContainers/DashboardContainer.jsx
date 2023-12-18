@@ -3,7 +3,7 @@ import Graph from "../GraphComponents/Graph.jsx";
 import Box from "@mui/material/Box";
 import { AppContext } from "../app.jsx";
 
-function BrokerContainer() {
+function DashboardContainer() {
 
   const {selectedGraphs} = useContext(AppContext);
 
@@ -24,4 +24,4 @@ function BrokerContainer() {
     </Box>
   );
 }
-export default BrokerContainer;
+export default DashboardContainer;
