@@ -14,6 +14,7 @@ import Settings from './pages/Settings.jsx';
 import { AppProvider } from '../src/AppContext.js';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
+import { Button } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -71,10 +72,10 @@ const theme = createTheme({
 
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  // const [isLoggedIn, setLoggedIn] = useState(true);
 
   // For development mode, isLoggedIn is set to true
-  // const [isLoggedIn, setLoggedIn] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);
