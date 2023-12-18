@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authControllers = require('../controllers/authControllers');
 
+// Need to refactor routers to send success/error messages from the server, not the middleware
 router.post(
   '/signup',
   authControllers.createUser,
