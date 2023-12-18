@@ -9,6 +9,8 @@ const dotenv = require('dotenv');
 // require in routers
 const authRouters = require('./routes/authRouters.js');
 const apiRouters = require('./routes/apiRouters.js')
+const graphRouters = require('./routes/graphRouters.js')
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -45,6 +47,10 @@ app.use('/auth', authRouters, (req, res) => {
 console.log('expressServer.js - about to hit /api')
 app.use('/api', apiRouters, (req, res) => {
 
+});
+
+app.use('/graph', graphRouters, (req, res) => {
+  
 });
 
 
