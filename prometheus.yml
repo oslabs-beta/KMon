@@ -20,11 +20,11 @@ scrape_configs:
   #   static_configs:
   #     - targets: ['service2:9102']
 
-alerting:
-  alertmanagers:
-  - static_configs:
-      - targets: ['alertmanager:9093']
-
 rule_files:
   # Load Prometheus alerting rules
   - kafka_controller_alerts.yaml
+
+alerting:
+  alertmanagers:
+  - static_configs:
+      - targets: ['localhost:9093']

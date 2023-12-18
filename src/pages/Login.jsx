@@ -148,7 +148,6 @@ const LogIn = (props) => {
       setValidateErrorMessage('')
       setFormData((prevData) => ({
         ...prevData,
-        email: '',
         password: '',
       }));
     }
