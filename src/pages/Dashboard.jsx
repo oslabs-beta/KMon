@@ -21,7 +21,7 @@ const Dashboard = () => {
   };
 
   const { selectedGraphs, setSelectedGraphs } = useContext(AppContext);
-
+  
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
   const allMetrics = {
     "Total Number of Bytes Allocated": 2,
