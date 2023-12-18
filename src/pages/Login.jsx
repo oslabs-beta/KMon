@@ -33,6 +33,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import loginImage from '../../assets/splash-art-gradient.jpeg';
 
+// Import the useAppContext hook
+import { useAppContext } from '.././AppContext.js';
+
 // TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
@@ -49,6 +52,8 @@ const LogIn = (props) => {
 
   // Destructure the onLogin function from props for managing the login status
   const { onLogin } = props;
+  // Use the useAppContext hook to get access to the context
+  const { userInfo, updateUserInfo } = useAppContext();
   
   const navigate = useNavigate();
 
@@ -122,6 +127,7 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
+          updateUserInfo(data.user);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');

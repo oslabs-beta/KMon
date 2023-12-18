@@ -10,6 +10,8 @@ import Connections from './pages/Connections.jsx';
 import Overview from './pages/Overview.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
+import Settings from './pages/Settings.jsx';
+import { AppProvider } from '../src/AppContext.js';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
 
@@ -69,10 +71,10 @@ const theme = createTheme({
 
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  // const [isLoggedIn, setLoggedIn] = useState(false);
 
   // For development mode, isLoggedIn is set to true
-  // const [isLoggedIn, setLoggedIn] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -84,6 +86,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <AppProvider>
       <HashRouter>
         {isLoggedIn && (
           <>
@@ -100,6 +103,7 @@ const App = () => {
               <Route path="/Producers" element={<Producers />} />
               <Route path="/Consumers" element={<Consumers />} />
               <Route path="/Overview" element={<Overview />} />
+              <Route path="/Settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/Overview" />} />
             </>
           ) : (
@@ -111,6 +115,7 @@ const App = () => {
           )}
         </Routes>
       </HashRouter>
+      </AppProvider>
     </ThemeProvider>
   );
 }

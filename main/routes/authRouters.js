@@ -7,7 +7,8 @@ router.post(
   authControllers.createUser,
   authControllers.setSessionCookie,
   (req, res) => {
-    res.status(201).json({ message: 'Signup successful' });
+    const user = res.locals.user;
+    res.status(201).json({ message: 'Signup successful', user });
   }
 );
 
@@ -16,7 +17,8 @@ router.post(
   authControllers.verifyUser,
   authControllers.setSessionCookie,
   (req, res) => {
-    res.status(201).json({ message: 'Login successful' });
+    const user = res.locals.user;
+    res.status(201).json({ message: 'Login successful', user });
   }
 );
 

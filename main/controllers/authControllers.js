@@ -72,12 +72,20 @@ authControllers.verifyUser = async (req, res, next) => {
     // Find the user's info in the db
     if (user_email && user_password) {
       const values = [user_email];
+      // const userQuery =
+      //   'SELECT user_id, user_password FROM users WHERE user_email = $1';
       const userQuery =
-        'SELECT user_id, user_password FROM users WHERE user_email = $1';
+        'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE user_email = $1';
       const result1 = await db.query(userQuery, values);
 
       if (result1.rows.length > 0) {
-        const userID = result1.rows[0].user_id;
+        // const userID = result1.rows[0].user_id;
+        const user = {
+          userID: result1.rows[0].user_id,
+          firstName: result1.rows[0].first_name,
+          lastName: result1.rows[0].last_name,
+          userEmail: result1.rows[0].user_email,
+        };
         // console.log('this is userID from result1.rows:', userID);
         const userDBPassword = result1.rows[0].user_password;
 
@@ -88,7 +96,8 @@ authControllers.verifyUser = async (req, res, next) => {
         );
 
         if (isAuthenticated) {
-          res.locals.user = userID;
+          // res.locals.user = userID;
+          res.locals.user = user;
           // console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
@@ -114,11 +123,12 @@ authControllers.verifyUser = async (req, res, next) => {
 // Set session cookie when login or signup
 authControllers.setSessionCookie = async (req, res, next) => {
   try {
-    const userID = res.locals.user;
+    // const userID = res.locals.user;
+    const user = res.locals.user;
 
     // Use the JWT method sign, which takes the payload and secret as its arguments. The generated token is a string.
     // TO DO: Add options such as expiresIn as needed for production env.
-    const sessionToken = jwt.sign({userID}, JWT_SECRET);
+    const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
 
     // Store the token locally
     store.set('sessionToken', sessionToken);

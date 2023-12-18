@@ -1,0 +1,36 @@
+groups:
+  - name: Kafka Controller Alerts
+    rules:
+      - alert: KafkaControllerHighCpu
+        expr: kafka_controller_kafka_controller_stats_ProcessCpuTimeSec > 0.8
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage in Kafka Controller detected"
+
+      - alert: KafkaControllerHighMemory
+        expr: kafka_controller_kafka_controller_stats_MemUsageBytes > 1e9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in Kafka Controller detected"
+
+      - alert: KafkaControllerOutOfSync
+        expr: kafka_controller_kafka_controller_stats_UnderReplicatedPartitions > 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka Controller out-of-sync detected"
+      # Test rule for sending a random Slack message
+      - alert: TestRandomSlackMessage
+        expr: vector(1)  # Always evaluates to 1, triggering the alert
+        labels:
+          severity: info
+        annotations:
+          summary: "Test Slack Message"
+          description: "This is a test Slack message triggered manually."
+          slack_channel: "#test"
+          receiver: 'slack-notifications'

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import { Container } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
+import { useAppContext } from '../AppContext.js';
 
 const Alerts = () => {
   const theme = useTheme();
@@ -23,6 +24,12 @@ const Alerts = () => {
   const StyledButton = styled(Button)({
     marginLeft: "10px",
   });
+
+  const { userInfo, updateUserInfo } = useAppContext();
+
+  useEffect(() => {
+    console.log(userInfo)
+  })
 
   return (
     <Container sx={containerStyle}>

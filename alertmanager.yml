@@ -1,0 +1,59 @@
+# Adjust the values according to email provider's SMTP settings
+# Critical alerts should be sent to the email-notifier receiver
+# receivers:
+#   - name: 'email-notifier'
+#     email_configs:
+#       - to: 'your-email@example.com'
+#         from: 'alertmanager@example.com'
+#         smarthost: 'smtp.example.com:587'
+#         auth_username: 'your-smtp-username'
+#         auth_password: 'your-smtp-password'
+# route:
+#   group_by: ['alertname']
+#   group_wait: 10s
+#   group_interval: 5m
+#   repeat_interval: 3h
+
+#   receiver: 'email-notifier'
+
+#   routes:
+#   - match:
+#       severity: 'critical'
+#     receiver: 'email-notifier'
+
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - channel: '#test'
+        send_resolved: true
+        username: 'Alertmanager'
+        icon_url: https://avatars3.githubusercontent.com/u/3380462
+        api_url: 'https://hooks.slack.com/services/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'
+        title: |-
+          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+          {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
+            {{" "}}(
+            {{- with .CommonLabels.Remove .GroupLabels.Names }}
+              {{- range $index, $label := .SortedPairs -}}
+                {{ if $index }}, {{ end }}
+                {{- $label.Name }}="{{ $label.Value -}}"
+              {{- end }}
+            {{- end -}}
+            )
+          {{- end }}
+        text: >-
+          {{ range .Alerts -}}
+          *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+
+          *Description:* {{ .Annotations.description }}
+
+          *Details:*
+            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+            {{ end }}
+          {{ end }}

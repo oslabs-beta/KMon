@@ -35,6 +35,10 @@ const AccountMenu = (props) => {
   
   const navigate = useNavigate();
 
+  const handleSettingsClick = () => {
+    navigate('/Settings')
+  }
+
   // Logout using POST API call
   const handleLoggingOut = async () => {
     try {
@@ -86,7 +90,7 @@ const AccountMenu = (props) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem>
+        <MenuItem onClick={handleSettingsClick}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
