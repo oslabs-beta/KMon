@@ -29,7 +29,7 @@ const Alerts = () => {
 
   useEffect(() => {
     console.log(userInfo)
-  })
+  }, [])
 
   return (
     <Container sx={containerStyle}>

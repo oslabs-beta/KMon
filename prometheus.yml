@@ -27,4 +27,4 @@ alerting:
 
 rule_files:
   # Load Prometheus alerting rules
-  - /etc/prometheus/rules/*.yaml
+  - kafka_controller_alerts.yaml

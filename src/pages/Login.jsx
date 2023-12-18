@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import validator from 'validator';
@@ -123,11 +123,14 @@ const LogIn = (props) => {
           user_password: formData.password,
         }),
       });
+
       if (response.ok) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
+          console.log(`This is the info: ${data.user}`);
           updateUserInfo(data.user);
+          console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');
@@ -140,6 +143,7 @@ const LogIn = (props) => {
       setIsError(true);
       console.log('Error in LogIn Form: ', error);
     } finally {
+      console.log(userInfo);
       setIsSubmitting(false);
       setValidateErrorMessage('')
       setFormData((prevData) => ({

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useAppContext } from '../AppContext.js';
 
 const AlertSettings = () => {
   const theme = useTheme();
@@ -77,6 +78,8 @@ const AlertSettings = () => {
   }
 
   useEffect(() => addEmailField(), []); // Only runs once and adds email field when the component mounts
+
+  const { userInfo, updateUserInfo } = useAppContext();
 
   return (
     <Container sx={containerStyle}>

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
+import { useAppContext } from '../AppContext.js';
 
 // TO DO: confirm apiUrl for production
 const apiUrl =
@@ -65,11 +66,13 @@ const AccountMenu = (props) => {
     }
   };  
 
+  const { userInfo, updateUserInfo } = useAppContext();
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Tooltip title="Account settings">
-          <IconButton
+          <IconButton 
             onClick={handleClick}
             size="small"
             sx={{ ml: 2 }}
@@ -77,7 +80,9 @@ const AccountMenu = (props) => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}></Avatar>
+            <Avatar sx={{ width: 32, height: 32 }}>
+                {userInfo.firstName ? userInfo.firstName[0] : ''}
+            </Avatar>
           </IconButton>
         </Tooltip>
       </Box>
