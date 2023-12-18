@@ -24,22 +24,23 @@ scrape_configs:
   #     - targets: ['node_exporter:9100']
 
   # Scrape additional services (modify this section)
+  # Targets are currently hard-coded to Darryl's machine address.
   - job_name: controller1
     static_configs:
       - targets: ['10.0.10.137:8994']
   - job_name: controller2
     static_configs:
-      - targets: ['10.0.11.193:8995']
+      - targets: ['10.0.10.137:8995']
   - job_name: controller3
     static_configs:
-      - targets: ['10.0.11.193:8996']
+      - targets: ['10.0.10.137:8996']
   - job_name: broker1
     static_configs:
-      - targets: ['10.0.11.193:8997']
+      - targets: ['10.0.10.137:8997']
   - job_name: broker2
     static_configs:
-      - targets: ['10.0.11.193:8998']
+      - targets: ['10.0.10.137:8998']
   - job_name: broker3
     static_configs:
-      - targets: ['10.0.11.193:8999']
+      - targets: ['10.0.10.137:8999']
 

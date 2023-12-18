@@ -40,8 +40,8 @@ const ConnectionDialogBox = () => {
   // clear hard-coded formData for production;
   const [formData, setFormData] = useState({
     clusterName: 'Demo',
-    serverURI: '192.168.10.85',
-    ports: ['8997', '8998', '8999'],
+    serverURI: '10.0.10.137',
+    ports: ['8994', '8995', '8996', '8997', '8998', '8999'],
     apiKey: '',
     apiSecret: '',
   });
@@ -52,7 +52,6 @@ const ConnectionDialogBox = () => {
     height: 0,
     message: ''
   })
-
 
   /************** Event Handlers *************/
 
