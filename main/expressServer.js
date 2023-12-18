@@ -1,11 +1,14 @@
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const authRouters = require('./routes/authRouters.js');
 const pool = require('./models/db.js');
 const cors = require('cors');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+
+// require in routers
+const authRouters = require('./routes/authRouters.js');
+const apiRouters = require('./routes/apiRouters.js')
 
 // Load environment variables from .env file
 dotenv.config();
@@ -35,7 +38,16 @@ app.use(
 );
 
 // Use routes
-app.use('/auth', authRouters);
+app.use('/auth', authRouters, (req, res) => {
+
+});
+
+console.log('expressServer.js - about to hit /api')
+app.use('/api', apiRouters, (req, res) => {
+
+});
+
+
 
 // Handle unknown routes
 app.use((req, res) => res.sendStatus(404));
