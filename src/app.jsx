@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createContext } from 'react';
 import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
@@ -87,6 +87,12 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <AppContext.Provider
+        value={{
+          selectedGraphs,
+          setSelectedGraphs,
+        }}
+        >
       <HashRouter>
         {isLoggedIn && (
           <>
@@ -113,6 +119,7 @@ const App = () => {
           )}
         </Routes>
       </HashRouter>
+      </AppContext.Provider>
     </ThemeProvider>
   );
 }
