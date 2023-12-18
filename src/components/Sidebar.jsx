@@ -1,13 +1,15 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
+import {
+  Box,
+  Drawer,
+  CssBaseline,
+  List,
+  Divider,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from '@mui/material';
 import { styled } from '@mui/system';
 import StreamIcon from "@mui/icons-material/Stream";
 import CollectionsIcon from "@mui/icons-material/Collections";
@@ -20,8 +22,8 @@ const drawerWidth = 240;
 function Sidebar() {
   const linkStyles = {
     textDecoration: 'none',
-    color: 'black'
-  }
+    color: 'black',
+  };
 
   const StyledDrawer = styled(Drawer)({
     width: drawerWidth,
@@ -33,10 +35,10 @@ function Sidebar() {
       }
     });
 
-    const StyledListItem = styled(ListItem)({
-      textDecoration: 'none',
-      color: 'black',
-    });
+  const StyledListItem = styled(ListItem)({
+    textDecoration: 'none',
+    color: 'black',
+  });
 
     const iconsPapaer1 = [
       <CategoryIcon />,

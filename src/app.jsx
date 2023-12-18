@@ -1,13 +1,17 @@
-import React, { useState, createContext } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
-import Sidebar from "./components/Sidebar.jsx";
-import Header from "./components/Header.jsx";
-import Alerts from "./pages/Alerts.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Connections from "./pages/Connections.jsx";
-import Overview from "./pages/Overview.jsx";
+import React, { useState } from 'react';
+import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
+import Sidebar from './components/Sidebar.jsx';
+import Header from './components/Header.jsx';
+import Alerts from './pages/Alerts.jsx';
+import Brokers from './pages/Brokers.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import Connections from './pages/Connections.jsx';
+import Overview from './pages/Overview.jsx';
+import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
+import { Button } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -65,28 +69,50 @@ const theme = createTheme({
 
 export const AppContext = createContext();
 
-function App() {
-  const [selectedGraphs, setSelectedGraphs] = useState([]);
+const App = () => {
+  // TO DO: uncomment and set isLoggedIn to false for production setting
+  const [isLoggedIn, setLoggedIn] = useState(true);
+  const [selectedGraphs, setSelectedGraphs] = useState([])
+
+  // For development mode, isLoggedIn is set to true
+  // const [isLoggedIn, setLoggedIn] = useState(true);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+  };
 
   return (
     <ThemeProvider theme={theme}>
-      <AppContext.Provider
-        value={{
-          selectedGraphs,
-          setSelectedGraphs,
-        }}
-      >
-        <HashRouter>
-          <Header />
-          <Sidebar />
-          <Routes>
-            <Route path="*" element={<Overview />} />
-            <Route path="/Connections" element={<Connections />} />
-            <Route path="/Alerts" element={<Alerts />} />
-            <Route path="/Dashboard" element={<Dashboard />} />
-          </Routes>
-        </HashRouter>
-      </AppContext.Provider>
+      <HashRouter>
+        {isLoggedIn && (
+          <>
+            <Header onLogout={handleLogout} />
+            <Sidebar />
+          </>
+        )}
+        <Routes>
+          {isLoggedIn ? (
+            <>
+              <Route path="/Connections" element={<Connections />} />
+              <Route path="/Alerts" element={<Alerts />} />
+              <Route path="/Brokers" element={<Brokers />} />
+              <Route path="/Dashboard" element={<Dashboard />} />
+              <Route path="/Overview" element={<Overview />} />
+              <Route path="*" element={<Navigate to="/Overview" />} />
+            </>
+          ) : (
+            <>
+              <Route path="/Login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
+              <Route path="*" element={<Navigate to="/Login" />} />
+            </>
+          )}
+        </Routes>
+      </HashRouter>
     </ThemeProvider>
   );
 }

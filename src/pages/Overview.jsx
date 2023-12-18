@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from '@mui/material';
 import OverviewContainer from '../GraphContainers/OverviewContainer.jsx';
 import { styled } from '@mui/system';
@@ -16,10 +16,8 @@ const Overview = () => {
   return (
     <Container sx={containerStyle}>
       <h1>This is the Overview Page</h1>
-      <OverviewContainer />
     </Container>
   );
 };
 
 export default Overview;
-

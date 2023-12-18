@@ -25,19 +25,18 @@ services:
       - 3000:3000
     depends_on:
       - prometheus
+  # node_exporter:
+  #   image: prom/node-exporter:latest
+  #   volumes:
+  #     - ./node_exporter:/etc/node_exporter
+  #   ports:
+  #     - 9100:9100
+  #   networks:
+  #     - monitoring
 
-  node_exporter:
-    image: prom/node-exporter:latest
-    volumes:
-      - ./node_exporter:/etc/node_exporter
-    ports:
-      - 9100:9100
-    networks:
-      - monitoring
-
-networks:
-  monitoring:
-    external: true
+  # networks:
+  # monitoring:
+  #   external: true
 
 volumes:
   prometheus_data:
