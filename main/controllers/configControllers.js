@@ -117,6 +117,9 @@ configController.createConnection = async (req, res, next) => {
 
 }
 
+configController.createGrafanaYml = async (req, res, next) => {
 
+
+}
 
 module.exports = configController
