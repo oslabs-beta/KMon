@@ -1,5 +1,6 @@
 import React, { useState, createContext } from 'react';
 import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { AppProvider } from './AppContext';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import Alerts from './pages/Alerts.jsx';
@@ -8,6 +9,7 @@ import Connections from './pages/Connections.jsx';
 import Overview from './pages/Overview.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
+import Settings from './pages/Settings.jsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
 
@@ -69,11 +71,11 @@ export const AppContext = createContext();
 
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
-  const [isLoggedIn, setLoggedIn] = useState(true);
+  // const [isLoggedIn, setLoggedIn] = useState(true);
   const [selectedGraphs, setSelectedGraphs] = useState([])
 
   // For development mode, isLoggedIn is set to true
-  // const [isLoggedIn, setLoggedIn] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -85,12 +87,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppContext.Provider
-        value={{
-          selectedGraphs,
-          setSelectedGraphs,
-        }}
-        >
+      <AppProvider>
       <HashRouter>
         {isLoggedIn && (
           <>
@@ -105,6 +102,7 @@ const App = () => {
               <Route path="/Alerts" element={<Alerts />} />
               <Route path="/Dashboard" element={<Dashboard />} />
               <Route path="/Overview" element={<Overview />} />
+              <Route path="/Settings" element={<Settings />} />
               <Route path="*" element={<Navigate to="/Overview" />} />
             </>
           ) : (
@@ -116,7 +114,7 @@ const App = () => {
           )}
         </Routes>
       </HashRouter>
-      </AppContext.Provider>
+      </AppProvider>
     </ThemeProvider>
   );
 }

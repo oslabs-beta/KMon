@@ -3,15 +3,16 @@ const router = express.Router();
 const configController = require('../controllers/configControllers');
 
 
-router.post('/createConnection', configController.createConnection, (req, res, next) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.createConnection, (req, res, next) => {
   try {
-    res.status(200);
-    return next();
+    res.status(200).send('Connection created!')
   }
   catch {
-    (err) => {
-      console
-    }
+    return next({
+      log: 'Error in apiRouters - could not create connection',
+      status: 500,
+      message: { error: 'Internal server error' },
+    })
   }
 })
 
