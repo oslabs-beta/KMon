@@ -1,20 +1,5 @@
 version: '3.8'
-
 services:
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      # - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml:ro
-      - prometheus_data:/prometheus
-    ports:
-      - 9090:9090
-  
-  # alertmanager:  # Define the Alertmanager service
-  #   image: prom/alertmanager:latest
-  #   ports:
-  #     - 9093:9093
-
   grafana:
     image: grafana/grafana:latest
     volumes:
@@ -25,25 +10,18 @@ services:
     environment:
       GF_SECURITY_ADMIN_PASSWORD: codesmith
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
-      # GF_PATHS_DATA: /var/lib/grafana
       GF_PATHS_CONFIG: /etc/grafana/grafana.ini
     ports:
-      - 3000:3000
+      - '3000:3000'
     depends_on:
       - prometheus
-  # node_exporter:
-  #   image: prom/node-exporter:latest
-  #   volumes:
-  #     - ./node_exporter:/etc/node_exporter
-  #   ports:
-  #     - 9100:9100
-  #   networks:
-  #     - monitoring
-
-  # networks:
-  # monitoring:
-  #   external: true
-
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - '9090:9090'
 volumes:
-  prometheus_data:
-  grafana_data:
+  prometheus_data: null
+  grafana_data: null
