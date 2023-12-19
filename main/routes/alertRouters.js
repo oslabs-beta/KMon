@@ -1,13 +1,10 @@
 const express = require('express');
-const router = express.Router();
-const alertControllers = require('../controllers/alertControllers');
+const alertController = require('../controllers/alertController');
 
-router.post(
-  '/getUserInfo',
-  alertControllers.findUser,
-  (req, res) => {
-    res.status(201);
-  }
-);
+const router = express.Router();
+
+router.post('/alertsInfo', alertController.writeAlertsInfo, (req, res) => {
+    res.status(200);
+})
 
 module.exports = router;

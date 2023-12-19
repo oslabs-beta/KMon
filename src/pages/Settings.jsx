@@ -84,8 +84,8 @@ const AlertSettings = () => {
   return (
     <Container sx={containerStyle}>
       <div style={{ textAlign: 'left' }}>
-        <Typography variant="h5">Email Settings</Typography>
-        <form onSubmit={handleEmailSettingsSubmit}>
+        {/* <Typography variant="h5">Email Settings</Typography> */}
+        {/* <form onSubmit={handleEmailSettingsSubmit}>
           {emailSettings.recipientEmails.map((recipient, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: '0' }}>
               <TextField
@@ -110,20 +110,23 @@ const AlertSettings = () => {
           <Button type="submit" variant="outlined">
             Save Settings
           </Button>
-        </form>
+        </form> */}
 
         <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'left', margin: '30px 0' }}>
           <Typography variant="h5">Alert Preferences</Typography>
           <form>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: '5px 0' }}>
-              {['Email', 'Slack', 'inApp'].map((type) => (
-                <FormControlLabel
-                  key={type}
-                  control={<Checkbox checked={alertPreferences[type]} onChange={() => handleAlertChange(type)} />}
-                  label={`Receive ${type === 'inApp' ? 'In App' : type} Alerts`}
-                />
-              ))}
-            </div>
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'left', margin: '5px 0' }}>
+            <FormControlLabel
+                key="Slack"
+                control={<Checkbox checked={alertPreferences['Slack']} onChange={() => handleAlertChange('Slack')} />}
+                label={`Receive Slack Alerts`}
+            />
+            <FormControlLabel
+                key="InApp"
+                control={<Checkbox checked={alertPreferences['InApp']} onChange={() => handleAlertChange('InApp')} />}
+                label={`Receive In App Alerts`}
+            />
+          </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'left', margin: '5px 0' }}>
               <TextField

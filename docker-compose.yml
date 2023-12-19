@@ -5,9 +5,15 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml:ro
       - prometheus_data:/prometheus
     ports:
       - 9090:9090
+  
+  alertmanager:  # Define the Alertmanager service
+    image: prom/alertmanager:latest
+    ports:
+      - 9093:9093
 
   grafana:
     image: grafana/grafana:latest
