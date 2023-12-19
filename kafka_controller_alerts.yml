@@ -7,7 +7,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "High CPU usage in Kafka Controller detected"
+          summary: "High CPU usage in Kafka Controller"
 
       - alert: KafkaControllerHighMemory
         expr: kafka_controller_kafka_controller_stats_MemUsageBytes > 1e9
@@ -15,7 +15,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "High memory usage in Kafka Controller detected"
+          summary: "High memory usage in Kafka Controller"
 
       - alert: KafkaControllerOutOfSync
         expr: kafka_controller_kafka_controller_stats_UnderReplicatedPartitions > 0
@@ -23,7 +23,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Kafka Controller out-of-sync detected"
+          summary: "Kafka Controller out-of-sync"
       # Test rule for sending a random Slack message
       - alert: TestRandomSlackMessage
         expr: vector(1)  # Always evaluates to 1, triggering the alert

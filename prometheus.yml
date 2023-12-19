@@ -5,7 +5,7 @@ global:
 alerting:
   alertmanagers:
   - static_configs:
-      - targets: ['68.237.54.51:9093'] # This assumes Prometheus is running on the same host as the Docker container.
+      - targets: ['localhost:9093'] # This assumes Prometheus is running on the same host as the Docker container.
 
 rule_files:
   # Load Prometheus alerting rules

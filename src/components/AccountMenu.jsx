@@ -81,8 +81,8 @@ const AccountMenu = (props) => {
             aria-expanded={open ? 'true' : undefined}
           >
             <Avatar sx={{ width: 32, height: 32 }}>
-                { /* Show the first initial in the Avatar when logged in; won't show in dev mode or if not logged in */ }
-                {userInfo && userInfo.firstName[0]}
+              { /* Show the first initial in the Avatar when logged in; won't show in dev mode or if not logged in */ }
+              {userInfo && userInfo.firstName && userInfo.firstName[0]}
             </Avatar>
           </IconButton>
         </Tooltip>
