@@ -55,64 +55,34 @@ configController.getPrometheusPorts = (req, res, next) => {
   }
 };
 
-configController.newGrafana = (req, res, next) => {
-  console.log('before try block', path.join('./grafana/grafana.ini'));
-  try {
-    // console.log(path.join(__dirname, '../../grafana/grafana.ini'));
+// configController.newGrafana = (req, res, next) => {
+//   console.log('before try block', path.join('./grafana/grafana.ini'));
+//   try {
+//     const config = ini.parse(
+//       fs.readFileSync(
+//         path.join(__dirname, '../../grafana/grafana.ini'),
+//         'utf-8'
+//       )
+//     );
+//     const ports = res.locals.prometheusPorts;
+//     console.log(ports);
+//     config.datasources = {};
+//     config.datasources['Prometheus'] = {
+//       type: 'prometheus',
+//       url: 'http://prometheus:9091',
+//       access: 'proxy',
+//       basic_auth: false,
+//       isDefault: true,
+//       editable: true,
+//     };
+//     fs.writeFileSync('./grafana/grafana.ini', ini.stringify(config), 'utf-8');
 
-    const config = ini.parse(
-      fs.readFileSync(
-        path.join(__dirname, '../../grafana/grafana.ini'),
-        'utf-8'
-      )
-    );
-    // config.datasources.name= 'prometheus';
-    // config.datasources.type = 'prometheus';
-    // config.datasources.url = 'http://prometheus:9090';
-    // console.log(config.datasources.url);
-    // config.datasources.access = 'proxy';
-    // config.datasources.basic_auth = false;
-    // config.datasources.isDefault = true;
-    // config.datasources.editable = true;
-    config.datasources = {};
-    config.datasources['Prometheus'] = {
-      type: 'prometheus',
-      url: 'http://prometheus:9091',
-      access: 'proxy',
-      basic_auth: false,
-      isDefault: true,
-      editable: true,
-    };
-    fs.writeFileSync('./grafana/grafana.ini', ini.stringify(config), 'utf-8');
-    // // const newDatasource = {
-    // //   Prometheus1: {
-    // //     type: 'prometheus',
-    // //     url: 'http://prometheus:9091',
-    // //     access: 'proxy',
-    // //     basic_auth: false,
-    // //     isDefault: true,
-    // //     editable: true,
-    // //   },
-    // // };
-    // console.log('post datasource declaration');
-    // // Object.assign(newDatasource, config);
-    // // dataSourcesCopy.push(newDatasource);
-    // console.log('NEWLY PARSED', ini.stringify(config));
-    // console.log('post push');
-    // console.log('post write filesync');
-    // console.log('PRE PARSE')
-    // const config = ini.parse(fs.readFileSync(path.join(__dirname, '../../grafana/grafana.ini'), 'utf-8'));
-
-    // fs.writeFileSync(path.join(
-    //   '../grafana/grafana.ini'),
-    //   ini.stringify(config, { section: 'datasources' })
-    // );
-    return next();
-  } catch (err) {
-    console.log('ERRRORRRRRR');
-    return next(err);
-  }
-};
+//     return next();
+//   } catch (err) {
+//     console.log('ERRRORRRRRR');
+//     return next(err);
+//   }
+// };
 
 configController.createConnection = (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
