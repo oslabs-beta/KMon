@@ -4,10 +4,16 @@
   "description": "Kafka monitoring tool",
   "main": "main/electron.js",
   "proxy": "http://localhost:3010",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config ./webpack.config.js --watch",
-    "start": "concurrently \"npm run build\" \"electron main/electron.js\" --kill-others"
+    "start": "NODE_ENV=development concurrently \"npm run build\" \"electron main/electron.js\"",
+    "dev": "NODE_ENV=development concurrently \"npm run build\" \"nodemon --exec electron main/electron.js\""
   },
   "repository": {
     "type": "git",
@@ -20,6 +26,7 @@
   },
   "homepage": "https://github.com/oslabs-beta/KMon#readme",
   "devDependencies": {
+    "@babel/cli": "^7.23.4",
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
@@ -55,6 +62,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "electron-store": "^8.1.0",
+    "execa": "^8.0.1",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "js-yaml": "^4.1.0",
@@ -66,6 +74,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reactjs-popup": "^2.0.6",
+    "rimraf": "^5.0.5",
     "validator": "^13.11.0"
   }
 }

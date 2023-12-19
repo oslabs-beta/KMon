@@ -1,36 +1,40 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const dotenv = require('dotenv');
+"use strict";
+
+var _require = require('electron'),
+  app = _require.app,
+  BrowserWindow = _require.BrowserWindow;
+var path = require('path');
+var dotenv = require('dotenv');
 
 // Load environment variables from .env file
 dotenv.config();
 
 // Express server to start when electron app is ready
-const expressServer = require('./expressServer');
+var expressServer = require('./expressServer');
 
 // Ensure .env file is included
-const env = process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'development';
 
 // If dev environment, enable auto-reloading during dev
 if (env === 'development') {
   try {
-    const electronReloader = require('electron-reloader');
+    var electronReloader = require('electron-reloader');
     electronReloader(module, {
-      ignore: [path.join(__dirname), path.join(__dirname, '..', 'src')],
+      ignore: [path.join(__dirname), path.join(__dirname, '..', 'src')]
     });
-  } catch {
+  } catch (_unused) {
     console.log('electron reloader failed');
   }
 }
 
 // Open web page in a browser window
-const createWindow = () => {
-  const win = new BrowserWindow({
+var createWindow = function createWindow() {
+  var win = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-    },
+      nodeIntegration: true
+    }
   });
 
   // Load the index.html file
@@ -38,8 +42,8 @@ const createWindow = () => {
 };
 
 // Open a window on activation (macOS), boot up express server and run createWindow
-app.whenReady().then(() => {
-  expressServer.listen(3010, (err) => {
+app.whenReady().then(function () {
+  expressServer.listen(3010, function (err) {
     if (err) {
       console.error('Error starting server:', err);
     } else {
@@ -47,13 +51,12 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
-
-  app.on('activate', () => {
+  app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
 // Quit the app when all windows are closed
-app.on('window-all-closed', () => {
+app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
