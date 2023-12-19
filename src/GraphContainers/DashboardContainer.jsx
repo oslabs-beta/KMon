@@ -12,8 +12,6 @@ function DashboardContainer() {
     return null; 
   }
 
-  //POST request here
-
   return (
     <Box>
       {/* Maps over selected graphs to render Graph components */}

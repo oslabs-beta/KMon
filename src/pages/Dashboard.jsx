@@ -33,8 +33,6 @@ const Dashboard = () => {
     "Memory Usage": 8,
   };
 
-  //GET request here
-
   //function to handle graph selection from dropdown menu
   function handleGraphSelection(event) {
     const selectedGraphId = event.target.value;

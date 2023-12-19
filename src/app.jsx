@@ -3,7 +3,6 @@ import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import Alerts from './pages/Alerts.jsx';
-import Brokers from './pages/Brokers.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Connections from './pages/Connections.jsx';
 import Overview from './pages/Overview.jsx';
@@ -11,7 +10,6 @@ import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
-import { Button } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -105,7 +103,6 @@ const App = () => {
             <>
               <Route path="/Connections" element={<Connections />} />
               <Route path="/Alerts" element={<Alerts />} />
-              <Route path="/Brokers" element={<Brokers />} />
               <Route path="/Dashboard" element={<Dashboard />} />
               <Route path="/Overview" element={<Overview />} />
               <Route path="*" element={<Navigate to="/Overview" />} />
@@ -123,5 +120,6 @@ const App = () => {
     </ThemeProvider>
   );
 }
+
 
 export default App;

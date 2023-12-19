@@ -1,6 +1,6 @@
 // ./models/db.js file defines a connection pool
-const { Pool } = require('pg');
-const dotenv = require('dotenv');
+const { Pool } = require("pg");
+const dotenv = require("dotenv");
 
 // Load environment variables from .env file
 dotenv.config();
@@ -10,37 +10,39 @@ dotenv.config();
 const pool = new Pool({ connectionString: process.env.DB_URI });
 
 const createTables = async () => {
-pool
-  .connect()
-  .then(() => {
-    console.log('Database is connected');
-  })
-  .catch((error) => {
-    console.log('Database connection error: ', error);
-  });
+  pool
+    .connect()
+    .then(() => {
+      console.log("Database is connected");
+    })
+    .catch((error) => {
+      console.log("Database connection error: ", error);
+    });
 
   //creat a graph table
   await pool.query(
     `
-  CREATE TABLE IF NOT EXISTS graph (
-    user_id VARCHAR(255) PRIMARY KEY,
-    metric_name VARCHAR(255),
-    grap_id BIGINT;`,
+  CREATE TABLE IF NOT EXISTS graphs (
+    user_id INTEGER REFERENCES users (user_id),
+    graph_id SERIAL PRIMARY KEY,
+    metric_name VARCHAR(255));`,
+
     (err, result) => {
       if (err) {
-        console.error('Error creating the graph table:', err);
+        console.error("Error creating the graph table:", err);
       } else {
-        console.log('Graph table created successfully');
+        console.log("Graph table created successfully");
       }
     }
   );
-}
+};
+//createTables()
 
 // Exports an object with a query method
 module.exports = {
   // The query method logs the executed query and then calls pool.query to execute the actual database query
   query: (text, params, callback) => {
-    console.log('Executed Query: ', text);
+    console.log("Executed Query: ", text);
     return pool.query(text, params, callback);
   },
 };
