@@ -9,7 +9,8 @@ import {
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import DashboardContainer from "../GraphContainers/DashboardContainer.jsx";
-import { AppContext } from "../app.jsx";
+import { useAppContext } from '../AppContext.js';
+
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -19,7 +20,7 @@ const Dashboard = () => {
     marginTop: theme.margins.headerMargin,
   };
 
-  const { selectedGraphs, setSelectedGraphs } = useContext(AppContext);
+  const { selectedGraphs, setSelectedGraphs, userInfo } = useAppContext();
 
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
   const allMetrics = {

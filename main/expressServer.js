@@ -47,6 +47,7 @@ console.log('expressServer.js - about to hit /api')
 app.use('/api', apiRouters);
 
 // app.use('/alert', alertRouters);
+app.use("/graph", graphRouters);
 
 // Handle unknown routes
 app.use((req, res) => res.sendStatus(404));
