@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import validator from 'validator';
@@ -33,6 +33,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import loginImage from '../../assets/splash-art-gradient.jpeg';
 
+// Import the useAppContext hook
+import { useAppContext } from '.././AppContext.js';
+
 // TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
@@ -49,6 +52,8 @@ const LogIn = (props) => {
 
   // Destructure the onLogin function from props for managing the login status
   const { onLogin } = props;
+  // Use the useAppContext hook to get access to the context
+  const { userInfo, updateUserInfo } = useAppContext();
   
   const navigate = useNavigate();
 
@@ -118,10 +123,14 @@ const LogIn = (props) => {
           user_password: formData.password,
         }),
       });
+
       if (response.ok) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
+          console.log(`This is the info: ${data.user}`);
+          updateUserInfo(data.user);
+          console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');
@@ -134,11 +143,11 @@ const LogIn = (props) => {
       setIsError(true);
       console.log('Error in LogIn Form: ', error);
     } finally {
+      console.log(userInfo);
       setIsSubmitting(false);
       setValidateErrorMessage('')
       setFormData((prevData) => ({
         ...prevData,
-        email: '',
         password: '',
       }));
     }

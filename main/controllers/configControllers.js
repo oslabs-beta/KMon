@@ -7,7 +7,6 @@ const kafka = require('kafkajs');
 const yaml = require('js-yaml');
 const { default: cluster } = require('cluster');
 
-
 const configController = {};
 
 
