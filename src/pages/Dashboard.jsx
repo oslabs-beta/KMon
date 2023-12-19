@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Container,
   Select,
@@ -11,7 +11,6 @@ import { useTheme } from "@mui/material/styles";
 import DashboardContainer from "../GraphContainers/DashboardContainer.jsx";
 import { AppContext } from "../app.jsx";
 
-
 const Dashboard = () => {
   const theme = useTheme();
 
@@ -21,7 +20,7 @@ const Dashboard = () => {
   };
 
   const { selectedGraphs, setSelectedGraphs } = useContext(AppContext);
-  
+
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
   const allMetrics = {
     "Total Number of Bytes Allocated": 2,
@@ -33,13 +32,53 @@ const Dashboard = () => {
     "Memory Usage": 8,
   };
 
+  //fetch GET :
+  //the logic here for when the user logs out and then logs back in again, the graphs that he has selected before loging out.
+  useEffect(() => {
+    if (user) {
+      fetch(`${apiUrl}/user/graph`, {
+        method: "GET",
+        headers: {
+          Authorization: `${user.token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("graphs: ", data);
+          setSelectedGraphs(data.SelectedGraphs);
+        })
+        .catch((error) => {
+          console.log("Error fetching graphs:", error);
+        });
+    }
+  }, [user, setSelectedGraphs]);
+
   //function to handle graph selection from dropdown menu
   function handleGraphSelection(event) {
     const selectedGraphId = event.target.value;
-    setSelectedGraphs((prevSelected) => {
-      //it adds the selected graph id to the array of already selected graphs
-      return [...prevSelected, selectedGraphId];
-    });
+    if (user) {
+      fetch(`${apiUrl}/graph`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${user.token}`,
+        },
+        body: JSON.stringify({selectedGraphId}),
+      })
+        .then((response) => {
+          if(response.ok) {
+            setSelectedGraphs((prevSelected) => {
+              //it adds the selected graph id to the array of already selected graphs
+              return [...prevSelected, selectedGraphId];
+        })
+    } else {
+      throw new Error ('graphs are not available')
+      //logic for when not logged in
+    }
+    })
+    .catch ((error) => {
+      console.log()
+    })
   }
 
   return (

@@ -1,7 +1,29 @@
-import React from "react";
+import React,  { useEffect } from "react";
 import Box from "@mui/material/Box";
 
 function Graph({ id }) {
+
+  useEffect(()=> {
+    fetch(`${apiUrl}/graph`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        graph_id: graph_id,
+        user_id:user_id,
+        metric_name: metric_name,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("created graph: ", data);
+      })
+      .catch((error) => {
+        console.log("Error creating graph: ", error);
+      });
+  }, [id])
+      
   return (
     <Box>
       <iframe
@@ -16,35 +38,3 @@ function Graph({ id }) {
 }
 
 export default Graph;
-
-//fetch GET :
-fetch("/graph")
-  .then((response) => response.json())
-  .then((data) => {
-    console.log("graphs: ", data);
-  })
-  .catch((error) => {
-    console.log("Error fetching graphs:", error);
-  });
-
-//fetch POST :
-const graphData = {
-  graph_id: 1,
-  user_id: 123,
-  metric_name: "Sample Metric",
-};
-
-fetch("/graph", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(graphData),
-})
-  .then((response) => response.json())
-  .then((data) => {
-    console.log("created graph: ", data);
-  })
-  .catch((error) => {
-    console.log("Error creating graph: ", error);
-  });
