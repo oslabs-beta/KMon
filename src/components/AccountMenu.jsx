@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
+import { useAppContext } from '../AppContext.js';
 
 // TO DO: confirm apiUrl for production
 const apiUrl =
@@ -34,6 +35,10 @@ const AccountMenu = (props) => {
   };
   
   const navigate = useNavigate();
+
+  const handleSettingsClick = () => {
+    navigate('/Settings')
+  }
 
   // Logout using POST API call
   const handleLoggingOut = async () => {
@@ -61,11 +66,13 @@ const AccountMenu = (props) => {
     }
   };  
 
+  const { userInfo, updateUserInfo } = useAppContext();
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Tooltip title="Account settings">
-          <IconButton
+          <IconButton 
             onClick={handleClick}
             size="small"
             sx={{ ml: 2 }}
@@ -73,7 +80,10 @@ const AccountMenu = (props) => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}></Avatar>
+            <Avatar sx={{ width: 32, height: 32 }}>
+              { /* Show the first initial in the Avatar when logged in; won't show in dev mode or if not logged in */ }
+              {userInfo && userInfo.firstName && userInfo.firstName[0]}
+            </Avatar>
           </IconButton>
         </Tooltip>
       </Box>
@@ -86,7 +96,7 @@ const AccountMenu = (props) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem>
+        <MenuItem onClick={handleSettingsClick}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
