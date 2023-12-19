@@ -1,34 +1,43 @@
 const Store = require('electron-store');
 const fs = require('fs');
 const path = require('path');
+const ini = require('ini');
 
 // external JS libraries for writing Kafka scripts and for writing YAML files
 const kafka = require('kafkajs');
 const yaml = require('js-yaml');
 const { default: cluster } = require('cluster');
 
-
 const configController = {};
-
-
 
 configController.getPrometheusPorts = (req, res, next) => {
   // console.log('configController.createConnection - req.body: ', req.body);
 
   try {
-    const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'))
+    const dockerCompose = yaml.load(
+      fs.readFileSync(
+        path.resolve(__dirname, '../../docker-compose.yml'),
+        'utf-8'
+      )
+    );
 
     const prometheusPorts = {
-      promCount: 0
+      promCount: 0,
     };
 
     // check how many Prometheus instances are running. Get the port numbers and the number of Prometheus instances.
     for (let key in dockerCompose.services) {
-      // check if the key contains the string 'prometheus.' If so, grab the external port 
+      // check if the key contains the string 'prometheus.' If so, grab the external port
       if (key.toLowerCase().includes('prometheus')) {
-        const outerPort = dockerCompose.services[key].ports[0].replace(/\:\d*/, '')
-        const innerPort = dockerCompose.services[key].ports[0].replace(/\d*\:/, '')
-        prometheusPorts[key] = [outerPort, innerPort]
+        const outerPort = dockerCompose.services[key].ports[0].replace(
+          /\:\d*/,
+          ''
+        );
+        const innerPort = dockerCompose.services[key].ports[0].replace(
+          /\d*\:/,
+          ''
+        );
+        prometheusPorts[key] = [outerPort, innerPort];
         prometheusPorts.promCount++;
       }
     }
@@ -36,21 +45,76 @@ configController.getPrometheusPorts = (req, res, next) => {
     // console.log('prometheusPorts: ', prometheusPorts);
     res.locals.prometheusPorts = prometheusPorts;
     return next();
-  }
-  catch {
+  } catch {
     const error = {
       log: 'Error occurred in configControllers.getPrometheusPorts middleware function',
       status: 500,
-      message: { err: 'Error occurred while trying to identify ports' }
-    }
+      message: { err: 'Error occurred while trying to identify ports' },
+    };
     return next(error);
   }
-}
+};
 
+configController.newGrafana = (req, res, next) => {
+  console.log('before try block', path.join('./grafana/grafana.ini'));
+  try {
+    // console.log(path.join(__dirname, '../../grafana/grafana.ini'));
+
+    const config = ini.parse(
+      fs.readFileSync(
+        path.join(__dirname, '../../grafana/grafana.ini'),
+        'utf-8'
+      )
+    );
+    // config.datasources.name= 'prometheus';
+    // config.datasources.type = 'prometheus';
+    // config.datasources.url = 'http://prometheus:9090';
+    // console.log(config.datasources.url);
+    // config.datasources.access = 'proxy';
+    // config.datasources.basic_auth = false;
+    // config.datasources.isDefault = true;
+    // config.datasources.editable = true;
+    config.datasources = {};
+    config.datasources['Prometheus'] = {
+      type: 'prometheus',
+      url: 'http://prometheus:9091',
+      access: 'proxy',
+      basic_auth: false,
+      isDefault: true,
+      editable: true,
+    };
+    fs.writeFileSync('./grafana/grafana.ini', ini.stringify(config), 'utf-8');
+    // // const newDatasource = {
+    // //   Prometheus1: {
+    // //     type: 'prometheus',
+    // //     url: 'http://prometheus:9091',
+    // //     access: 'proxy',
+    // //     basic_auth: false,
+    // //     isDefault: true,
+    // //     editable: true,
+    // //   },
+    // // };
+    // console.log('post datasource declaration');
+    // // Object.assign(newDatasource, config);
+    // // dataSourcesCopy.push(newDatasource);
+    // console.log('NEWLY PARSED', ini.stringify(config));
+    // console.log('post push');
+    // console.log('post write filesync');
+    // console.log('PRE PARSE')
+    // const config = ini.parse(fs.readFileSync(path.join(__dirname, '../../grafana/grafana.ini'), 'utf-8'));
+
+    // fs.writeFileSync(path.join(
+    //   '../grafana/grafana.ini'),
+    //   ini.stringify(config, { section: 'datasources' })
+    // );
+    return next();
+  } catch (err) {
+    console.log('ERRRORRRRRR');
+    return next(err);
+  }
+};
 
 configController.createConnection = (req, res, next) => {
-
-
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
   try {
@@ -59,7 +123,6 @@ configController.createConnection = (req, res, next) => {
 
     console.log(prometheusPorts);
 
-
     const newDockerCompose = {
       version: '3.8',
       services: {
@@ -67,9 +130,9 @@ configController.createConnection = (req, res, next) => {
           image: 'prom/prometheus:latest',
           volumes: [
             './prometheus.yml:/etc/prometheus/prometheus.yml:ro',
-            'prometheus_data:/prometheus'
+            'prometheus_data:/prometheus',
           ],
-          ports: ['9090:9090']
+          ports: ['9090:9090'],
         },
         grafana: {
           image: 'grafana/grafana:latest',
@@ -77,55 +140,48 @@ configController.createConnection = (req, res, next) => {
             './grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards',
             './grafana/provisioning/datasources:/etc/grafana/provisioning/datasources',
             './grafana/dashboards:/var/lib/grafana/dashboards',
-            './grafana/grafana.ini:/etc/grafana/grafana.ini'
+            './grafana/grafana.ini:/etc/grafana/grafana.ini',
           ],
           environment: {
             GF_SECURITY_ADMIN_PASSWORD: 'codesmith',
             GF_AUTH_ANONYMOUS_ENABLED: 'true',
-            GF_PATHS_CONFIG: '/etc/grafana/grafana.ini'
+            GF_PATHS_CONFIG: '/etc/grafana/grafana.ini',
           },
           ports: ['3000:3000'],
-          depends_on: ['prometheus']
-        }
+          depends_on: ['prometheus'],
+        },
       },
-      volumes: { prometheus_data: null, grafana_data: null }
-    }
+      volumes: { prometheus_data: null, grafana_data: null },
+    };
 
     const newPromConfig = {
       global: { scrape_interval: '15s' },
       alerting: {
-        alertmanagers: [{
-        }]
+        alertmanagers: [{}],
       },
       rule_files: ['/etc/prometheus/rules/*.yaml'],
       scrape_configs: [
         {
           job_name: clusterName,
           static_configs: ports.map((port) => {
-            return `${serverURI}:${port}`
-          })
-        }
-      ]
-    }
+            return `${serverURI}:${port}`;
+          }),
+        },
+      ],
+    };
 
     // console.log(newConfig.scrape_configs[0].static_configs);
     // create new Yaml config, write it to a new file
     const newPromYml = yaml.dump(newPromConfig);
     // fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
-
-  }
-
-  catch {
+  } catch {
     const error = {
       log: 'Error occurred in configControllers.createConnection middleware function',
       status: 500,
-      message: { err: 'Error occurred while trying to create connection' }
-    }
+      message: { err: 'Error occurred while trying to create connection' },
+    };
     return next(error);
   }
+};
 
-}
-
-
-
-module.exports = configController
+module.exports = configController;
