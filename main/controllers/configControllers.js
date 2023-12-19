@@ -1,12 +1,13 @@
 const Store = require('electron-store');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('node:child_process');
 
 // external JS libraries for writing Kafka scripts and for writing YAML files
 const kafka = require('kafkajs');
 const yaml = require('js-yaml');
-// const execa = require('execa');
-// import execa from ('execa')
+
+
 const { default: cluster } = require('cluster');
 
 const configController = {};
@@ -24,7 +25,7 @@ configController.getPrometheusPorts = (req, res, next) => {
 
     // check how many Prometheus instances are running. Get the port numbers and the number of Prometheus instances.
     for (let key in dockerCompose.services) {
-      // check if the key contains the string 'prometheus.' If so, grab the external port 
+      // check if the key contains the string 'prometheus.' If so, grab the ports and add them to the property in an array.
       if (key.toLowerCase().includes('prometheus')) {
         const outerPort = dockerCompose.services[key].ports[0].replace(/\:\d*/, '')
         const innerPort = dockerCompose.services[key].ports[0].replace(/\d*\:/, '')
@@ -37,7 +38,6 @@ configController.getPrometheusPorts = (req, res, next) => {
         prometheusPorts.promCount++;
       }
     }
-    console.log(prometheusPorts);
 
     res.locals.prometheusPorts = prometheusPorts;
     return next();
@@ -52,7 +52,7 @@ configController.getPrometheusPorts = (req, res, next) => {
   }
 }
 
-configController.createConnection = async (req, res, next) => {
+configController.createConnection = (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
   console.log(req.body, res.locals);
@@ -74,6 +74,7 @@ configController.createConnection = async (req, res, next) => {
       ports: [`${Number(prometheusPorts.maxPort) + 1}:9090`]
     }
 
+    // define new Prometheus config file
     const newPromConfig = {
       global: { scrape_interval: '15s' },
       alerting: {
@@ -91,7 +92,7 @@ configController.createConnection = async (req, res, next) => {
       ]
     }
 
-    // parse objects back to YAML
+    // parse JS objects back to YAML
     const newPromYml = yaml.dump(newPromConfig);
     const newDockerYml = yaml.dump(dockerCompose);
 
@@ -99,12 +100,15 @@ configController.createConnection = async (req, res, next) => {
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
     fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
 
-    execa.execaCommand('docker-compose up -d')
-      .then((response) => {
-        console.log(response)
-      }).catch((error) => {
-        console.error(error)
-      })
+    exec('docker compose up -d', (err, stdout, stderr) => {
+      if (err) {
+        return next({
+          log: 'Error while restarting Docker container',
+          status: 500,
+          message: { error: 'Internal server error' },
+        })
+      }
+    })
   }
   catch {
     const error = {
@@ -114,7 +118,6 @@ configController.createConnection = async (req, res, next) => {
     }
     return next(error);
   }
-
 }
 
 configController.createGrafanaYml = async (req, res, next) => {

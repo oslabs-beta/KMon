@@ -1,6 +1,5 @@
 version: '3.8'
 services:
-
   grafana:
     image: grafana/grafana:latest
     volumes:
@@ -23,7 +22,6 @@ services:
       - prometheus_data:/prometheus
     ports:
       - '9090:9090'
-
 volumes:
   prometheus_data: null
   grafana_data: null
