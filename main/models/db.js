@@ -22,9 +22,9 @@ const createTables = async () => {
   //creat a graph table
   await pool.query(
     `
-  CREATE TABLE IF NOT EXISTS graphs (
-    user_id INTEGER REFERENCES users (user_id),
-    graph_id SERIAL PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS graphs (
+    user_id INTEGER REFERENCES users (user_id), 
+    graph_id INTEGER PRIMARY KEY, 
     metric_name VARCHAR(255));`,
 
     (err, result) => {

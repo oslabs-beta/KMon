@@ -3,26 +3,26 @@ import Box from "@mui/material/Box";
 
 function Graph({ id }) {
 
-  useEffect(()=> {
-    fetch(`${apiUrl}/graph`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        graph_id: graph_id,
-        user_id:user_id,
-        metric_name: metric_name,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("created graph: ", data);
-      })
-      .catch((error) => {
-        console.log("Error creating graph: ", error);
-      });
-  }, [id])
+  // useEffect(()=> {
+  //   fetch(`${apiUrl}/graph`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       graph_id: graph_id,
+  //       user_id:user_id,
+  //       metric_name: metric_name,
+  //     }),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log("created graph: ", data);
+  //     })
+  //     .catch((error) => {
+  //       console.log("Error creating graph: ", error);
+  //     });
+  // }, [id])
       
   return (
     <Box>

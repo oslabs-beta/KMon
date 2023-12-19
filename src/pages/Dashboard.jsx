@@ -35,11 +35,11 @@ const Dashboard = () => {
   //fetch GET :
   //the logic here for when the user logs out and then logs back in again, the graphs that he has selected before loging out.
   useEffect(() => {
-    if (user) {
+    if (userInfo) {
       fetch(`${apiUrl}/user/graph`, {
         method: "GET",
         headers: {
-          Authorization: `${user.token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       })
         .then((response) => response.json())
@@ -48,7 +48,7 @@ const Dashboard = () => {
           setSelectedGraphs(data.SelectedGraphs);
         })
         .catch((error) => {
-          console.log("Error fetching graphs:", error);
+          console.log("Error fetching user's selected graphs:", error);
         });
     }
   }, [user, setSelectedGraphs]);
@@ -57,30 +57,33 @@ const Dashboard = () => {
   function handleGraphSelection(event) {
     const selectedGraphId = event.target.value;
     if (user) {
-      fetch(`${apiUrl}/graph`, {
+      fetch(`${apiUrl}/user/graph`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${user.token}`,
+          Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify({selectedGraphId}),
       })
         .then((response) => {
           if(response.ok) {
+            // Update the frontend state 
             setSelectedGraphs((prevSelected) => {
               //it adds the selected graph id to the array of already selected graphs
               return [...prevSelected, selectedGraphId];
         })
     } else {
-      throw new Error ('graphs are not available')
-      //logic for when not logged in
+      throw new Error ('Failed to update selected graphs')
     }
     })
     .catch ((error) => {
-      console.log()
+      console.log('Error updating selected graphs:', error)
     })
+  } else {
+    //logic for when not logged in
+    console.log('User context not available')
   }
-
+}
   return (
     <Container sx={containerStyle}>
       <h1>This is the Dashbords Page</h1>

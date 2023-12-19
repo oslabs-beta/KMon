@@ -1,8 +1,9 @@
 const db = require("../models/db");
 
+
 const graphControllers = {};
 
-authControllers.createGraph = async (req, res, next) => {
+graphControllers.createGraph = async (req, res, next) => {
   try {
     const { graph_id, metric_name, user_id } = req.body;
     let graphQuery = `
@@ -23,7 +24,7 @@ authControllers.createGraph = async (req, res, next) => {
   }
 };
 
-authControllers.getGraphs = async (req, res, next) => {
+graphControllers.getGraphs = async (req, res, next) => {
   try {
     const { user_id } = req.query;
     const graphQuery = `
