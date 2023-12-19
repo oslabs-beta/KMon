@@ -52,10 +52,20 @@ configController.getPrometheusPorts = (req, res, next) => {
   }
 }
 
+configController.createGrafanaYml = (req, res, next) => {
+  try {
+
+  }
+  catch {
+
+  }
+
+}
+
 configController.createConnection = (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
-  console.log(req.body, res.locals);
+  // console.log(req.body, res.locals);
   try {
     const { clusterName, serverURI, ports } = req.body;
     const prometheusPorts = res.locals.prometheusPorts;
@@ -65,16 +75,19 @@ configController.createConnection = (req, res, next) => {
 
     // load dockerCompose file from YAML and add new prometheus port to services
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'))
+    console.log(dockerCompose.services.grafana.depends_on)
+    dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`)
     dockerCompose.services[`prometheus${prometheusNum}`] = {
       image: 'prom/prometheus:latest',
       volumes: [
-        `./prometheus${prometheusNum}.yml:/etc/prometheus/prometheus${prometheusNum}.yml:ro`,
+        `./prometheus${prometheusNum}.yml:/etc/prometheus/prometheus.yml:ro`,
         `prometheus_data:/prometheus${prometheusNum}`
       ],
       ports: [`${Number(prometheusPorts.maxPort) + 1}:9090`]
     }
 
     // define new Prometheus config file
+    // config MUST return strings for ports.
     const newPromConfig = {
       global: { scrape_interval: '15s' },
       alerting: {
@@ -85,16 +98,24 @@ configController.createConnection = (req, res, next) => {
       scrape_configs: [
         {
           job_name: clusterName,
-          static_configs: ports.map((port) => {
+          static_configs: [
+            {targets: ports.map((port) => {
             return `${serverURI}:${port}`
           })
+        }]
         }
       ]
     }
 
     // parse JS objects back to YAML
-    const newPromYml = yaml.dump(newPromConfig);
-    const newDockerYml = yaml.dump(dockerCompose);
+    const newPromYml = yaml.dump(newPromConfig, {
+      indent: 2,
+      noArrayIndent: true
+    });
+    const newDockerYml = yaml.dump(dockerCompose, {
+      indent: 2,
+      noArrayIndent: true
+    });
 
     // write new files to directory
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
@@ -120,9 +141,6 @@ configController.createConnection = (req, res, next) => {
   }
 }
 
-configController.createGrafanaYml = async (req, res, next) => {
 
-
-}
 
 module.exports = configController
