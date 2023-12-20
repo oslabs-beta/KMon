@@ -54,7 +54,7 @@ alertControllers.updatePreferences = async (req, res, next) => {
   }
 };
 
-alertControllers.sendPreferences = async (req, res, next) => {
+alertControllers.fetchPreferences = async (req, res, next) => {
   try {
     const { userID } = req.params; // Use req.params to get the userID from the URL parameters
 
@@ -95,8 +95,9 @@ alertControllers.sendPreferences = async (req, res, next) => {
   }
 };
 
+
   // Store or process the alert from Alertmanager
-alertControllers.receiveAlert = (req, res) => {
+alertControllers.receiveAlert = (req, res, next) => {
   const alert = req.body;
   console.log('Received alert:', alert);
   res.status(200).send('Alert received successfully.');

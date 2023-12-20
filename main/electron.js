@@ -23,23 +23,6 @@ if (env === 'development') {
   }
 }
 
-// Read and replace configuration file
-const configPath = 'config.yaml';
-let configTemplate = fs.readFileSync(configPath, 'utf8');
-
-// Replace environment variables in the template
-Object.keys(process.env).forEach((key) => {
-  const placeholder = `__${key}__`;
-  configTemplate = configTemplate.replace(new RegExp(placeholder, 'g'), process.env[key]);
-});
-
-try {
-  const config = yaml.load(configTemplate, 'utf-8');
-  console.log(config);
-} catch (e) {
-  console.log(e);
-}
-
 // Open web page in a browser window
 const createWindow = () => {
   const win = new BrowserWindow({

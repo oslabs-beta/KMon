@@ -13,7 +13,7 @@ router.put(
 
 router.get(
   '/get-preferences/:userID',
-  alertControllers.sendPreferences,
+  alertControllers.fetchPreferences,
   (req, res) => {
     res.status(200);
   }
