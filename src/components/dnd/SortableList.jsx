@@ -1,9 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { SortableOverlay } from "./SortableOverlay.jsx";
-import { DragHandle, SortableItem } from './SortableItem.jsx';
-
+import { DragHandle, SortableItem } from "./SortableItem.jsx";
+import Graph from "../../GraphComponents/Graph.jsx";
 
 const SortableList = ({ items, onChange }) => {
   // prop drilled up
@@ -14,16 +23,16 @@ const SortableList = ({ items, onChange }) => {
       {item.id}
       <DragHandle />
     </SortableItem>
-  )
+  );
 
   const activeItem = useMemo(
     () => items.find((item) => item.id === active?.id),
     [active, items]
   );
 
-    const onDragStart = ({ active }) => {
-      setActive(active);
-    }
+  const onDragStart = ({ active }) => {
+    setActive(active);
+  };
 
   const onDragEnd = ({ active, over }) => {
     if (over && active.id !== over?.id) {
@@ -37,19 +46,23 @@ const SortableList = ({ items, onChange }) => {
 
   const onDragCancel = () => {
     setActive(null);
-  }
+  };
 
   const style = {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: '10px',
-    padding: '10px',
-    listStyle: 'none'
-  }
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: "10px",
+    padding: "10px",
+    listStyle: "none",
+  };
 
   return (
-    <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={onDragCancel}>
+    <DndContext
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onDragCancel={onDragCancel}
+    >
       <SortableContext items={items}>
         <ul className="SortableList" role="application" style={style}>
           {items.map((item) => (
@@ -62,6 +75,6 @@ const SortableList = ({ items, onChange }) => {
       </SortableOverlay>
     </DndContext>
   );
-}
+};
 
 export default SortableList;
