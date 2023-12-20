@@ -20,22 +20,6 @@ import { alpha } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 
-const createData = (id, name, uri, status, lastUsed) => {
-  return {
-    id,
-    name,
-    uri,
-    status,
-    lastUsed,
-  };
-};
-
-const rows = [
-  createData(1, 'Cluster1', 305, 'Inactive', '1/2/2023'),
-  createData(2, 'Cluster2', 452, 'Active', '12/6/2023'),
-  createData(3, 'Cluster3', 262, 'Active', '12/5/2023'),
-];
-
 // Sorts in descending order
 const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -91,10 +75,10 @@ const headCells = [
     label: 'Connection Status',
   },
   {
-    id: 'lastUsed',
+    id: 'created',
     numeric: true,
     disablePadding: false,
-    label: 'Last Used',
+    label: 'Created',
   },
 ];
 
@@ -218,12 +202,13 @@ EnhancedTableToolbar.propTypes = {
 };
 
 // Main component w/ sorting, pagination, and selection features that gets returned
-const EnhancedTable = () => {
+const EnhancedTable = (props) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = props.rows;
 
   // Handles sorting request
   const handleRequestSort = (event, property) => {
@@ -269,14 +254,14 @@ const EnhancedTable = () => {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   // Determines number of rows that appear on page
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
-    [order, orderBy, page, rowsPerPage]
-  );
+  // const visibleRows = React.useMemo(
+  //   () =>
+  //     stableSort(rows, getComparator(order, orderBy)).slice(
+  //       page * rowsPerPage,
+  //       page * rowsPerPage + rowsPerPage
+  //     ),
+  //   [order, orderBy, page, rowsPerPage]
+  // );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -297,7 +282,7 @@ const EnhancedTable = () => {
               rowCount={rows.length}
             />
             <TableBody>
-              {visibleRows.map((row, index) => {
+              {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -331,7 +316,7 @@ const EnhancedTable = () => {
                     </TableCell>
                     <TableCell align="right">{row.uri}</TableCell>
                     <TableCell align="right">{row.status}</TableCell>
-                    <TableCell align="right">{row.lastUsed}</TableCell>
+                    <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
                 );
               })}
