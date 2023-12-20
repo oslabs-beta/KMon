@@ -28,14 +28,18 @@ const AlertSettings = () => {
   };
 
   const [password, setPassword] = useState('');
+  // Initialize alert preferences to false for the form
   const [alertPreferences, setAlertPreferences] = useState({
     Email: false,
     Slack: false,
     InApp: false,
   });
+  // Provide feedback to the user once response is received from database
   const [settingsFeedback, setSettingsFeedback] = useState(null);
+  // Slack URL and Email are required if the user has selected the checkboxes for them
   const isSlackURLRequired = alertPreferences['Slack'];
   const isEmailRequired = alertPreferences['Email'];
+  // Store previously saved preferences, updated when userInfo is retrieved from global state or settingsFeedback is updated after form submission
   const [savedPreferences, setSavedPreferences] = useState({});
 
   const handlePasswordChange = (event) => setPassword(event.target.value);
@@ -44,6 +48,7 @@ const AlertSettings = () => {
     setAlertPreferences((prev) => ({ ...prev, [type]: !prev[type] }));
   };
 
+  // Use global context to access user info
   const { userInfo, updateUserInfo } = useAppContext();
 
   useEffect(() => {
@@ -57,15 +62,14 @@ const AlertSettings = () => {
         if (response.ok) {
           const preferencesData = await response.json();
           setSavedPreferences(preferencesData.data.preferences);
-          console.log(savedPreferences.Email);
-          console.log(savedPreferences.Slack);
-          console.log('Alert preferences received.');
+          // console.log('Alert preferences received.');
         }
       } catch (error) {
         console.error('Error while getting saved alert preferences:', error);
       }
     };
   
+    // Fetch data when user is on Settings page. Optional chaining to allow reading the value of userInfo.userID even if userInfo is null or undefined without causing an error.
     if (userInfo?.userID) {
       fetchData();
     }
@@ -75,6 +79,7 @@ const AlertSettings = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Check to see if any changes were made before API call
     const changesMade =
       JSON.stringify(alertPreferences) !== JSON.stringify({
         Email: false,
@@ -101,14 +106,17 @@ const AlertSettings = () => {
       return;
     }
 
+    // If email required, extract the email address from the field. Otherwise, preferredEmail will be empty
     const preferredEmail = isEmailRequired
       ? document.getElementById('emailAddress').value
       : '';
 
+    // If slack URL required, extract the slack URL from the field. Otherwise, slackURL will be empty
     const slackURL = isSlackURLRequired
       ? document.getElementById('slack').value
       : '';
 
+    // Put request to update the preferences in db
     try {
       const response = await fetch(`${apiUrl}/alert/update-preferences`, {
         method: 'PUT',
@@ -121,6 +129,7 @@ const AlertSettings = () => {
         }),
       });
 
+      // If successful, then update the saved preferences and feedback message on the front end
       if (response.ok) {
         console.log('Alert preferences saved successfully.');
         setSavedPreferences(alertPreferences);
@@ -147,7 +156,7 @@ const AlertSettings = () => {
             </List>
           </Paper>
         </Grid>
-        <Grid item xs={8} md={6}>
+        <Grid item xs={8} md={5}>
           <Paper elevation={1} style={{ padding: '15px', marginBottom: '10px' }}>
             <Typography variant="h4" paddingBottom={'10px'}>Alert Preferences</Typography>
             <form onSubmit={handleSubmit}>
@@ -223,6 +232,7 @@ const AlertSettings = () => {
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
+                  {/* condiitonal rendering of feedback message*/}
                   {settingsFeedback ? (
                     <Typography
                       variant="body2"

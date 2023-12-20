@@ -1,9 +1,9 @@
 const db = require('../models/db');
 const dotenv = require('dotenv');
 
-// alert preferences is a JSON object in the database
-// default value for alert_preferences is '{"Email": false, "Slack": false, "InApp": false}';
-// also have columns for preferred_email and slack_url
+// Alert preferences is a JSON object in the database; Default value for alert_preferences is '{"Email": false, "Slack": false, "InApp": false}'
+// Also have columns for preferred_email and slack_url
+
 const alertControllers = {};
 
 alertControllers.updatePreferences = async (req, res, next) => {
@@ -36,12 +36,10 @@ alertControllers.updatePreferences = async (req, res, next) => {
 
     if (result.rowCount === 1) {
       // Successfully updated the alert preferences
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: 'Alert preferences updated successfully.',
-        });
+      res.status(200).json({
+        success: true,
+        message: 'Alert preferences updated successfully.',
+      });
     } else {
       res.status(404).json({ error: 'User not found.' });
     }
@@ -95,12 +93,11 @@ alertControllers.fetchPreferences = async (req, res, next) => {
   }
 };
 
-
-  // Store or process the alert from Alertmanager
-alertControllers.receiveAlert = (req, res, next) => {
-  const alert = req.body;
-  console.log('Received alert:', alert);
-  res.status(200).send('Alert received successfully.');
-};
+// TO DO: Store or process the alert from Alertmanager
+// alertControllers.receiveAlert = (req, res, next) => {
+//   const alert = req.body;
+//   console.log('Received alert:', alert);
+//   res.status(200).send('Alert received successfully.');
+// };
 
 module.exports = alertControllers;

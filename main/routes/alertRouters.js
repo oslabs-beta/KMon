@@ -19,11 +19,11 @@ router.get(
   }
 );
 
-// For receiving alerts from Alertmanager
-router.post('/receive-alert', alertControllers.receiveAlert, (req, res) => {
-  res
-    .status(200)
-    .json({ success: true, message: 'Alert received successfully.' });
-});
+// TO DO: For receiving alerts from Alertmanager
+// router.post('/receive-alert', alertControllers.receiveAlert, (req, res) => {
+//   res
+//     .status(200)
+//     .json({ success: true, message: 'Alert received successfully.' });
+// });
 
 module.exports = router;
