@@ -5,12 +5,12 @@ global:
 alerting:
   alertmanagers:
   - static_configs:
-      - targets: ['localhost:9093'] # This assumes Prometheus is running on the same host as the Docker container.
+      - targets: ['alertmanager:9093'] # This assumes Prometheus is running on the same host as the Docker container.
 
 rule_files:
   # Load Prometheus alerting rules
-  # - kafka_controller_alerts.yml
-  - /etc/prometheus/kafka_controller_alerts.yml
+  - kafka_controller_alerts.yml
+  # - /etc/prometheus/kafka_controller_alerts.yml
       
 # Scrape settings:
 scrape_configs:

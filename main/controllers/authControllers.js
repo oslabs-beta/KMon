@@ -126,9 +126,13 @@ authControllers.setSessionCookie = async (req, res, next) => {
     // const userID = res.locals.user;
     const user = res.locals.user;
 
+    /* adding this for hot reloading */
+    const existingSessionToken = store.get('sessionToken');
+    const sessionToken = existingSessionToken || jwt.sign({ userID: user.userID }, JWT_SECRET);
+
     // Use the JWT method sign, which takes the payload and secret as its arguments. The generated token is a string.
     // TO DO: Add options such as expiresIn as needed for production env.
-    const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
+    // const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
 
     // Store the token locally
     store.set('sessionToken', sessionToken);

@@ -45,10 +45,6 @@ const AlertSettings = () => {
       setSettingsFeedback('Failed to save alert preferences.');
     }
   };  
-
-  const addEmailField = () => setEmailSettings((prev) => (
-    { ...prev, recipientEmails: [...prev.recipientEmails, ''] }
-  ));
   
   const { userInfo, updateUserInfo } = useAppContext();
 

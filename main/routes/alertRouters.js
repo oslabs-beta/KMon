@@ -1,14 +1,10 @@
 const express = require('express');
+const alertControllers = require('../controllers/alertControllers');
+
 const router = express.Router();
-const authControllers = require('../controllers/alertControllers');
 
-// Need to refactor routers to send success/error messages from the server, not the middleware
-router.post(
-  '/alert-preferences',
-  (req, res) => {
-  }
-);
-
-
+router.post('/alertsInfo', alertControllers.writeAlertsInfo, (req, res) => {
+    res.status(200);
+})
 
 module.exports = router;
