@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { DashboardContext } from "../../context/DashboardContext.jsx";
+import DashboardContext from "../../context/DashboardContext.jsx";
 
 const MetricGroupContext = createContext({
   attributes: {},
@@ -11,10 +11,6 @@ const MetricGroupContext = createContext({
 
 export function MetricGroup({ children, id }) {
   const [items, setItems] = useContext(DashboardContext);
-
-
-  const graphId = id;
-
   const {
     attributes,
     isDragging,
@@ -41,10 +37,8 @@ export function MetricGroup({ children, id }) {
     justifyContent: 'space-between',
     width: '550px',
     height: '250px',
-    // alignItems: 'center',
     padding: '18px 20px',
     backgroundColor: '#fff',
-    // backgroundColor: 'red',
     boxShadow: '0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05), 0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15)',
     borderRadius: 'calc(4px / var(--scale-x, 1))',
     boxSizing: 'border-box',
@@ -63,11 +57,11 @@ export function MetricGroup({ children, id }) {
     const rect = div.getBoundingClientRect();
 
     if (20 > Math.abs(rect.bottom - mouseUpEvent.y) && 
-    20 > Math.abs(rect.right - mouseUpEvent.x)) {
+        20 > Math.abs(rect.right - mouseUpEvent.x)) {
       const updateItems = [...items];
       let activeItem;
       for (let i = 0; i < updateItems.length; i++) {
-        if (updateItems[i]['id'] === graphId) {
+        if (updateItems[i]['id'] === id) {
           activeItem = updateItems[i];
         };
       }
@@ -81,14 +75,12 @@ export function MetricGroup({ children, id }) {
   }
 
   const onMouseDown = (mouseDownEvent) => {
-    console.log('mouseDownEvent', mouseDownEvent);
-    // const div = mouseDownEvent.target
-    // const rect = div.getBoundingClientRect();
-    // console.log(rect);
-    // if (20 > Math.abs(rect.bottom - mouseDownEvent.pageY) && 
-    // 20 > Math.abs(rect.right - mouseDownEvent.pageX)) {
-    document.addEventListener("mouseup", onMouseUp);
-    // }
+    const div = mouseDownEvent.target
+    const rect = div.getBoundingClientRect();
+    if (20 > Math.abs(rect.bottom - mouseDownEvent.pageY) && 
+        20 > Math.abs(rect.right - mouseDownEvent.pageX)) {
+      document.addEventListener("mouseup", onMouseUp);
+    }
   }
 
   return (

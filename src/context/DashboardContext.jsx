@@ -1,4 +1,5 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 
-export const DashboardContext = createContext(undefined);
-export const ItemSizeContext = createContext(undefined);
+const DashboardContext = createContext(undefined);
+
+export default DashboardContext;

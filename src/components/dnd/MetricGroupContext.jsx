@@ -3,7 +3,7 @@ import { DndContext } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { SortableOverlay } from "./SortableOverlay.jsx";
 import { DragHandle, MetricGroup } from "./MetricGroup.jsx";
-import { DashboardContext, ItemSizeContext} from "../../context/DashboardContext.jsx";
+import DashboardContext from "../../context/DashboardContext.jsx";
 
 const MetricGroupContext = () => {
   const [active, setActive] = useState(null);
@@ -11,10 +11,10 @@ const MetricGroupContext = () => {
 
   const renderItem = (item) => (
     <DashboardContext.Provider value={[items, setItems]}>
-    <MetricGroup id={item.id} key={item.id}>
-      {item.component}
-      <DragHandle />
-    </MetricGroup>
+      <MetricGroup id={item.id} key={item.id}>
+        {item.component}
+        <DragHandle />
+      </MetricGroup>
     </DashboardContext.Provider>
   )
 
