@@ -232,7 +232,7 @@ const AlertSettings = () => {
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  {/* condiitonal rendering of feedback message*/}
+                  {/* condiitonal rendering of feedback message */}
                   {settingsFeedback ? (
                     <Typography
                       variant="body2"

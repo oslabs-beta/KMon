@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
-import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { AppProvider } from './AppContext';
-import Sidebar from './components/Sidebar.jsx';
-import Header from './components/Header.jsx';
-import Alerts from './pages/Alerts.jsx';
-import Brokers from './pages/Brokers.jsx';
-import Producers from './pages/Producers.jsx';
-import Consumers from './pages/Consumers.jsx';
-import Connections from './pages/Connections.jsx';
-import Overview from './pages/Overview.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
-import Settings from './pages/Settings.jsx';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
-import { Button } from '@mui/material';
+import React, { useState, createContext } from "react";
+import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
+import { AppProvider } from "./AppContext";
+import Sidebar from "./components/Sidebar.jsx";
+import Header from "./components/Header.jsx";
+import Alerts from "./pages/Alerts.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Connections from "./pages/Connections.jsx";
+import Overview from "./pages/Overview.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import Settings from "./pages/Settings.jsx";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
 
 const theme = createTheme({
   palette: {
@@ -70,6 +67,8 @@ const theme = createTheme({
   },
 });
 
+export const AppContext = createContext();
+
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
   // const [isLoggedIn, setLoggedIn] = useState(true);
@@ -100,9 +99,7 @@ const App = () => {
               <>
                 <Route path="/Connections" element={<Connections />} />
                 <Route path="/Alerts" element={<Alerts />} />
-                <Route path="/Brokers" element={<Brokers />} />
-                <Route path="/Producers" element={<Producers />} />
-                <Route path="/Consumers" element={<Consumers />} />
+                <Route path="/Dashboard" element={<Dashboard />} />
                 <Route path="/Overview" element={<Overview />} />
                 <Route path="/Settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/Overview" />} />

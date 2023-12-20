@@ -11,10 +11,8 @@ import {
   ListItemText,
 } from '@mui/material';
 import { styled } from '@mui/system';
-import { Inbox } from "@mui/icons-material";
 import StreamIcon from "@mui/icons-material/Stream";
 import CollectionsIcon from "@mui/icons-material/Collections";
-import InventoryIcon from "@mui/icons-material/Inventory";
 import CategoryIcon from "@mui/icons-material/Category";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 
@@ -46,8 +44,6 @@ function Sidebar() {
       <CategoryIcon />,
       <StreamIcon />,
       <CollectionsIcon />,
-      <InventoryIcon />,
-      <Inbox />,
     ];
 
     const iconsPapaer2 = [<AddAlertIcon />];
@@ -62,9 +58,7 @@ function Sidebar() {
           {[
             "Overview",
             "Connections",
-            "Brokers",
-            "Producers",
-            "Consumers",
+            "Dashboard",
           ].map((text, index) => (
             
             <StyledListItem 

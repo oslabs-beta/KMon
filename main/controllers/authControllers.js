@@ -1,8 +1,8 @@
-const Store = require('electron-store');
-const db = require('../models/db');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const Store = require("electron-store");
+const db = require("../models/db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
 
 // Load environment variables from .env file
 dotenv.config();
@@ -12,8 +12,8 @@ const authControllers = {};
 const store = new Store();
 
 // Ensure .env file is included
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
-const isDevelopment = process.env.NODE_ENV === 'development';
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 // Create a new user in db
 authControllers.createUser = async (req, res, next) => {
@@ -21,15 +21,15 @@ authControllers.createUser = async (req, res, next) => {
     const { first_name, last_name, user_email, user_password } = req.body;
 
     // Query to check if account with the provided email exists, and if so, return
-    const checkUserQuery = 'SELECT * FROM users WHERE user_email = $1';
+    const checkUserQuery = "SELECT * FROM users WHERE user_email = $1";
     const checkUserValues = [user_email];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
 
     if (existingUser.rows.length > 0) {
       return next({
-        log: 'Error in authControllers.createUser',
+        log: "Error in authControllers.createUser",
         status: 400,
-        message: { error: 'Account with this email already exists.' },
+        message: { error: "Account with this email already exists." },
       });
     }
 
@@ -40,11 +40,11 @@ authControllers.createUser = async (req, res, next) => {
     // Different queries to insert new user info depending on whether user has provided last name
     if (last_name) {
       signupQuery =
-        'INSERT INTO users (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id';
+        "INSERT INTO users (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id";
       signupValues = [first_name, last_name, user_email, hashedPassword];
     } else {
       signupQuery =
-        'INSERT INTO users (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id';
+        "INSERT INTO users (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id";
       signupValues = [first_name, user_email, hashedPassword];
     }
 
@@ -56,9 +56,9 @@ authControllers.createUser = async (req, res, next) => {
     return next();
   } catch (err) {
     return next({
-      log: 'Error in authControllers.createUser',
+      log: "Error in authControllers.createUser",
       status: 500,
-      message: { error: 'Internal server error' },
+      message: { error: "Internal server error" },
     });
   }
 };
@@ -99,7 +99,7 @@ authControllers.verifyUser = async (req, res, next) => {
           // console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
-          res.status(401).json({ error: 'Incorrect password' });
+          res.status(401).json({ error: "Incorrect password" });
         }
       } else {
         res.status(404).json({ error: "User doesn't exist" });
@@ -107,13 +107,13 @@ authControllers.verifyUser = async (req, res, next) => {
     } else {
       res
         .status(400)
-        .json({ error: 'Please enter email and password details' });
+        .json({ error: "Please enter email and password details" });
     }
   } catch (err) {
     return next({
-      log: 'Error in authControllers.verifyUser',
+      log: "Error in authControllers.verifyUser",
       status: 500,
-      message: { error: 'Internal server error' },
+      message: { error: "Internal server error" },
     });
   }
 };
@@ -129,13 +129,13 @@ authControllers.setSessionCookie = async (req, res, next) => {
     const sessionToken = jwt.sign({ userID: user.userID }, JWT_SECRET);
 
     // Store the token locally
-    store.set('sessionToken', sessionToken);
+    store.set("sessionToken", sessionToken);
 
     // Specify the following properties when creating a cookie
     // TO DO: specify expires property, as needed
     const cookieOptions = {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: "strict",
     };
 
     if (!isDevelopment) {
@@ -143,14 +143,14 @@ authControllers.setSessionCookie = async (req, res, next) => {
     }
 
     // Create the cookie 'KMonST' (aka KMon Session Token)
-    res.cookie('KMonST', sessionToken, cookieOptions);
+    res.cookie("KMonST", sessionToken, cookieOptions);
 
     return next();
   } catch (err) {
     return next({
-      log: 'Error in authControllers.setSessionCookie',
+      log: "Error in authControllers.setSessionCookie",
       status: 500,
-      message: { error: 'Internal server error' },
+      message: { error: "Internal server error" },
     });
   }
 };
@@ -177,27 +177,27 @@ authControllers.setSessionCookie = async (req, res, next) => {
 authControllers.clearSessionCookie = async (req, res, next) => {
   try {
     // Remove the token from local storage
-    store.delete('sessionToken');
+    store.delete("sessionToken");
 
     // Clear the cookie 'KMonST'
-    res.clearCookie('KMonST');
+    res.clearCookie("KMonST");
 
     // Destroy the session created with express-session
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: "Internal server error" });
       }
 
       // Clear the session cookie 'connect.sid'
-      res.clearCookie('connect.sid');
+      res.clearCookie("connect.sid");
 
       return next();
     });
   } catch (err) {
     return next({
-      log: 'Error in authControllers.clearSessionCookie',
+      log: "Error in authControllers.clearSessionCookie",
       status: 500,
-      message: { error: 'Internal server error' },
+      message: { error: "Internal server error" },
     });
   }
 };
