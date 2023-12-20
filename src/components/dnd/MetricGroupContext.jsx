@@ -1,19 +1,23 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useContext } from "react";
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { SortableOverlay } from "./SortableOverlay.jsx";
-import { DragHandle, SortableItem } from './SortableItem.jsx';
+import { DragHandle, MetricGroup } from "./MetricGroup.jsx";
+import DashboardContext from "../../context/DashboardContext.jsx";
+// import { DragHandle, SortableItem } from './SortableItem.jsx';
 
-
-const SortableList = ({ items, onChange }) => {
+const MetricGroupContext = () => {
   // prop drilled up
   const [active, setActive] = useState(null);
+  const [items, setItems] = useContext(DashboardContext);
 
   const renderItem = (item) => (
-    <SortableItem id={item.id} key={item.id}>
-      {item.id}
+    <DashboardContext.Provider value={[items, setItems]}>
+    <MetricGroup id={item.id} key={item.id}>
+      {item.component}
       <DragHandle />
-    </SortableItem>
+    </MetricGroup>
+    </DashboardContext.Provider>
   )
 
   const activeItem = useMemo(
@@ -29,8 +33,8 @@ const SortableList = ({ items, onChange }) => {
     if (over && active.id !== over?.id) {
       const activeIndex = items.findIndex(({ id }) => id === active.id);
       const overIndex = items.findIndex(({ id }) => id === over.id);
-
-      onChange(arrayMove(items, activeIndex, overIndex));
+      console.log('active index onDragEnd', activeIndex);
+      setItems(arrayMove(items, activeIndex, overIndex));
     }
     setActive(null);
   };
@@ -64,4 +68,4 @@ const SortableList = ({ items, onChange }) => {
   );
 }
 
-export default SortableList;
+export default MetricGroupContext;

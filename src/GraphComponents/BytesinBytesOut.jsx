@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+// import DashboardContext from '../context/DashboardContext';
 
-function BytesInBytesOut({ active }) {
+function BytesInBytesOut({ items, id }) {
+
   // if (active !== null) {
     return (
       <div>
@@ -9,7 +11,7 @@ function BytesInBytesOut({ active }) {
           width='450'
           height='200'
           frameborder='0'
-          // style={{pointerEvents: 'none'}}
+          style={{pointerEvents: 'none'}}
         ></iframe>
       </div>
     );
