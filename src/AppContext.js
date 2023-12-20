@@ -1,5 +1,5 @@
 // AppContext.js
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 // Create a context to manage the application state
 const AppContext = createContext();
@@ -8,6 +8,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   // State to hold user information
   const [userInfo, setUserInfo] = useState(null);
+  const [selectedGraphs, setSelectedGraphs] = useState([]);
 
   // Function to update the user information in the state
   const updateUserInfo = (newUserInfo) => {
@@ -16,7 +17,9 @@ export const AppProvider = ({ children }) => {
 
   // Return the provider component with a value set to an object containing user information and update functions
   return (
-    <AppContext.Provider value={{ userInfo, updateUserInfo }}>
+    <AppContext.Provider
+      value={{ userInfo, updateUserInfo, selectedGraphs, setSelectedGraphs }}
+    >
       {children}
     </AppContext.Provider>
   );
