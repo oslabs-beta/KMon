@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = [
   {
-    mode: process.env.NODE_ENV,
+    mode: 'development',
     entry: path.join(__dirname, 'src', 'react.jsx'),
     target: 'electron-renderer',
     output: {
