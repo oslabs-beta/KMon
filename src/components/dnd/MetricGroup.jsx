@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ItemSizeContext, DashboardContext } from "../../context/DashboardContext.jsx";
+import { DashboardContext } from "../../context/DashboardContext.jsx";
 
 const MetricGroupContext = createContext({
   attributes: {},
@@ -10,8 +10,9 @@ const MetricGroupContext = createContext({
 });
 
 export function MetricGroup({ children, id }) {
-  const [itemSizes, setItemSizes] = useContext(ItemSizeContext);
   const [items, setItems] = useContext(DashboardContext);
+
+
   const graphId = id;
 
   const {
@@ -60,50 +61,20 @@ export function MetricGroup({ children, id }) {
   const onMouseUp = (mouseUpEvent) => {
     const div = mouseUpEvent.target
     const rect = div.getBoundingClientRect();
-    // console.log(rect);
-    // console.log('bottom', rect.bottom);
-    // console.log('y', mouseUpEvent.y);
-    // console.log('right', rect.right);
-    // console.log('x', mouseUpEvent.x);
-    // console.log(
-    //   20 > Math.abs(rect.bottom - mouseUpEvent.y) && 
-    //   20 > Math.abs(rect.right - mouseUpEvent.x)
-    // );
 
     if (20 > Math.abs(rect.bottom - mouseUpEvent.y) && 
     20 > Math.abs(rect.right - mouseUpEvent.x)) {
-      const updateItemSize = [...itemSizes];
+      const updateItems = [...items];
       let activeItem;
-      for (let i = 0; i < updateItemSize.length; i++) {
-        if (updateItemSize[i]['id'] === graphId) {
-          activeItem = updateItemSize[i];
+      for (let i = 0; i < updateItems.length; i++) {
+        if (updateItems[i]['id'] === graphId) {
+          activeItem = updateItems[i];
         };
       }
 
-      // console.log('activeItem', activeItem);
       activeItem.width = rect.width;
       activeItem.height = rect.height;
-      // console.log('activeItem', activeItem);
-      // console.log('hi');
-      // console.log('updateItemSize', updateItemSize);
-      console.log('hi');
-      setItemSizes(updateItemSize);
-
-      const updatedItems = [...items];
-      for (let i = 0; i < updatedItems.length; i++) {
-        if (updatedItems[i]['id'] === graphId) {
-          console.log(updatedItems[i]);
-        };
-      }
-      // update prop drilled state in items
-      // const newItems = [];
-      // for (let i = 0; i < items.length; i++) {
-      //   // newItems[i].component.itemSizes = updateItemSize; // or itemSizes
-      //   console.log(items[i].component);
-      //   const compWithNewState = Object.assign(items[i].component, {itemSizes: updateItemSize});
-      //   newItems.push(Object.assign(items[i], {component: compWithNewState}));
-      // }
-      // setItems(newItems);
+      setItems(updateItems);
     }
 
     document.removeEventListener("mouseup", onMouseUp)
