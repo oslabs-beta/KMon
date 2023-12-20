@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import {
   Container,
   Select,
@@ -9,8 +9,7 @@ import {
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import DashboardContainer from "../GraphContainers/DashboardContainer.jsx";
-import { useAppContext } from '../AppContext.js';
-
+import { useAppContext } from "../AppContext.js";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -20,8 +19,7 @@ const Dashboard = () => {
     marginTop: theme.margins.headerMargin,
   };
 
-  const { selectedGraphs, setSelectedGraphs, userInfo } = useAppContext();
-
+  const { selectedGraphs, setSelectedGraphs } = useAppContext();
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
   const allMetrics = {
     "Total Number of Bytes Allocated": 2,
@@ -32,59 +30,77 @@ const Dashboard = () => {
     "Closed Connection Rate": 7,
     "Memory Usage": 8,
   };
-
+  //object with reversed values. it is for backend
+  // const reverseMetrics = {
+  //   2: "Total Number of Bytes Allocated",
+  //   3: "Bytes Saved to Memory",
+  //   4: "Handler Request",
+  //   5: "Request Duration",
+  //   6: "Task Handlers",
+  //   7: "Closed Connection Rate",
+  //   8: "Memory Usage",
+  // };
   //fetch GET :
   //the logic here for when the user logs out and then logs back in again, the graphs that he has selected before loging out.
-  useEffect(() => {
-    if (userInfo) {
-      fetch(`${apiUrl}/user/graph`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("graphs: ", data);
-          setSelectedGraphs(data.SelectedGraphs);
-        })
-        .catch((error) => {
-          console.log("Error fetching user's selected graphs:", error);
-        });
-    }
-  }, [user, setSelectedGraphs]);
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     fetch(`${apiUrl}/allgraph`)
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log("graphs: ", data);
+  //         setSelectedGraphs(data.SelectedGraphs);
+  //       })
+  //       .catch((error) => {
+  //         console.log("Error fetching user's selected graphs:", error);
+  //       });
+  //   }
+  // }, [userInfo]);
+
+  // TO DO: confirm apiUrl for production
+  // const apiUrl =
+  //   process.env.NODE_ENV === "production"
+  //     ? "https://api.kmon.com"
+  //     : "http://localhost:3010";
 
   //function to handle graph selection from dropdown menu
   function handleGraphSelection(event) {
     const selectedGraphId = event.target.value;
-    if (user) {
-      fetch(`${apiUrl}/user/graph`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({selectedGraphId}),
-      })
-        .then((response) => {
-          if(response.ok) {
-            // Update the frontend state 
-            setSelectedGraphs((prevSelected) => {
-              //it adds the selected graph id to the array of already selected graphs
-              return [...prevSelected, selectedGraphId];
-        })
-    } else {
-      throw new Error ('Failed to update selected graphs')
-    }
-    })
-    .catch ((error) => {
-      console.log('Error updating selected graphs:', error)
-    })
-  } else {
-    //logic for when not logged in
-    console.log('User context not available')
+
+    //it is a back end logic to do a post request for one graph in graphs table in db
+    // if (userInfo) {
+    //   console.log("hi4");
+    //   fetch(`${apiUrl}/graph/creategraph`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ graph_id: selectedGraphId, metric_name: reverseMetrics[selectedGraphId] , user_id: userInfo.userID }),
+    //   })
+    //     .then(
+    //       (response) =>
+    //       {
+    //         console.log("in .then. Response received?");
+    //         response.json();
+    //       if(response.ok) {
+    // Update the frontend state
+    setSelectedGraphs((prevSelected) => {
+      //it adds the selected graph id to the array of already selected graphs
+      return [...prevSelected, selectedGraphId];
+    });
+    //         } else {
+    //           throw new Error ('Failed to post selected graphs')
+    //         }
+    //         }
+    //       )
+    //       .catch((error) => {
+    //         console.log("Error posting selected graphs:", error);
+    //         console.log("in catch");
+    //       });
+    //   } else {
+    //     //logic for when not logged in
+    //     console.log("User context not available");
+    //   }
   }
-}
   return (
     <Container sx={containerStyle}>
       <h1>This is the Dashbords Page</h1>

@@ -1,17 +1,17 @@
-import React, { useState, createContext } from 'react';
-import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { AppProvider } from './AppContext';
-import Sidebar from './components/Sidebar.jsx';
-import Header from './components/Header.jsx';
-import Alerts from './pages/Alerts.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Connections from './pages/Connections.jsx';
-import Overview from './pages/Overview.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
-import Settings from './pages/Settings.jsx';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
+import React, { useState, createContext } from "react";
+import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
+import { AppProvider } from "./AppContext";
+import Sidebar from "./components/Sidebar.jsx";
+import Header from "./components/Header.jsx";
+import Alerts from "./pages/Alerts.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Connections from "./pages/Connections.jsx";
+import Overview from "./pages/Overview.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import Settings from "./pages/Settings.jsx";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
 
 const theme = createTheme({
   palette: {
@@ -72,7 +72,6 @@ export const AppContext = createContext();
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
   // const [isLoggedIn, setLoggedIn] = useState(true);
-  
 
   // For development mode, isLoggedIn is set to true
   const [isLoggedIn, setLoggedIn] = useState(true);
@@ -88,36 +87,41 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <AppProvider>
-      <HashRouter>
-        {isLoggedIn && (
-          <>
-            <Header onLogout={handleLogout} />
-            <Sidebar />
-          </>
-        )}
-        <Routes>
-          {isLoggedIn ? (
+        <HashRouter>
+          {isLoggedIn && (
             <>
-              <Route path="/Connections" element={<Connections />} />
-              <Route path="/Alerts" element={<Alerts />} />
-              <Route path="/Dashboard" element={<Dashboard />} />
-              <Route path="/Overview" element={<Overview />} />
-              <Route path="/Settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/Overview" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/Login" element={<Login onLogin={handleLogin} />} />
-              <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
-              <Route path="*" element={<Navigate to="/Login" />} />
+              <Header onLogout={handleLogout} />
+              <Sidebar />
             </>
           )}
-        </Routes>
-      </HashRouter>
+          <Routes>
+            {isLoggedIn ? (
+              <>
+                <Route path="/Connections" element={<Connections />} />
+                <Route path="/Alerts" element={<Alerts />} />
+                <Route path="/Dashboard" element={<Dashboard />} />
+                <Route path="/Overview" element={<Overview />} />
+                <Route path="/Settings" element={<Settings />} />
+                <Route path="*" element={<Navigate to="/Overview" />} />
+              </>
+            ) : (
+              <>
+                <Route
+                  path="/Login"
+                  element={<Login onLogin={handleLogin} />}
+                />
+                <Route
+                  path="/Signup"
+                  element={<Signup onLogin={handleLogin} />}
+                />
+                <Route path="*" element={<Navigate to="/Login" />} />
+              </>
+            )}
+          </Routes>
+        </HashRouter>
       </AppProvider>
     </ThemeProvider>
   );
-}
-
+};
 
 export default App;

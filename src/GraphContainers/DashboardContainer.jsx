@@ -1,11 +1,11 @@
 import React, {useContext} from "react";
 import Graph from "../GraphComponents/Graph.jsx";
 import Box from "@mui/material/Box";
-import { AppContext } from "../app.jsx";
+import { useAppContext } from '../AppContext.js';
 
 function DashboardContainer() {
 
-  const {selectedGraphs} = useContext(AppContext);
+  const { selectedGraphs } = useAppContext();
 
   // handle the case where there are no selected graphs
   if (!Array.isArray(selectedGraphs) || selectedGraphs.length === 0) {
