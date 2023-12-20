@@ -95,4 +95,11 @@ alertControllers.sendPreferences = async (req, res, next) => {
   }
 };
 
+  // Store or process the alert from Alertmanager
+alertControllers.receiveAlert = (req, res) => {
+  const alert = req.body;
+  console.log('Received alert:', alert);
+  res.status(200).send('Alert received successfully.');
+};
+
 module.exports = alertControllers;

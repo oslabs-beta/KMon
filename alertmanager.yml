@@ -1,17 +1,22 @@
 global:
   resolve_timeout: 1m
-  slack_api_url: 'https://hooks.slack.com/services/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'
+  slack_api_url: 'https://hooks.slack.com/services/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'
+  # slack_api_url: {{process.env.SLACK_API_URL}}
 route:
   receiver: 'slack-notifications'
 
 receivers:
+  # - name: 'app-backend'
+  #   webhook_configs:
+  #   - url: 'http://localhost:3010/alert/receive-alert'
   - name: 'slack-notifications'
     slack_configs:
-      - channel: '#test'
+      - channel: '#test2'
         send_resolved: true
         username: 'Alertmanager'
-        icon_url: https://avatars3.githubusercontent.com/u/3380462
-        api_url: 'https://hooks.slack.com/services/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'
+        icon_url: 'https://avatars3.githubusercontent.com/u/3380462'
+        api_url: 'https://hooks.slack.com/services/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'
+        # api_url: {{process.env.SLACK_API_URL}}
         title: |-
           [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
           {{- if gt (len .CommonLabels) (len .GroupLabels) -}}

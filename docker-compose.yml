@@ -27,6 +27,10 @@ services:
     image: prom/alertmanager:latest
     ports:
       - '9093:9093'
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/data
 volumes:
   prometheus_data: null
   grafana_data: null
+  alertmanager_data: null
