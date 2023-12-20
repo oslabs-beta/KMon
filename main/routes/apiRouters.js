@@ -3,9 +3,9 @@ const router = express.Router();
 const configController = require('../controllers/configControllers');
 
 
-router.post('/createConnection', configController.getPrometheusPorts, configController.createConnection, (req, res, next) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res, next) => {
   try {
-    res.status(200).send('Connection created!')
+    res.status(200).send(JSON.stringify('Connection created!'))
   }
   catch {
     return next({
