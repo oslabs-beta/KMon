@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import DashboardContext from "../../context/DashboardContext.jsx";
+import { ItemSizeContext, DashboardContext } from "../../context/DashboardContext.jsx";
 
 const MetricGroupContext = createContext({
   attributes: {},
@@ -9,7 +9,8 @@ const MetricGroupContext = createContext({
   ref() {},
 });
 
-export function MetricGroup({ children, id}) {
+export function MetricGroup({ children, id }) {
+  const [itemSizes, setItemSizes] = useContext(ItemSizeContext);
   const [items, setItems] = useContext(DashboardContext);
   const graphId = id;
 
@@ -39,7 +40,7 @@ export function MetricGroup({ children, id}) {
     justifyContent: 'space-between',
     width: '550px',
     height: '250px',
-    alignItems: 'center',
+    // alignItems: 'center',
     padding: '18px 20px',
     backgroundColor: '#fff',
     // backgroundColor: 'red',
@@ -71,22 +72,38 @@ export function MetricGroup({ children, id}) {
 
     if (20 > Math.abs(rect.bottom - mouseUpEvent.y) && 
     20 > Math.abs(rect.right - mouseUpEvent.x)) {
-      const updateItems = [...items];
+      const updateItemSize = [...itemSizes];
       let activeItem;
-      for (let i = 0; i < updateItems.length; i++) {
-        if (updateItems[i]['id'] === graphId) {
-          activeItem = updateItems[i];
+      for (let i = 0; i < updateItemSize.length; i++) {
+        if (updateItemSize[i]['id'] === graphId) {
+          activeItem = updateItemSize[i];
         };
       }
 
-      console.log('activeItem', activeItem);
+      // console.log('activeItem', activeItem);
       activeItem.width = rect.width;
       activeItem.height = rect.height;
-      console.log('activeItem', activeItem);
-      console.log('hi');
-      console.log('updateItems', updateItems);
+      // console.log('activeItem', activeItem);
       // console.log('hi');
-      setItems(updateItems);
+      // console.log('updateItemSize', updateItemSize);
+      console.log('hi');
+      setItemSizes(updateItemSize);
+
+      const updatedItems = [...items];
+      for (let i = 0; i < updatedItems.length; i++) {
+        if (updatedItems[i]['id'] === graphId) {
+          console.log(updatedItems[i]);
+        };
+      }
+      // update prop drilled state in items
+      // const newItems = [];
+      // for (let i = 0; i < items.length; i++) {
+      //   // newItems[i].component.itemSizes = updateItemSize; // or itemSizes
+      //   console.log(items[i].component);
+      //   const compWithNewState = Object.assign(items[i].component, {itemSizes: updateItemSize});
+      //   newItems.push(Object.assign(items[i], {component: compWithNewState}));
+      // }
+      // setItems(newItems);
     }
 
     document.removeEventListener("mouseup", onMouseUp)
@@ -94,7 +111,13 @@ export function MetricGroup({ children, id}) {
 
   const onMouseDown = (mouseDownEvent) => {
     console.log('mouseDownEvent', mouseDownEvent);
+    // const div = mouseDownEvent.target
+    // const rect = div.getBoundingClientRect();
+    // console.log(rect);
+    // if (20 > Math.abs(rect.bottom - mouseDownEvent.pageY) && 
+    // 20 > Math.abs(rect.right - mouseDownEvent.pageX)) {
     document.addEventListener("mouseup", onMouseUp);
+    // }
   }
 
   return (

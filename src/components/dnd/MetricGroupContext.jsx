@@ -3,20 +3,23 @@ import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { SortableOverlay } from "./SortableOverlay.jsx";
 import { DragHandle, MetricGroup } from "./MetricGroup.jsx";
-import DashboardContext from "../../context/DashboardContext.jsx";
+import { DashboardContext, ItemSizeContext} from "../../context/DashboardContext.jsx";
 // import { DragHandle, SortableItem } from './SortableItem.jsx';
 
 const MetricGroupContext = () => {
   // prop drilled up
   const [active, setActive] = useState(null);
   const [items, setItems] = useContext(DashboardContext);
+  const [itemSizes, setItemSizes] = useContext(ItemSizeContext);
 
   const renderItem = (item) => (
     <DashboardContext.Provider value={[items, setItems]}>
+    <ItemSizeContext.Provider value={[itemSizes, setItemSizes]}>
     <MetricGroup id={item.id} key={item.id}>
       {item.component}
       <DragHandle />
     </MetricGroup>
+    </ItemSizeContext.Provider>
     </DashboardContext.Provider>
   )
 
@@ -33,7 +36,6 @@ const MetricGroupContext = () => {
     if (over && active.id !== over?.id) {
       const activeIndex = items.findIndex(({ id }) => id === active.id);
       const overIndex = items.findIndex(({ id }) => id === over.id);
-      console.log('active index onDragEnd', activeIndex);
       setItems(arrayMove(items, activeIndex, overIndex));
     }
     setActive(null);
