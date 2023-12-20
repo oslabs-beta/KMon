@@ -9,7 +9,7 @@ const dotenv = require('dotenv');
 // require in routers
 const authRouters = require('./routes/authRouters.js');
 const apiRouters = require('./routes/apiRouters.js');
-// const alertRouters = require('./routes/alertRouters.js');
+const alertRouters = require('./routes/alertRouters.js');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -44,7 +44,7 @@ app.use('/auth', authRouters);
 console.log('expressServer.js - about to hit /api')
 app.use('/api', apiRouters);
 
-// app.use('/alert', alertRouters);
+app.use('/alert', alertRouters);
 
 // Handle unknown routes
 app.use((req, res) => res.sendStatus(404));

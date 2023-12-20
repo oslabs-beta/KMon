@@ -64,6 +64,53 @@ authControllers.createUser = async (req, res, next) => {
 };
 
 // Verify user when login
+// authControllers.verifyUser = async (req, res, next) => {
+//   try {
+//     const user_email = req.body.user_email;
+//     const user_password = req.body.user_password;
+
+//     // Find the user's info in the db
+//     if (user_email && user_password) {
+//       const values = [user_email];
+//       const userQuery =
+//         'SELECT user_id, user_password FROM users WHERE user_email = $1';
+//       const result1 = await db.query(userQuery, values);
+
+//       if (result1.rows.length > 0) {
+//         const userID = result1.rows[0].user_id;
+//         // console.log('this is userID from result1.rows:', userID);
+//         const userDBPassword = result1.rows[0].user_password;
+
+//         // Use bcrypt method to compare passwords
+//         const isAuthenticated = await bcrypt.compare(
+//           user_password,
+//           userDBPassword
+//         );
+
+//         if (isAuthenticated) {
+//           res.locals.user = userID;
+//           // console.log('User successfully logged in with ID:', userID);
+//           return next();
+//         } else {
+//           res.status(401).json({ error: 'Incorrect password' });
+//         }
+//       } else {
+//         res.status(404).json({ error: "User doesn't exist" });
+//       }
+//     } else {
+//       res
+//         .status(400)
+//         .json({ error: 'Please enter email and password details' });
+//     }
+//   } catch (err) {
+//     return next({
+//       log: 'Error in authControllers.verifyUser',
+//       status: 500,
+//       message: { error: 'Internal server error' },
+//     });
+//   }
+// };
+
 authControllers.verifyUser = async (req, res, next) => {
   try {
     const user_email = req.body.user_email;
@@ -72,11 +119,13 @@ authControllers.verifyUser = async (req, res, next) => {
     // Find the user's info in the db
     if (user_email && user_password) {
       const values = [user_email];
-      // const userQuery =
-      //   'SELECT user_id, user_password FROM users WHERE user_email = $1';
       const userQuery =
         'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE user_email = $1';
+      ('SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE user_email = $1');
       const result1 = await db.query(userQuery, values);
+      console.log('user_email:', user_email);
+      console.log('user_password:', user_password);
+      console.log('result1:', result1);
 
       if (result1.rows.length > 0) {
         // const userID = result1.rows[0].user_id;
@@ -95,13 +144,15 @@ authControllers.verifyUser = async (req, res, next) => {
           userDBPassword
         );
 
+        console.log(isAuthenticated);
+
         if (isAuthenticated) {
           // res.locals.user = userID;
           res.locals.user = user;
           // console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
-          res.status(401).json({ error: 'Incorrect password' });
+          res.status(401).json({ error: 'Incorrect email or password' });
         }
       } else {
         res.status(404).json({ error: "User doesn't exist" });
@@ -126,13 +177,9 @@ authControllers.setSessionCookie = async (req, res, next) => {
     // const userID = res.locals.user;
     const user = res.locals.user;
 
-    /* adding this for hot reloading */
-    const existingSessionToken = store.get('sessionToken');
-    const sessionToken = existingSessionToken || jwt.sign({ userID: user.userID }, JWT_SECRET);
-
     // Use the JWT method sign, which takes the payload and secret as its arguments. The generated token is a string.
     // TO DO: Add options such as expiresIn as needed for production env.
-    // const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
+    const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
 
     // Store the token locally
     store.set('sessionToken', sessionToken);

@@ -7,6 +7,7 @@ const AppContext = createContext();
 // Provider component that wraps children components and provides access to user information
 export const AppProvider = ({ children }) => {
   // State to hold user information
+  // userInfo is an object containing the keys userID, firstName, lastName, userEmail
   const [userInfo, setUserInfo] = useState(null);
 
   // Function to update the user information in the state

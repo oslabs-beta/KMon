@@ -1,6 +1,6 @@
 global:
   resolve_timeout: 1m
-  slack_api_url: 'https://hooks.slack.com/services/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'
+  slack_api_url: 'https://hooks.slack.com/services/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'
 route:
   receiver: 'slack-notifications'
 
@@ -11,7 +11,7 @@ receivers:
         send_resolved: true
         username: 'Alertmanager'
         icon_url: https://avatars3.githubusercontent.com/u/3380462
-        api_url: 'https://hooks.slack.com/services/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'
+        api_url: 'https://hooks.slack.com/services/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'
         title: |-
           [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
           {{- if gt (len .CommonLabels) (len .GroupLabels) -}}

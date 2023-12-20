@@ -14,8 +14,8 @@ const Producers = () => {
 
   return (
     <Container sx={containerStyle}>
-    <h1>This is the Producers Page</h1>
-  </Container>
+      <h1>This is the Producers Page</h1>
+    </Container>
   );
 };
 

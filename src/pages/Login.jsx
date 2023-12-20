@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '.././AppContext';
 import { Link as RouterLink } from 'react-router-dom';
 import validator from 'validator';
 import {
@@ -56,6 +57,7 @@ const LogIn = (props) => {
   const { userInfo, updateUserInfo } = useAppContext();
   
   const navigate = useNavigate();
+  const { updateUserInfo } = useAppContext();
 
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,6 +134,8 @@ const LogIn = (props) => {
           updateUserInfo(data.user);
           console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
+          updateUserInfo(data.user);
+          console.log(data.user);
           onLogin();
           navigate('/Overview');
         }

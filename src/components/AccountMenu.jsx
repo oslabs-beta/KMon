@@ -26,12 +26,20 @@ const AccountMenu = (props) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const open = Boolean(menuAnchorEl);
 
+  // Anchor the menu to the button, so the menu appears near the button when opened
   const handleClick = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
+  // For closing the account menu
   const handleClose = () => {
     setMenuAnchorEl(null);
+  };
+
+  // Navigate to the user settings page or open a modal for settings
+  const handleSettings = () => {
+    navigate('/Settings');
+    handleClose();
   };
   
   const navigate = useNavigate();
