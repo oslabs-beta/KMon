@@ -1,7 +1,7 @@
 global:
   resolve_timeout: 1m
-  # TO DO: replace slack_api_url with the actual Slack API URL https://hooks.slack.com/services/...
-  slack_api_url: ''
+  # TO DO: replace slack_api_url with the actual Slack API URL
+  slack_api_url: 'https://hooks.slack.com/services/...'
 route:
   receiver: 'slack-notifications'
 
@@ -12,8 +12,8 @@ receivers:
         send_resolved: true
         username: 'Alertmanager'
         icon_url: 'https://avatars3.githubusercontent.com/u/3380462'
-        # TO DO: replace api_url with the actual Slack API URL https://hooks.slack.com/services/...
-        api_url: ''
+        # TO DO: replace api_url with the actual Slack API URL
+        api_url: 'https://hooks.slack.com/services/...'
         title: |-
           [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
           {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
