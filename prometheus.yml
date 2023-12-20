@@ -35,9 +35,6 @@ scrape_configs:
   - job_name: controller3
     static_configs:
       - targets: ['10.0.10.137:8996']
-  - job_name: broker1
-    static_configs:
-      - targets: ['10.0.10.137:8997']
   - job_name: broker2
     static_configs:
       - targets: ['10.0.10.137:8998']

@@ -3,7 +3,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana/provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./grafana/provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
       - ./grafana/provisioning/datasources/:/etc/grafana/provisioning/datasources/
       - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
