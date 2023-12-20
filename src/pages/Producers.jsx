@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container } from '@mui/material'
+import { Container } from '@mui/material';
 import ProducerContainer from '../GraphContainers/ProducerContainer.jsx';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';

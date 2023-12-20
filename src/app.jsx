@@ -9,7 +9,6 @@ import Producers from './pages/Producers.jsx';
 import Consumers from './pages/Consumers.jsx';
 import Connections from './pages/Connections.jsx';
 import Overview from './pages/Overview.jsx';
-import Settings from './pages/Settings.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import Settings from './pages/Settings.jsx';
@@ -77,7 +76,6 @@ const App = () => {
 
   // For development mode, isLoggedIn is set to true
   const [isLoggedIn, setLoggedIn] = useState(true);
-  const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -88,47 +86,44 @@ const App = () => {
   };
 
   return (
-    <AppProvider>
-      <ThemeProvider theme={theme}>
-        <AppProvider>
-          <HashRouter>
-            {isLoggedIn && (
+    <ThemeProvider theme={theme}>
+      <AppProvider>
+        <HashRouter>
+          {isLoggedIn && (
+            <>
+              <Header onLogout={handleLogout} />
+              <Sidebar />
+            </>
+          )}
+          <Routes>
+            {isLoggedIn ? (
               <>
-                <Header onLogout={handleLogout} />
-                <Sidebar />
+                <Route path="/Connections" element={<Connections />} />
+                <Route path="/Alerts" element={<Alerts />} />
+                <Route path="/Brokers" element={<Brokers />} />
+                <Route path="/Producers" element={<Producers />} />
+                <Route path="/Consumers" element={<Consumers />} />
+                <Route path="/Overview" element={<Overview />} />
+                <Route path="/Settings" element={<Settings />} />
+                <Route path="*" element={<Navigate to="/Overview" />} />
+              </>
+            ) : (
+              <>
+                <Route
+                  path="/Login"
+                  element={<Login onLogin={handleLogin} />}
+                />
+                <Route
+                  path="/Signup"
+                  element={<Signup onLogin={handleLogin} />}
+                />
+                <Route path="*" element={<Navigate to="/Login" />} />
               </>
             )}
-            <Routes>
-              {isLoggedIn ? (
-                <>
-                  <Route path="/Connections" element={<Connections />} />
-                  <Route path="/Alerts" element={<Alerts />} />
-                  <Route path="/Brokers" element={<Brokers />} />
-                  <Route path="/Producers" element={<Producers />} />
-                  <Route path="/Consumers" element={<Consumers />} />
-                  <Route path="/Overview" element={<Overview />} />
-                  <Route path="/Settings" element={<Settings />} />
-                  <Route path="/Settings" element={<Settings />} />
-                  <Route path="*" element={<Navigate to="/Overview" />} />
-                </>
-              ) : (
-                <>
-                  <Route
-                    path="/Login"
-                    element={<Login onLogin={handleLogin} />}
-                  />
-                  <Route
-                    path="/Signup"
-                    element={<Signup onLogin={handleLogin} />}
-                  />
-                  <Route path="*" element={<Navigate to="/Login" />} />
-                </>
-              )}
-            </Routes>
-          </HashRouter>
-        </AppProvider>
-      </ThemeProvider>
-    </AppProvider>
+          </Routes>
+        </HashRouter>
+      </AppProvider>
+    </ThemeProvider>
   );
 };
 

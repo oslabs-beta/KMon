@@ -24,9 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Ensure .env file is included / Generate a secret for the session
-const secret = process.env.NODE_ENV === 'production'
-  ? process.env.SESSION_SECRET
-  : crypto.randomBytes(64).toString('hex');
+const secret =
+  process.env.NODE_ENV === 'production'
+    ? process.env.SESSION_SECRET
+    : crypto.randomBytes(64).toString('hex');
 
 // Create a session
 app.use(
@@ -34,14 +35,14 @@ app.use(
     secret: secret,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { secure: process.env.NODE_ENV === 'production' },
   })
 );
 
 // Use routes
 app.use('/auth', authRouters);
 
-console.log('expressServer.js - about to hit /api')
+console.log('expressServer.js - about to hit /api');
 app.use('/api', apiRouters);
 
 app.use('/alert', alertRouters);

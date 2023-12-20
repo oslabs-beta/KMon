@@ -18,44 +18,72 @@ const apiUrl =
 
 const AlertSettings = () => {
   const theme = useTheme();
+  const containerStyle = {
+    marginLeft: theme.margins.sideBarMargin,
+    marginTop: theme.margins.headerMargin,
+  };
+
   const [password, setPassword] = useState('');
   const [alertPreferences, setAlertPreferences] = useState({
     Email: false,
     Slack: false,
     InApp: false,
   });
-  const [emailSettings, setEmailSettings] = useState({ recipientEmails: [''] });
   const [settingsFeedback, setSettingsFeedback] = useState(null);
   const isSlackURLRequired = alertPreferences['Slack'];
   const isEmailRequired = alertPreferences['Email'];
 
-  const containerStyle = {
-    marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
-  };
-
   const handlePasswordChange = (event) => setPassword(event.target.value);
 
-  const handleAlertChange = (type) => setAlertPreferences((prev) => ({ ...prev, [type]: !prev[type] }));
+  const handleAlertChange = (type) => {
+    // Check if the user has changed the checkbox state
+    if (
+      !existingPreferences ||
+      alertPreferences[type] !== existingPreferences[type]
+    ) {
+      setAlertPreferences((prev) => ({ ...prev, [type]: !prev[type] }));
+    }
+  };
 
   const { userInfo, updateUserInfo } = useAppContext();
+
+  // TO DO: set existing preferences so user sees their previous selections
+  const [existingPreferences, setExistingPreferences] = useState({});
 
   // Ensure valid submission and handle saving using POST API call
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Check if any changes were made by comparing with existing preferences
+    const changesMade =
+      JSON.stringify(alertPreferences) !== JSON.stringify(existingPreferences);
+
+    if (!changesMade) {
+      setSettingsFeedback('No changes were made.');
+      return;
+    }
+
     if (
-      alertPreferences.Email === false &&
-      alertPreferences.Slack === false &&
-      alertPreferences.InApp === false
+      !alertPreferences.Email &&
+      !alertPreferences.Slack &&
+      !alertPreferences.InApp
     ) {
       setSettingsFeedback('Select at least one alert preference.');
       return;
     }
 
-    if (password.length === 0){
+    if (!password.trim()) {
       setSettingsFeedback('Enter password to save preferences.');
       return;
     }
+
+    const preferredEmail = isEmailRequired
+      ? document.getElementById('emailAddress').value
+      : '';
+
+    const slackURL = isSlackURLRequired
+      ? document.getElementById('slack').value
+      : '';
 
     try {
       const response = await fetch(`${apiUrl}/alert/update-preferences`, {
@@ -64,17 +92,14 @@ const AlertSettings = () => {
         body: JSON.stringify({
           userID: userInfo.userID,
           preferences: alertPreferences,
-          preferredEmail: ,
-          slackURL: 
+          preferredEmail: preferredEmail,
+          slackURL: slackURL,
         }),
       });
 
       if (response.ok) {
         console.log('Alert preferences saved successfully.');
         setSettingsFeedback('Alert preferences saved successfully.');
-      } else {
-        console.error('Failed to save alert preferences:', response.statusText);
-        setSettingsFeedback('Failed to save alert preferences.');
       }
     } catch (error) {
       console.error('Error while saving alert preferences:', error);
@@ -109,41 +134,51 @@ const AlertSettings = () => {
                 key="Email"
                 control={
                   <Checkbox
-                    checked={alertPreferences['Email']}
+                    // checked={alertPreferences['Email']}
+                    checked={
+                      existingPreferences ? existingPreferences['Email'] : false
+                    }
                     onChange={() => handleAlertChange('Email')}
                   />
                 }
                 label={`Receive Email Alerts`}
               />
-              <TextField
-                id="emailAddress"
-                label="Enter email for email alerts"
-                variant="outlined"
-                margin="normal"
-                name="emailAddress"
-                sx={{ width: '400px' }}
-                required={isEmailRequired}
-              />
+              {alertPreferences['Email'] && (
+                <TextField
+                  id="emailAddress"
+                  label="Enter email for email alerts"
+                  variant="outlined"
+                  margin="normal"
+                  name="emailAddress"
+                  sx={{ width: '400px' }}
+                  required={isEmailRequired}
+                />
+              )}
 
               <FormControlLabel
                 key="Slack"
                 control={
                   <Checkbox
-                    checked={alertPreferences['Slack']}
+                    // checked={alertPreferences['Slack']}
+                    checked={
+                      existingPreferences ? existingPreferences['Slack'] : false
+                    }
                     onChange={() => handleAlertChange('Slack')}
                   />
                 }
                 label={`Receive Slack Alerts`}
               />
-              <TextField
-                id="slack"
-                label="Enter Slack API URL for notifications"
-                variant="outlined"
-                margin="normal"
-                name="slackURL"
-                sx={{ width: '400px' }}
-                required={isSlackURLRequired}
-              />
+              {alertPreferences['Slack'] && (
+                <TextField
+                  id="slack"
+                  label="Enter Slack API URL for notifications"
+                  variant="outlined"
+                  margin="normal"
+                  name="slackURL"
+                  sx={{ width: '400px' }}
+                  required={isSlackURLRequired}
+                />
+              )}
               <FormControlLabel
                 key="InApp"
                 control={

@@ -109,7 +109,7 @@ function SignUp(props) {
     event.preventDefault();
     setIsSubmitting(true);
     setApiErrorMessage('');
-    
+
     // If invalid email, set isError and the email error message
     if (!validator.isEmail(formData.email)) {
       setIsError(true);
@@ -117,15 +117,15 @@ function SignUp(props) {
       setIsSubmitting(false);
       return;
     }
-    
+
     // If invalid password, set isError and the validate error message
-    if (!validatePassword(formData.password) || (passMatch === false)) {
+    if (!validatePassword(formData.password) || passMatch === false) {
       setIsError(true);
       setValidateErrorMessage('Invalid password');
       setIsSubmitting(false);
       return;
     }
-    
+
     try {
       const response = await fetch(`${apiUrl}/auth/signup`, {
         method: 'POST',
@@ -170,7 +170,7 @@ function SignUp(props) {
       }));
     }
   };
-  
+
   // MUI Theme setup
   const defaultTheme = createTheme();
 
@@ -234,11 +234,7 @@ function SignUp(props) {
                   onChange={handleChange}
                   autoComplete="email"
                 />
-                  <Typography
-                      variant="body2"
-                  >
-                      {emailErrorMessage}
-                  </Typography>
+                <Typography variant="body2">{emailErrorMessage}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -252,43 +248,49 @@ function SignUp(props) {
                   onChange={handleChange}
                   autoComplete="new-password"
                 />
-                  <Typography
-                      variant="body2"
-                  >
-                      {validateErrorMessage}
-                  </Typography>
+                <Typography variant="body2">{validateErrorMessage}</Typography>
               </Grid>
               <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                id="confirmPassword"
-                value={formData.confirmPassword}
-                className={`form-control ${passMatch ? '' : 'input-error-border'}`}
-                error={!passMatch}
-                onChange={handleChange}
-                autoComplete="new-password"
-              />
-              <Typography variant="body2">
-                {/* If confirm password field is not empty, then provide feedback on whether passwords match or not */}
-                {formData.confirmPassword !== '' && (
-                  <>
-                    <div className={`input-error ${passMatch ? 'success-message' : 'error-message'}`}>
-                      {passMatch ? 'Passwords match.' : 'Those passwords didn’t match. Try again.'}
-                    </div>
-                  </>
-                )}
-              </Typography>
-              {/* Conditional rendering of invalid signup error message */}
-              {isError ? (
+                <TextField
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  id="confirmPassword"
+                  value={formData.confirmPassword}
+                  className={`form-control ${
+                    passMatch ? '' : 'input-error-border'
+                  }`}
+                  error={!passMatch}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                />
+                <Typography variant="body2">
+                  {/* If confirm password field is not empty, then provide feedback on whether passwords match or not */}
+                  {formData.confirmPassword !== '' && (
+                    <>
+                      <div
+                        className={`input-error ${
+                          passMatch ? 'success-message' : 'error-message'
+                        }`}
+                      >
+                        {passMatch
+                          ? 'Passwords match.'
+                          : 'Those passwords didn’t match. Try again.'}
+                      </div>
+                    </>
+                  )}
+                </Typography>
+                {/* Conditional rendering of invalid signup error message */}
+                {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
-                    {apiErrorMessage || emailErrorMessage || validateErrorMessage}
+                    {apiErrorMessage ||
+                      emailErrorMessage ||
+                      validateErrorMessage}
                   </Alert>
                 ) : null}
-            </Grid>
+              </Grid>
             </Grid>
             <Button
               type="submit"

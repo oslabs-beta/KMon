@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useMemo } from 'react';
-import { Container, Box } from '@mui/material'
+import { Container, Box } from '@mui/material';
 import SortableList from '../components/dnd/SortableList.jsx';
 
 import BytesInBytesOut from '../GraphComponents/BytesinBytesOut.jsx';
@@ -19,12 +19,12 @@ const Brokers = () => {
 
   const [active, setActive] = useState(null);
   const [items, setItems] = useState([
-    {id: 1, component: <BytesInBytesOut active/>},
-    {id: 2, component: <CpuUsage/>},
-    {id: 3, component: <DiskIO/>},
-    {id: 4, component: <MemoryUse/>},
-    {id: 5, component: <ProducerLatency/>},
-    {id: 6, component: <UnderReplication/>},
+    { id: 1, component: <BytesInBytesOut active /> },
+    { id: 2, component: <CpuUsage /> },
+    { id: 3, component: <DiskIO /> },
+    { id: 4, component: <MemoryUse /> },
+    { id: 5, component: <ProducerLatency /> },
+    { id: 6, component: <UnderReplication /> },
   ]);
 
   const containerStyle = {
@@ -32,26 +32,26 @@ const Brokers = () => {
     marginTop: theme.margins.headerMargin,
     height: '100vh',
     // border: '1px solid blue',
-    padding: '20px'
+    padding: '20px',
   };
 
   const dndContainerStyle = {
     // border: '1px solid black',
     display: 'flex',
-    flexWrap: 'wrap'
-  }
+    flexWrap: 'wrap',
+  };
 
   return (
-    <Box className='pageContainer' sx={containerStyle}>
-    <h1>This is the Brokers Page</h1>
+    <Box className="pageContainer" sx={containerStyle}>
+      <h1>This is the Brokers Page</h1>
 
-      <Box className='dndContainer' sx={dndContainerStyle}>
-          <SortableList
-            items={items} 
-            onChange={setItems} 
-            active={active} 
-            setActive={setActive} 
-          />
+      <Box className="dndContainer" sx={dndContainerStyle}>
+        <SortableList
+          items={items}
+          onChange={setItems}
+          active={active}
+          setActive={setActive}
+        />
       </Box>
     </Box>
   );
