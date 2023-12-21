@@ -232,7 +232,7 @@ const ConnectionDialogBox = () => {
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button variant="contained" sx={{marginBottom: '10px'}} onClick={handleClickOpen}>
         <AddIcon></AddIcon>
       </Button>
       <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmitKey}>
@@ -240,13 +240,13 @@ const ConnectionDialogBox = () => {
         <DialogContent>
           {/* removed DialogContentText component; caused DOM content error due to div nested inside of a p element */}
           <form onSubmit={handleSubmit}>
-            <Stack className='clusterStack' spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            <Stack className='clusterStack' spacing={2} direction="row" sx={{ marginBottom: 4, marginTop: 3 }}>
               <TextField
                 id="cluster-name"
                 name="clusterName"
                 required
                 label="Cluster Name:"
-                variant="filled"
+                variant="outlined"
                 onChange={handleChange}
                 value={formData.clusterName}
               />
@@ -257,7 +257,7 @@ const ConnectionDialogBox = () => {
                 name="serverURI"
                 required
                 label="Kafka Server URI:"
-                variant="filled"
+                variant="outlined"
                 onChange={handleChange}
                 value={formData.serverURI}
               />
@@ -268,7 +268,7 @@ const ConnectionDialogBox = () => {
                 id="ports-input"
                 name="ports"
                 label="Port(s):"
-                variant="filled"
+                variant="outlined"
                 onFocus={() => {
                   setPortIsClicked(true);
                 }}
@@ -299,7 +299,7 @@ const ConnectionDialogBox = () => {
                 // required
                 id="api-key-input"
                 label="API Key:"
-                variant="filled"
+                variant="outlined"
                 onChange={handleChange}
                 value={formData.apiKey}
               />
@@ -309,7 +309,7 @@ const ConnectionDialogBox = () => {
                 id="api-secret-input"
                 label="API Secret:"
                 type="password"
-                variant="filled"
+                variant="outlined"
                 onChange={handleChange}
                 value={formData.apiSecret}
               />

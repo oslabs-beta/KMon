@@ -13,6 +13,7 @@ import {
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { useAppContext } from '../AppContext.js';
+import { useTheme} from "@mui/material/styles";
 
 // TO DO: confirm apiUrl for production
 const apiUrl =
@@ -22,6 +23,7 @@ const apiUrl =
 
 const AccountMenu = (props) => {
   const { onLogout } = props;
+  const theme = useTheme();
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const open = Boolean(menuAnchorEl);
@@ -71,16 +73,16 @@ const AccountMenu = (props) => {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <Tooltip title="Account settings">
+        <Tooltip title="Account settings" >
           <IconButton 
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2 }}
+            sx={{ ml: 2}}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>
+            <Avatar sx={{ width: '40px', height: '40px' }}>
               { /* Show the first initial in the Avatar when logged in; won't show in dev mode or if not logged in */ }
               {userInfo && userInfo.firstName && userInfo.firstName[0]}
             </Avatar>

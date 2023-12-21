@@ -2,7 +2,6 @@ import React, { useState, createContext } from "react";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AppProvider } from "./AppContext";
 import Sidebar from "./components/Sidebar.jsx";
-import Header from "./components/Header.jsx";
 import Alerts from "./pages/Alerts.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Connections from "./pages/Connections.jsx";
@@ -12,6 +11,8 @@ import Settings from "./pages/Settings.jsx";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple, indigo, grey } from "@mui/material/colors";
 import 'typeface-roboto';
+import Box from '@mui/material';
+
 
 const theme = createTheme({
   palette: {
@@ -35,8 +36,6 @@ const theme = createTheme({
     defaultMargin: 8,
     largeMargin: 16,
     smallMargin: 4,
-    sideBarMargin: 30,
-    headerMargin: 3.75,
   },
   breakpoints: {
     values: {
@@ -64,7 +63,23 @@ const theme = createTheme({
         },
       },
     },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          border: '1px solid #ccc', // Adjust the color and border width as needed
+          boxShadow: 'none', // Remove box-shadow
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        root: {
+          backgroundColor: grey[900], // Set the background color here
+        },
+      },
+    },
   },
+  shadows: [],
 });
 
 export const AppContext = createContext();
@@ -84,16 +99,20 @@ const App = () => {
     setLoggedIn(false);
   };
 
+  const backColor = theme.palette.customColor.dark
+
+
   return (
     <ThemeProvider theme={theme}>
       <AppProvider>
         <HashRouter>
+        <div style={{ display: "flex"}}>
           {isLoggedIn && (
             <>
-              <Header onLogout={handleLogout} />
               <Sidebar />
             </>
           )}
+          <div style={{ flex: 1, paddingLeft: isLoggedIn ? 0 : 240 }} >
           <Routes>
             {isLoggedIn ? (
               <>
@@ -117,6 +136,8 @@ const App = () => {
               </>
             )}
           </Routes>
+          </div>
+          </div>
         </HashRouter>
       </AppProvider>
     </ThemeProvider>

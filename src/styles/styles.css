@@ -1,5 +1,13 @@
-h1 {
+/* h1 {
   color: rgb(34, 0, 255);
+} */
+
+.activeLink {
+  color: purple !important;
+}
+
+.main-content {
+  margin-left: 0; /* Remove the left margin */
 }
 
 .pageContainer h1 {

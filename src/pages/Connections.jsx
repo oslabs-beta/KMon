@@ -8,15 +8,10 @@ import { useTheme } from '@mui/material/styles';
 const Connections = () => {
   const theme = useTheme();
 
-  const containerStyle = {
-    marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
-  };
-
   return (
-    <Container sx={containerStyle}>
+    <Container>
       <div>
-        <h1>Saved Connections</h1>
+        <h1>Welcome back. Your connections: </h1>
         <ConnectionDialogBox />
       </div>
       <ConnectionsTable />

@@ -13,11 +13,7 @@ import { useAppContext } from "../AppContext.js";
 
 const Dashboard = () => {
   const theme = useTheme();
-
-  const containerStyle = {
-    marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
-  };
+  const primaryColor = theme.palette.primary.main;
 
   const { selectedGraphs, setSelectedGraphs } = useAppContext();
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
@@ -102,8 +98,8 @@ const Dashboard = () => {
     //   }
   }
   return (
-    <Container sx={containerStyle}>
-      <h1>This is the Dashbords Page</h1>
+    <Container >
+      <h1>Your Dashbords: </h1>
       <FormControl
         variant="outlined"
         style={{ width: 250 }}

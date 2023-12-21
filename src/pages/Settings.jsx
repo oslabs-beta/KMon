@@ -104,7 +104,7 @@ const AlertSettings = () => {
 
               <Button
                 type="button"
-                variant="outlined"
+                variant="contained"
                 onClick={saveAlertPreferences}
                 sx={{ width: '200px' }}
               >
