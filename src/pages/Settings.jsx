@@ -123,6 +123,8 @@ const AlertSettings = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userID: userInfo.userID,
+          user_email: userInfo.userEmail,
+          user_password: password,
           preferences: alertPreferences,
           preferredEmail: preferredEmail,
           slackURL: slackURL,
@@ -134,10 +136,13 @@ const AlertSettings = () => {
         console.log('Alert preferences saved successfully.');
         setSavedPreferences(alertPreferences);
         setSettingsFeedback('Alert preferences saved successfully.');
+      } else {
+        setSettingsFeedback('Incorrect password. Please try again.');
       }
     } catch (error) {
       console.error('Error while saving alert preferences:', error);
-      setSettingsFeedback('Failed to save alert preferences.');
+      // setSettingsFeedback('Failed to save alert preferences.');
+      setSettingsFeedback(`Error while saving alert preferences: ${response.status}`);
     }
   };
 

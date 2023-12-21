@@ -58,6 +58,7 @@ const LogIn = (props) => {
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
+  const [serverRes, setServerRes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validateErrorMessage, setValidateErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -110,6 +111,7 @@ const LogIn = (props) => {
       }
 
       setValidateErrorMessage(errorMessage + '.');
+      setServerRes('');
       setIsSubmitting(false);
       return;
     }
@@ -138,8 +140,11 @@ const LogIn = (props) => {
           navigate('/Overview');
         }
       } else {
+        const errorResponse = await response.json(); // Parse JSON response
+        const errorMessage = errorResponse.error || 'An error occurred'; // Access the error property
         setIsError(true);
-        console.log('Login failed. Status:', response.status);
+        console.log('Login failed.', errorMessage);
+        setServerRes(errorMessage);
       }
     } catch (error) {
       setIsError(true);
@@ -261,9 +266,10 @@ const LogIn = (props) => {
                 {/* Conditional rendering of invalid login credentials error message */}
                 {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
-                    Email or password is incorrect
+                    {serverRes !== '' ? serverRes : 'Email or password is incorrect'}
                   </Alert>
                 ) : null}
+
 
                 <Grid container>
                   <Grid item xs>
