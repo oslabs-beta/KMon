@@ -4,15 +4,19 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { SortableOverlay } from "./SortableOverlay.jsx";
 import { DragHandle, MetricGroup } from "./MetricGroup.jsx";
 import DashboardContext from "../../context/DashboardContext.jsx";
+import Graph from "../../GraphComponents/Graph.jsx";
+import { useAppContext } from "../../AppContext.js";
 
 const MetricGroupContext = () => {
   const [active, setActive] = useState(null);
-  const [items, setItems] = useContext(DashboardContext);
+  const {items, setItems} = useAppContext();
+  console.log('items in MGContext', items);
 
   const renderItem = (item) => (
     <DashboardContext.Provider value={[items, setItems]}>
       <MetricGroup id={item.id} key={item.id}>
-        {item.component}
+        <Graph key={item.id} id={item.graphId} />
+        {/* {item.component} */}
         <DragHandle />
       </MetricGroup>
     </DashboardContext.Provider>

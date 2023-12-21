@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Select,
@@ -9,7 +9,9 @@ import {
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import DashboardContainer from "../GraphContainers/DashboardContainer.jsx";
+import MetricGroupContext from '../components/dnd/MetricGroupContext.jsx'
 import { useAppContext } from "../AppContext.js";
+import DashboardContext from "../context/DashboardContext.jsx";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -19,8 +21,12 @@ const Dashboard = () => {
     marginTop: theme.margins.headerMargin,
   };
 
-  const { selectedGraphs, setSelectedGraphs } = useAppContext();
+  const { selectedGraphs, setSelectedGraphs} = useAppContext();
+
+  // console.log('items for dashboard', items);
+  
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
+   console.log('selectedGraphs', selectedGraphs);
   const allMetrics = {
     "Total Number of Bytes Allocated": 2,
     "Bytes Saved to Memory": 3,
@@ -85,7 +91,12 @@ const Dashboard = () => {
     // Update the frontend state
     setSelectedGraphs((prevSelected) => {
       //it adds the selected graph id to the array of already selected graphs
-      return [...prevSelected, selectedGraphId];
+      return [...prevSelected, { 
+          id: prevSelected.length, 
+          graphId: selectedGraphId, 
+          width: 550, height: 250 
+        }];
+      ;
     });
     //         } else {
     //           throw new Error ('Failed to post selected graphs')
@@ -103,7 +114,7 @@ const Dashboard = () => {
   }
   return (
     <Container sx={containerStyle}>
-      <h1>This is the Dashbords Page</h1>
+      <h1>This is the Dashboards Page</h1>
       <FormControl
         variant="outlined"
         style={{ width: 250 }}
@@ -133,6 +144,10 @@ const Dashboard = () => {
       </FormControl>
       {/* Renders the DashboardContainer component passing selected graphs */}
       <DashboardContainer />
+
+      {/* <DashboardContext.Provider value={[items, setItems]}> */}
+        {/* <MetricGroupContext/> */}
+      {/* </DashboardContext.Provider> */}
     </Container>
   );
 };

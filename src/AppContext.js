@@ -9,6 +9,12 @@ export const AppProvider = ({ children }) => {
   // State to hold user information
   const [userInfo, setUserInfo] = useState(null);
   const [selectedGraphs, setSelectedGraphs] = useState([]);
+  const [items, setItems] = useState([
+    { id: 1, graphId: 2, width: 550, height: 250},
+    { id: 2, graphId: 3, width: 550, height: 250},
+    { id: 3, graphId: 4, width: 550, height: 250},
+  ]);
+
 
   // Function to update the user information in the state
   const updateUserInfo = (newUserInfo) => {
@@ -18,7 +24,7 @@ export const AppProvider = ({ children }) => {
   // Return the provider component with a value set to an object containing user information and update functions
   return (
     <AppContext.Provider
-      value={{ userInfo, updateUserInfo, selectedGraphs, setSelectedGraphs }}
+      value={{ userInfo, updateUserInfo, selectedGraphs, setSelectedGraphs, items, setItems }}
     >
       {children}
     </AppContext.Provider>

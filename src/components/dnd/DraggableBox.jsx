@@ -3,14 +3,14 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import DashboardContext from "../../context/DashboardContext.jsx";
 
-const MetricGroupContext = createContext({
+const DraggableBoxContext = createContext({
   attributes: {},
   listeners: undefined,
   ref() {},
 });
 
-export function MetricGroup({ children, id }) {
-  const [items, setItems] = useContext(DashboardContext);
+export function DraggableBox({ children, id }) {
+  const [selectedGraphs, setSelectedGraphs] = useContext(DashboardContext);
   const {
     attributes,
     isDragging,
@@ -30,7 +30,7 @@ export function MetricGroup({ children, id }) {
     [attributes, listeners, setActivatorNodeRef]
   );
 
-  const MetricGroupStyle = {
+  const DraggableBoxStyle = {
     display: 'flex',
     resize: 'both',
     overflow: 'auto',
@@ -56,9 +56,7 @@ export function MetricGroup({ children, id }) {
     const div = mouseUpEvent.target
     const rect = div.getBoundingClientRect();
 
-    // if (20 > Math.abs(rect.bottom - mouseUpEvent.y) && 
-    //     20 > Math.abs(rect.right - mouseUpEvent.x)) {
-      const updateItems = [...items];
+      const updateItems = [...selectedGraphs];
       let activeItem;
       for (let i = 0; i < updateItems.length; i++) {
         if (updateItems[i]['id'] === id) {
@@ -68,8 +66,7 @@ export function MetricGroup({ children, id }) {
 
       activeItem.width = rect.width;
       activeItem.height = rect.height;
-      setItems(updateItems);
-    // }
+      setSelectedGraphs(updateItems);
 
     document.removeEventListener("mouseup", onMouseUp)
   }
@@ -77,30 +74,23 @@ export function MetricGroup({ children, id }) {
   const onMouseDown = (mouseDownEvent) => {
     const div = mouseDownEvent.target
     const rect = div.getBoundingClientRect();
-    console.log(div);
-    console.log(rect);
-    console.log('rect', rect.right, rect.bottom);
-    console.log('mouse', mouseDownEvent.pageX, mouseDownEvent.pageY);
-    console.log(20 > Math.abs(rect.bottom - mouseDownEvent.pageY) && 
-    20 > Math.abs(rect.right - mouseDownEvent.pageX));
     if (20 > Math.abs(rect.bottom - mouseDownEvent.pageY) && 
         20 > Math.abs(rect.right - mouseDownEvent.pageX)) {
-          console.log('mouse on target');
       document.addEventListener("mouseup", onMouseUp);
     }
   }
 
   return (
-    <MetricGroupContext.Provider value={context}>
-      <div className="SortableItem" ref={setNodeRef} style={MetricGroupStyle} onMouseDown={onMouseDown}>
+    <DraggableBoxContext.Provider value={context}>
+      <div className="SortableItem" ref={setNodeRef} style={DraggableBoxStyle} onMouseDown={onMouseDown}>
           {children}
       </div>
-    </MetricGroupContext.Provider>
+    </DraggableBoxContext.Provider>
   );
 }
 
 export function DragHandle() {
-  const { attributes, listeners, ref } = useContext(MetricGroupContext);
+  const { attributes, listeners, ref } = useContext(DraggableBoxContext);
 
   const dragHandleStyle = {
     display: 'flex',
@@ -127,3 +117,4 @@ export function DragHandle() {
     </button>
   );
 }
+
