@@ -56,7 +56,6 @@ function Sidebar() {
       <Box sx={{ overflow: "auto" }}>
         <List>
           {[
-            "Overview",
             "Connections",
             "Dashboard",
           ].map((text, index) => (

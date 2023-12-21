@@ -83,8 +83,8 @@ const Dashboard = () => {
     //         response.json();
     //       if(response.ok) {
     // Update the frontend state
+
     setSelectedGraphs((prevSelected) => {
-      //it adds the selected graph id to the array of already selected graphs
       return [...prevSelected, selectedGraphId];
     });
     //         } else {

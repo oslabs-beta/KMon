@@ -6,12 +6,12 @@ import Header from "./components/Header.jsx";
 import Alerts from "./pages/Alerts.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Connections from "./pages/Connections.jsx";
-import Overview from "./pages/Overview.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Settings from "./pages/Settings.jsx";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { deepPurple, indigo, grey, blueGrey } from "@mui/material/colors";
+import { deepPurple, indigo, grey } from "@mui/material/colors";
+import 'typeface-roboto';
 
 const theme = createTheme({
   palette: {
@@ -24,11 +24,11 @@ const theme = createTheme({
     customColor: {
       main: deepPurple[600],
       light: grey[400],
-      dark: blueGrey[700],
+      dark: grey[900],
     },
   },
   typography: {
-    fontFamily: "Helvetica Neue",
+    fontFamily: "Roboto, sans-serif",
   },
   spacing: 8,
   margins: {
@@ -100,7 +100,6 @@ const App = () => {
                 <Route path="/Connections" element={<Connections />} />
                 <Route path="/Alerts" element={<Alerts />} />
                 <Route path="/Dashboard" element={<Dashboard />} />
-                <Route path="/Overview" element={<Overview />} />
                 <Route path="/Settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/Overview" />} />
               </>

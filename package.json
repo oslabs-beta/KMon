@@ -72,6 +72,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reactjs-popup": "^2.0.6",
+    "typeface-roboto": "^1.1.13",
     "validator": "^13.11.0"
   }
 }
