@@ -65,12 +65,11 @@ configController.getPrometheusPorts = (req, res, next) => {
 
 configController.createGrafanaYaml = (req, res, next) => {
   try {
-    console.log('starting grafana yaml creation...')
     const prometheusNum = res.locals.prometheusPorts.promCount;
     const maxPort = res.locals.prometheusPorts.maxPort
 
     const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
-    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), 'utf-8'))
+    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
 
     // create new dataProvider object, replace the dataprovider in the original dashboard.yml and write this as a new dashboard file.
     const newDataProvider = {
@@ -122,7 +121,7 @@ configController.createGrafanaYaml = (req, res, next) => {
 
 
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8')
-    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), newDatasourcesYaml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), newDatasourcesYaml, 'utf-8')
 
     return next();
   } catch {
@@ -189,7 +188,7 @@ configController.createConnection = (req, res, next) => {
           ]
         }]
       },
-      rule_files: ['/etc/prometheus/rules/*.yaml'],
+      rule_files: ['/etc/prometheus/rules/*.yml'],
       scrape_configs: [
         {
           job_name: clusterName,

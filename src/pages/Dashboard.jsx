@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Container,
   Select,
   FormControl,
   InputLabel,
   MenuItem,
-} from "@mui/material";
-import { styled } from "@mui/system";
-import { useTheme } from "@mui/material/styles";
-import DashboardContainer from "../GraphContainers/DashboardContainer.jsx";
-import MetricGroupContext from '../components/dnd/MetricGroupContext.jsx'
-import { useAppContext } from "../AppContext.js";
-import DashboardContext from "../context/DashboardContext.jsx";
+} from '@mui/material';
+import { styled } from '@mui/system';
+import { useTheme } from '@mui/material/styles';
+import DashboardContainer from '../GraphContainers/DashboardContainer.jsx';
+import MetricGroupContext from '../components/dnd/MetricGroupContext.jsx';
+import { useAppContext } from '../AppContext.js';
+import DashboardContext from '../context/DashboardContext.jsx';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,20 +21,25 @@ const Dashboard = () => {
     marginTop: theme.margins.headerMargin,
   };
 
-  const { selectedGraphs, setSelectedGraphs} = useAppContext();
+  const { selectedGraphs, setSelectedGraphs } = useAppContext();
 
   // console.log('items for dashboard', items);
-  
+
   //object with all available metrics and their corresponding IDs(IDs are from grafana)
-   console.log('selectedGraphs', selectedGraphs);
+  console.log('selectedGraphs', selectedGraphs);
   const allMetrics = {
-    "Total Number of Bytes Allocated": 2,
-    "Bytes Saved to Memory": 3,
-    "Handler Request": 4,
-    "Request Duration": 5,
-    "Task Handlers": 6,
-    "Closed Connection Rate": 7,
-    "Memory Usage": 8,
+    'Under-Replicated Partitions': 2,
+    'Offline Partitions Count': 3,
+    'Acive Controller Count': 4,
+    'JVM Memory Pool Bytes Used': 5,
+    'Total CPU Process Seconds': 6,
+    'Total Bytes In': 7,
+    'Total Bytes Out': 8,
+    'Failed Fetch Requests Total': 9,
+    'ISR Shrinks Total': 10,
+    'Consumer Lag': 11,
+    'Total Groups Rebalancing': 12,
+    'Metadata Error Count': 13,
   };
   //object with reversed values. it is for backend
   // const reverseMetrics = {
@@ -91,12 +96,15 @@ const Dashboard = () => {
     // Update the frontend state
     setSelectedGraphs((prevSelected) => {
       //it adds the selected graph id to the array of already selected graphs
-      return [...prevSelected, { 
-          id: prevSelected.length, 
-          graphId: selectedGraphId, 
-          width: 550, height: 250 
-        }];
-      ;
+      return [
+        ...prevSelected,
+        {
+          id: prevSelected.length,
+          graphId: selectedGraphId,
+          width: 550,
+          height: 250,
+        },
+      ];
     });
     //         } else {
     //           throw new Error ('Failed to post selected graphs')
@@ -115,21 +123,21 @@ const Dashboard = () => {
   return (
     <Container sx={containerStyle}>
       <FormControl
-        variant="outlined"
+        variant='outlined'
         style={{ width: 250 }}
-        sx={{ marginBottom: "10px" }}
+        sx={{ marginBottom: '10px' }}
       >
-        <InputLabel hiddenLabel={true} variant="filled">
-          {" "}
+        <InputLabel hiddenLabel={true} variant='filled'>
+          {' '}
           + Add Metric
         </InputLabel>
         <Select
           IconComponent={() => null}
           value={selectedGraphs}
-          renderValue={() => " "}
+          renderValue={() => ' '}
           onChange={handleGraphSelection}
           displayEmpty
-          inputProps={{ "aria-label": "Select Graphs" }}
+          inputProps={{ 'aria-label': 'Select Graphs' }}
           MenuProps={{ autoClose: true }}
         >
           {/* Maps over all metrics to create options in the dropdown */}
@@ -145,7 +153,7 @@ const Dashboard = () => {
       <DashboardContainer />
 
       {/* <DashboardContext.Provider value={[items, setItems]}> */}
-        {/* <MetricGroupContext/> */}
+      {/* <MetricGroupContext/> */}
       {/* </DashboardContext.Provider> */}
     </Container>
   );
