@@ -145,7 +145,7 @@ function SignUp(props) {
           const data = await response.json();
           // console.log('Signup successful. Navigating to /Overview...');
           onLogin();
-          navigate('/Overview');
+          navigate('/Connections');
         }
       } else {
         const data = await response.json();

@@ -114,7 +114,6 @@ const Dashboard = () => {
   }
   return (
     <Container sx={containerStyle}>
-      <h1>This is the Dashboards Page</h1>
       <FormControl
         variant="outlined"
         style={{ width: 250 }}

@@ -100,9 +100,9 @@ const App = () => {
                 <Route path="/Connections" element={<Connections />} />
                 <Route path="/Alerts" element={<Alerts />} />
                 <Route path="/Dashboard" element={<Dashboard />} />
-                <Route path="/Overview" element={<Overview />} />
+                {/* <Route path="/Overview" element={<Overview />} /> */}
                 <Route path="/Settings" element={<Settings />} />
-                <Route path="*" element={<Navigate to="/Overview" />} />
+                <Route path="*" element={<Navigate to="/Connections" />} />
               </>
             ) : (
               <>

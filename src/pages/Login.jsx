@@ -137,7 +137,7 @@ const LogIn = (props) => {
           // console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
-          navigate('/Overview');
+          navigate('/Connections');
         }
       } else {
         const errorResponse = await response.json(); // Parse JSON response
