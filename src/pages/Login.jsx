@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from "@mui/material/styles";
 import { Link as RouterLink } from 'react-router-dom';
 import validator from 'validator';
 import {
@@ -27,7 +28,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+//import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // import GoogleSignIn from './GoogleSignIn.jsx';
 
@@ -42,13 +43,14 @@ const apiUrl =
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
 
-const defaultTheme = createTheme();
+// const defaultTheme = createTheme();
 
 const LogIn = (props) => {
   const containerStyle = {
     marginLeft: 'auto',
     marginTop: 'auto',
   };
+  const theme = useTheme();
 
   // Destructure the onLogin function from props for managing the login status
   const { onLogin } = props;
@@ -154,7 +156,7 @@ const LogIn = (props) => {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    // <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="100%" sx={containerStyle}>
         <CssBaseline />
         <Grid
@@ -290,7 +292,7 @@ const LogIn = (props) => {
           </Grid>
         </Grid>
       </Container>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
 };
 

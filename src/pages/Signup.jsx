@@ -4,6 +4,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTheme } from "@mui/material/styles";
+
 import validator from 'validator';
 import {
   Alert,
@@ -17,7 +19,7 @@ import {
   Container,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+//import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // TO DO: confirm apiUrl for production
 // API URL setup based on the environment
@@ -31,6 +33,7 @@ function SignUp(props) {
     marginLeft: 'auto',
     marginTop: 'auto',
   };
+  const theme = useTheme();
 
   const navigate = useNavigate();
 
@@ -172,10 +175,10 @@ function SignUp(props) {
   };
   
   // MUI Theme setup
-  const defaultTheme = createTheme();
+  // const defaultTheme = createTheme();
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    // <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs" sx={containerStyle}>
         <CssBaseline />
         <Box
@@ -308,7 +311,7 @@ function SignUp(props) {
           </Box>
         </Box>
       </Container>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
 }
 

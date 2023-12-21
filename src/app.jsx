@@ -84,12 +84,16 @@ const theme = createTheme({
 
 export const AppContext = createContext();
 
+
+
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
   // const [isLoggedIn, setLoggedIn] = useState(true);
 
   // For development mode, isLoggedIn is set to true
   const [isLoggedIn, setLoggedIn] = useState(true);
+
+  
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -109,7 +113,7 @@ const App = () => {
         <div style={{ display: "flex"}}>
           {isLoggedIn && (
             <>
-              <Sidebar />
+              <Sidebar onLogout={handleLogout}/>
             </>
           )}
           <div style={{ flex: 1, paddingLeft: isLoggedIn ? 0 : 240 }} >
