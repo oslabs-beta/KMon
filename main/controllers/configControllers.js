@@ -11,6 +11,57 @@ const { default: cluster } = require('cluster');
 
 const configController = {};
 
+configController.switchDashboard = (req, res, next) => {
+  try {
+    const { dataswitch } = req.body;
+    console.log(
+      path.join(
+        __dirname,
+        '../../grafana/provisioning/dashboards/dashboard.json'
+      )
+    );
+    fs.readFile(
+      path.join(
+        __dirname,
+        '../../grafana/provisioning/dashboards/dashboard.json'
+      ),
+      'utf8',
+      (err, data) => {
+        if (err) {
+          console.error(err, 'ERROR READING FILE');
+          return;
+        }
+
+        const dashboard = JSON.parse(data);
+
+        // Get datasource UID from chosen storage mechanism
+        const datasourceUid = 'Prometheus3'; // Replace with your logic
+
+        dashboard.panels[0].datasource.uid = datasourceUid;
+
+        fs.writeFile(
+          path.join(
+            __dirname,
+            '../../grafana/provisioning/dashboards/dashboard.json'
+          ),
+          JSON.stringify(dashboard, null, 4),
+          (err) => {
+            if (err) {
+              console.log('past read file, error in write file');
+              console.error(err);
+            } else {
+              console.log('Dashboard.json updated successfully');
+            }
+          }
+        );
+      }
+    );
+    return next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 configController.getPrometheusPorts = (req, res, next) => {
   // console.log('configController.createConnection - req.body: ', req.body);
   try {

@@ -16,7 +16,9 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
-
+// import { fs } from 'fs';
+// import { path } from 'path';
+// const path = require('path');
 
 // TO DO: confirm apiUrl for production
 const apiUrl =
@@ -24,15 +26,43 @@ const apiUrl =
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
 
+// fs.readFile(
+//   path.join(__dirname, '../../grafana/provisioning/dasboards/dashboard.json'),
+//   'utf8',
+//   (err, data) => {
+//     if (err) {
+//       console.error(err, 'ERROR READING FILE');
+//       return;
+//     }
+
+//     const dashboard = JSON.parse(data);
+
+//     // Get datasource UID from chosen storage mechanism
+//     const datasourceUid = 'Prometheus3'; // Replace with your logic
+
+//     dashboard.datasource.uid = datasourceUid;
+
+//     fs.writeFile(
+//       '../../grafana/provisioning/dasboards/dashboard.json',
+//       JSON.stringify(dashboard, null, 4),
+//       (err) => {
+//         if (err) {
+//           console.error(err);
+//         } else {
+//           console.log('Dashboard.json updated successfully');
+//         }
+//       }
+//     );
+//   }
+// );
 
 const ConnectionDialogBox = () => {
-
   /************** Component States ****************/
 
   // states for port entry
   const [portIsClicked, setPortIsClicked] = useState(false);
-  const [portIsValid, setPortIsValid] = useState(true)
-  const [helperText, setHelperText] = useState(null)
+  const [portIsValid, setPortIsValid] = useState(true);
+  const [helperText, setHelperText] = useState(null);
   // clear hard-coded faults for production
   // const [ports, setPorts] = useState(['1234', '2345', '3456']);
   // form states
@@ -50,8 +80,8 @@ const ConnectionDialogBox = () => {
   const [alertProps, setAlertProps] = useState({
     visibility: 'hidden',
     height: 0,
-    message: ''
-  })
+    message: '',
+  });
 
   /************** Event Handlers *************/
 
@@ -64,7 +94,7 @@ const ConnectionDialogBox = () => {
     }));
   };
 
-  // TO DO: 
+  // TO DO:
   // - update api call
   // - need to fix up ports input event handlers. Currently, clicking "enter" with a valid port updates port numbers in state but also serves sets the state for "portIsValid" to false, which changes the appearance of the input box.
   const handleSubmit = async (event) => {
@@ -72,23 +102,30 @@ const ConnectionDialogBox = () => {
     event.preventDefault();
     if (!portIsClicked) {
       // check if form is valid, otherwise display alert.
-      if (!formData.clusterName || !formData.serverURI || !formData.ports.length) {
+      if (
+        !formData.clusterName ||
+        !formData.serverURI ||
+        !formData.ports.length
+      ) {
         setAlertProps({
           visibility: 'visible',
           marginTop: '15px',
           height: '100%',
-          message: 'Please provide cluster name, server URI, and port numbers'
-        })
-      }
-      else
+          message: 'Please provide cluster name, server URI, and port numbers',
+        });
+      } else
         try {
-          const response = await fetch(`${apiUrl}/api/createConnection`, {
+          // const response = await fetch(`${apiUrl}/api/createConnection`, {
+          const response = await fetch(`${apiUrl}/api/test`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
+            // body: JSON.stringify({
+            //   ...formData,
+            // }),
             body: JSON.stringify({
-              ...formData
+              dataSwitch: 'Prometheus3',
             }),
           });
           console.log(response);
@@ -103,7 +140,7 @@ const ConnectionDialogBox = () => {
               apiKey: '',
               apiSecret: '',
             });
-            console.log('data submitted! data: ', data)
+            console.log('data submitted! data: ', data);
           } else {
             console.log('Failed to save credentials');
           }
@@ -119,24 +156,21 @@ const ConnectionDialogBox = () => {
             apiSecret: '',
           });
         }
-    }
-    else {
+    } else {
       event.preventDefault();
     }
   };
 
   const handleSubmitKey = (event) => {
-
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       if (portIsClicked === true) {
         event.preventDefault();
         handleCheckPort(event);
-      }
-      else {
+      } else {
         handleSubmit(event);
       }
     }
-  }
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -153,86 +187,83 @@ const ConnectionDialogBox = () => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
 
     const portNum = event.target.value;
-    if (event.key === "Enter" || event.key === "Space") {
-
+    if (event.key === 'Enter' || event.key === 'Space') {
       event.preventDefault();
       if (!Number(portNum) || portNum.length < 4 || portNum.length > 5) {
         setPortIsValid(false);
-        setHelperText("Invalid Port Number")
+        setHelperText('Invalid Port Number');
         event.target.value = null;
-      }
-      else if (ports.includes(portNum)) {
+      } else if (ports.includes(portNum)) {
         setPortIsValid(false);
-        setHelperText('Duplicate Port Detected')
+        setHelperText('Duplicate Port Detected');
         event.target.value = null;
-      }
-      else {
+      } else {
         setPortIsValid(true);
         // setPorts((prevState) => {
         //   return [...prevState, portNum];
         // })
-        console.log('event target name in checkPort: ', event.target.name)
-        console.log('event target value in checkPort: ', event.target.value)
-        const newPorts = [...ports, portNum]
+        console.log('event target name in checkPort: ', event.target.name);
+        console.log('event target value in checkPort: ', event.target.value);
+        const newPorts = [...ports, portNum];
         setFormData((prevFormData) => {
           return {
             ...prevFormData,
-            ports: [...newPorts]
-          }
-        })
+            ports: [...newPorts],
+          };
+        });
         setHelperText(null);
         event.target.value = null;
       }
     }
 
-    console.log('handleCheckPort - formData: ', formData)
-
-  }
+    console.log('handleCheckPort - formData: ', formData);
+  };
 
   const handleDeleteChip = (event) => {
-    const deleteChip = event.currentTarget.parentNode.firstChild
+    const deleteChip = event.currentTarget.parentNode.firstChild;
 
-    const deletePort = deleteChip.innerText
+    const deletePort = deleteChip.innerText;
 
     const newPorts = ports.filter((port, index) => {
-      return port !== deletePort
-    })
+      return port !== deletePort;
+    });
     // setPorts([...newPorts])
     setFormData((prevFormData) => {
       return {
         ...prevFormData,
-        ports: [...newPorts]
-      }
-    })
+        ports: [...newPorts],
+      };
+    });
     setHelperText(null);
-    console.log('handleCheckPort - formData: ', formData)
-  }
+    console.log('handleCheckPort - formData: ', formData);
+  };
 
   /******** sub-Components *******/
 
   // render Tags
 
   const portChips = ports.map((port, index) => {
-    return <Chip
-      id={`chip${index}`}
-      key={`chip${index}`}
-      label={port}
-      variant='filled'
-      onDelete={(e) => {
-        handleDeleteChip(e);
-      }}
-      sx={{
-        width: '100%',
-        marginLeft: 0,
-        marginRight: 0
-      }}
-    />
-  })
-
+    return (
+      <Chip
+        id={`chip${index}`}
+        key={`chip${index}`}
+        label={port}
+        variant='filled'
+        onDelete={(e) => {
+          handleDeleteChip(e);
+        }}
+        sx={{
+          width: '100%',
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      />
+    );
+  });
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button variant='outlined' onClick={handleClickOpen}>
         <AddIcon></AddIcon>
       </Button>
       <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmitKey}>
@@ -240,35 +271,50 @@ const ConnectionDialogBox = () => {
         <DialogContent>
           {/* removed DialogContentText component; caused DOM content error due to div nested inside of a p element */}
           <form onSubmit={handleSubmit}>
-            <Stack className='clusterStack' spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            <Stack
+              className='clusterStack'
+              spacing={2}
+              direction='row'
+              sx={{ marginBottom: 4 }}
+            >
               <TextField
-                id="cluster-name"
-                name="clusterName"
+                id='cluster-name'
+                name='clusterName'
                 required
-                label="Cluster Name:"
-                variant="filled"
+                label='Cluster Name:'
+                variant='filled'
                 onChange={handleChange}
                 value={formData.clusterName}
               />
             </Stack>
-            <Stack className='uriInputStack' spacing={2} direction="column" sx={{ marginBottom: 4 }}>
+            <Stack
+              className='uriInputStack'
+              spacing={2}
+              direction='column'
+              sx={{ marginBottom: 4 }}
+            >
               <TextField
-                id="uri-input"
-                name="serverURI"
+                id='uri-input'
+                name='serverURI'
                 required
-                label="Kafka Server URI:"
-                variant="filled"
+                label='Kafka Server URI:'
+                variant='filled'
                 onChange={handleChange}
                 value={formData.serverURI}
               />
             </Stack>
             {/* Check port numbers and display ports as chips */}
-            <Stack className='portsInputStack' spacing={2} direction="column" sx={{ marginBottom: 4, maxWidth: 417 }}>
+            <Stack
+              className='portsInputStack'
+              spacing={2}
+              direction='column'
+              sx={{ marginBottom: 4, maxWidth: 417 }}
+            >
               <TextField
-                id="ports-input"
-                name="ports"
-                label="Port(s):"
-                variant="filled"
+                id='ports-input'
+                name='ports'
+                label='Port(s):'
+                variant='filled'
                 onFocus={() => {
                   setPortIsClicked(true);
                 }}
@@ -280,48 +326,61 @@ const ConnectionDialogBox = () => {
                 onKeyDown={handleCheckPort}
               />
               <Stack
-                className="tagStack"
+                className='tagStack'
                 spacing={2}
-                direction="row"
+                direction='row'
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr 1fr 1fr',
                   gridAutoRows: true,
                   gridGap: '5px 2px',
-                  maxWidth: '85%'
-                }}>
+                  maxWidth: '85%',
+                }}
+              >
                 {portChips}
               </Stack>
             </Stack>
-            <Stack className='apiStack' spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            <Stack
+              className='apiStack'
+              spacing={2}
+              direction='row'
+              sx={{ marginBottom: 4 }}
+            >
               <TextField
-                name="apiKey"
+                name='apiKey'
                 // required
-                id="api-key-input"
-                label="API Key:"
-                variant="filled"
+                id='api-key-input'
+                label='API Key:'
+                variant='filled'
                 onChange={handleChange}
                 value={formData.apiKey}
               />
               <TextField
-                name="apiSecret"
+                name='apiSecret'
                 // required
-                id="api-secret-input"
-                label="API Secret:"
-                type="password"
-                variant="filled"
+                id='api-secret-input'
+                label='API Secret:'
+                type='password'
+                variant='filled'
                 onChange={handleChange}
                 value={formData.apiSecret}
               />
             </Stack>
-            <Button type="submit" variant="contained">Submit</Button>
-            <Alert id='portAlert' severity='error' variant='outlined' sx={{ ...alertProps }}>
+            <Button type='submit' variant='contained'>
+              Submit
+            </Button>
+            <Alert
+              id='portAlert'
+              severity='error'
+              variant='outlined'
+              sx={{ ...alertProps }}
+            >
               {alertProps.message}
             </Alert>
           </form>
           <Box
             noValidate
-            component="form"
+            component='form'
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -331,7 +390,9 @@ const ConnectionDialogBox = () => {
           ></Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} onKeyDown={handleSubmitKey}>Close</Button>
+          <Button onClick={handleClose} onKeyDown={handleSubmitKey}>
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

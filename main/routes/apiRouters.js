@@ -19,5 +19,8 @@ router.post(
     }
   }
 );
+router.post('/test', configController.switchDashboard, (req, res, next) => {
+  res.status(200).send(JSON.stringify('Switched Datasource'));
+});
 
 module.exports = router;
