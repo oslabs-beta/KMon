@@ -3,8 +3,8 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
+      - ./grafana/provisioning/datasources/:/etc/grafana/provisioning/datasources/
       - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
@@ -15,6 +15,7 @@ services:
       - '3000:3000'
     depends_on:
       - prometheus
+      - prometheus3
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -26,10 +27,17 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-      - '9093:9093'
+      - '9094:9094'
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/data
+  prometheus3:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus3.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus3
+    ports:
+      - '9093:9090'
 volumes:
   prometheus_data: null
   grafana_data: null

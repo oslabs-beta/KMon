@@ -6,7 +6,16 @@ providers:
     folder: ''
     type: file
     disableDeletion: false
-    editable: false
+    editable: true
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+  - name: 'Prometheus3'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
     allowUiUpdates: true
     options:
       path: /etc/grafana/provisioning/dashboards

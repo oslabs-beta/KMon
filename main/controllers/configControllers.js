@@ -62,6 +62,7 @@ configController.getPrometheusPorts = (req, res, next) => {
 
 configController.createGrafanaYaml = (req, res, next) => {
   try {
+    console.log('INSIDE OF CREATE GRAFANA YAML');
     const prometheusNum = res.locals.prometheusPorts.promCount;
 
     const dashboardsDoc = yaml.load(
@@ -100,7 +101,6 @@ configController.createGrafanaYaml = (req, res, next) => {
     };
 
     dashboardsDoc.providers[0] = newDataProvider;
-
     const newDatasource = {
       name: `prometheus${prometheusNum + 1}`,
       type: 'prometheus',
@@ -212,18 +212,22 @@ configController.createConnection = (req, res, next) => {
     });
 
     // write new files to directory
-    // fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
-    // fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
+    fs.writeFileSync(
+      path.resolve(__dirname, '../../docker-compose.yml'),
+      newDockerYml,
+      'utf-8'
+    );
+    fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8');
 
-    // exec('docker compose up -d', (err, stdout, stderr) => {
-    //   if (err) {
-    //     return next({
-    //       log: 'Error while restarting Docker container',
-    //       status: 500,
-    //       message: { error: 'Internal server error' },
-    //     })
-    //   }
-    // })
+    exec('docker compose up -d', (err, stdout, stderr) => {
+      if (err) {
+        return next({
+          log: 'Error while restarting Docker container',
+          status: 500,
+          message: { error: 'Internal server error' },
+        });
+      }
+    });
 
     return next();
   } catch {
