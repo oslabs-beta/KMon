@@ -23,12 +23,8 @@ router.post(
   }
 );
 
-router.post(
-  '/logout',
-  authControllers.clearSessionCookie,
-  (req, res) => {
-    res.status(200).json({ message: 'Logout successful' });
-  }
-);
+router.post('/logout', authControllers.clearSessionCookie, (req, res) => {
+  res.status(200).json({ message: 'Logout successful' });
+});
 
 module.exports = router;

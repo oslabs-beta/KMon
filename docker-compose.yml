@@ -23,17 +23,12 @@ services:
   prometheus1:
     image: prom/prometheus:latest
     volumes:
-    - ./prometheus1.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus_data:/prometheus1
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml:ro
+      - prometheus_data:/prometheus
     ports:
-    - '9090:9090'
-  prometheus2:
-    image: prom/prometheus:latest
-    volumes:
-    - ./prometheus2.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus_data:/prometheus2
-    ports:
-    - '9091:9090'
+      - '9090:9090'
 volumes:
   prometheus_data: null
   grafana_data: null
+  alertmanager_data: null

@@ -55,10 +55,10 @@ const LogIn = (props) => {
   // Use the useAppContext hook to get access to the context
   const { userInfo, updateUserInfo } = useAppContext();
   
-  
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
+  const [serverRes, setServerRes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validateErrorMessage, setValidateErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -80,7 +80,7 @@ const LogIn = (props) => {
   const isValidLoginSubmission = (email, password) => {
     const isValidEmail = validator.isEmail(email);
     const isValidPassword = password.trim().length > 0;
-  
+
     return {
       isValid: isValidEmail && isValidPassword,
       isValidEmail,
@@ -93,7 +93,10 @@ const LogIn = (props) => {
     event.preventDefault();
     setIsSubmitting(true);
 
-    const validation = isValidLoginSubmission(formData.email, formData.password);
+    const validation = isValidLoginSubmission(
+      formData.email,
+      formData.password
+    );
 
     // Customize error message depending on output of isValidLoginSubmission
     if (!validation.isValid) {
@@ -103,12 +106,12 @@ const LogIn = (props) => {
         if (!validation.isValidPassword) {
           errorMessage += ' and password';
         }
-      }
-      else if (!validation.isValidPassword) {
+      } else if (!validation.isValidPassword) {
         errorMessage = 'Enter a password';
       }
-  
+
       setValidateErrorMessage(errorMessage + '.');
+      setServerRes('');
       setIsSubmitting(false);
       return;
     }
@@ -129,24 +132,27 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          // console.log('Login - data.user: ',  data.user);
+          console.log(`This is the info: ${data.user}`);
           updateUserInfo(data.user);
           // console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
-          navigate('/Overview');
+          navigate('/Connections');
         }
       } else {
+        const errorResponse = await response.json(); // Parse JSON response
+        const errorMessage = errorResponse.error || 'An error occurred'; // Access the error property
         setIsError(true);
-        console.log('Login failed. Status:', response.status);
+        // console.log('Login failed.', errorMessage);
+        setServerRes(errorMessage);
       }
     } catch (error) {
       setIsError(true);
-      console.log('Error in LogIn Form: ', error);
+      // console.log('Error in LogIn Form: ', error);
     } finally {
-      console.log(userInfo);
+      // console.log(userInfo);
       setIsSubmitting(false);
-      setValidateErrorMessage('')
+      setValidateErrorMessage('');
       setFormData((prevData) => ({
         ...prevData,
         password: '',
@@ -249,20 +255,21 @@ const LogIn = (props) => {
                 </Button>
 
                 {/* Conditional rendering of email and password validation error message */}
-                {validateErrorMessage? (
+                {validateErrorMessage ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
                     {validateErrorMessage}
                   </Alert>
                 ) : null}
-                
+
                 {/* <GoogleSignIn /> */}
 
                 {/* Conditional rendering of invalid login credentials error message */}
                 {isError ? (
                   <Alert severity="error" sx={{ marginTop: '10px' }}>
-                    Email or password is incorrect
+                    {serverRes !== '' ? serverRes : 'Email or password is incorrect'}
                   </Alert>
                 ) : null}
+
 
                 <Grid container>
                   <Grid item xs>

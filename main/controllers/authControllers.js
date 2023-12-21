@@ -19,7 +19,10 @@ const isDevelopment = process.env.NODE_ENV === "development";
 authControllers.createUser = async (req, res, next) => {
   try {
     const { first_name, last_name, user_email, user_password } = req.body;
-    console.log('createUser - body vars: ', first_name, last_name, user_email, user_password)
+
+    // Convert user_email to lowercase for case-insensitive comparison to check whether there is existing account
+    const user_email_lowercase = user_email.toLowerCase();
+
     // Query to check if account with the provided email exists, and if so, return
     const checkUserQuery = `SELECT * FROM "Users" WHERE user_email=$1`;
     const checkUserValues = [user_email];
@@ -70,16 +73,14 @@ authControllers.createUser = async (req, res, next) => {
 // Verify user when login
 authControllers.verifyUser = async (req, res, next) => {
   try {
-    const user_email = req.body.user_email;
+    const user_email = req.body.user_email.toLowerCase();
     const user_password = req.body.user_password;
 
     // Find the user's info in the db
     if (user_email && user_password) {
       const values = [user_email];
-      // const userQuery =
-      //   'SELECT user_id, user_password FROM users WHERE user_email = $1';
       const userQuery =
-        'SELECT user_id, first_name, last_name, user_password, user_email FROM "Users" WHERE user_email=$1';
+        'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE LOWER(user_email)=$1';
       const result1 = await db.query(userQuery, values);
 
       if (result1.rows.length > 0) {
@@ -94,26 +95,34 @@ authControllers.verifyUser = async (req, res, next) => {
         const userDBPassword = result1.rows[0].user_password;
 
         // Use bcrypt method to compare passwords
-        const isAuthenticated = await bcrypt.compare(
-          user_password,
-          userDBPassword
-        );
+        const isAuthenticated = await bcrypt.compare(user_password, userDBPassword);
 
         if (isAuthenticated) {
-          // res.locals.user = userID;
           res.locals.user = user;
-          // console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
-          res.status(401).json({ error: "Incorrect password" });
+          // Propagate error to global handler
+          return next({
+            log: "Error in authControllers.verifyUser",
+            status: 401,
+            message: { error: "Incorrect email or password" },
+          });
         }
       } else {
-        res.status(404).json({ error: "User doesn't exist" });
+        // Propagate error to global handler
+        return next({
+          log: "Error in authControllers.verifyUser",
+          status: 404,
+          message: { error: "Incorrect email or password" },
+        });
       }
     } else {
-      res
-        .status(400)
-        .json({ error: "Please enter email and password details" });
+      // Propagate error to global handler
+      return next({
+        log: "Error in authControllers.verifyUser",
+        status: 400,
+        message: { error: "Please enter email and password details" },
+      })
     }
   } catch (err) {
     return next({
@@ -127,12 +136,11 @@ authControllers.verifyUser = async (req, res, next) => {
 // Set session cookie when login or signup
 authControllers.setSessionCookie = async (req, res, next) => {
   try {
-    // const userID = res.locals.user;
     const user = res.locals.user;
 
     // Use the JWT method sign, which takes the payload and secret as its arguments. The generated token is a string.
     // TO DO: Add options such as expiresIn as needed for production env.
-    const sessionToken = jwt.sign({userID: user.userID}, JWT_SECRET);
+    const sessionToken = jwt.sign({ userID: user.userID }, JWT_SECRET);
 
     // Store the token locally
     store.set("sessionToken", sessionToken);
@@ -161,24 +169,6 @@ authControllers.setSessionCookie = async (req, res, next) => {
   }
 };
 
-// TO DO: For production, verify JWT token for protected routes
-// authControllers.verifyToken = async (req, res, next) => {
-//   // Retrieve the token from local storage
-//   const token = store.get('sessionToken');
-
-//   if (!token) {
-//     return res.status(401).json({ error: 'Unauthorized' });
-//   }
-
-//   try {
-//     const { userID } = jwt.verify(token, JWT_SECRET);
-//     req.userID = userID;
-//     return next();
-//   } catch (error) {
-//     return res.status(401).json({ error: 'Invalid token' });
-//   }
-// };
-
 // Clear session cookie when logging out
 authControllers.clearSessionCookie = async (req, res, next) => {
   try {
@@ -188,10 +178,15 @@ authControllers.clearSessionCookie = async (req, res, next) => {
     // Clear the cookie 'KMonST'
     res.clearCookie("KMonST");
 
-    // Destroy the session created with express-session
+    // If error in destroying the session created with express-session
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).json({ message: "Internal server error" });
+        // Propagate error to global handler
+        return next({
+          log: "Error in authControllers.clearSessionCookie",
+          status: 500,
+          message: { error: "Internal server error" },
+        });
       }
 
       // Clear the session cookie 'connect.sid'

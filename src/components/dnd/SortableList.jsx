@@ -20,7 +20,7 @@ const SortableList = ({ items, onChange }) => {
 
   const renderItem = (item) => (
     <SortableItem id={item.id} key={item.id}>
-      <Graph id={item.graphId} />
+      {item.id}
       <DragHandle />
     </SortableItem>
   );

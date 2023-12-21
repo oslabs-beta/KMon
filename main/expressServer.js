@@ -10,7 +10,7 @@ const dotenv = require("dotenv");
 const authRouters = require("./routes/authRouters.js");
 const apiRouters = require("./routes/apiRouters.js");
 //const graphRouters = require("./routes/graphRouters.js");;
-// const alertRouters = require('./routes/alertRouters.js');
+const alertRouters = require('./routes/alertRouters.js');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,9 +26,10 @@ app.use(express.json());
 
 // Ensure .env file is included / Generate a secret for the session
 const secret =
+ 
   process.env.NODE_ENV === "production"
-    ? process.env.SESSION_SECRET
-    : crypto.randomBytes(64).toString("hex");
+      ? process.env.SESSION_SECRET
+      : crypto.randomBytes(64).toString("hex");
 
 // Create a session
 app.use(
@@ -43,10 +44,10 @@ app.use(
 // Use routes
 app.use('/auth', authRouters);
 
-console.log('expressServer.js - about to hit /api')
+console.log('expressServer.js - about to hit /api');
 app.use('/api', apiRouters);
 
-// app.use('/alert', alertRouters);
+app.use('/alert', alertRouters);
 //app.use("/graph", graphRouters);
 
 // Handle unknown routes
