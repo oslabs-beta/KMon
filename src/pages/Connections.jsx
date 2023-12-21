@@ -16,7 +16,6 @@ const Connections = () => {
   return (
     <Container sx={containerStyle}>
       <div>
-        <h1>Saved Connections</h1>
         <ConnectionDialogBox />
       </div>
       <ConnectionsTable />
