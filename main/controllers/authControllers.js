@@ -25,7 +25,7 @@ authControllers.createUser = async (req, res, next) => {
 
     // Query to check if account with the provided email exists, and if so, return
     const checkUserQuery = "SELECT * FROM users WHERE LOWER(user_email) = $1";
-    const checkUserValues = [user_email];
+    const checkUserValues = [user_email_lowercase];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
 
     if (existingUser.rows.length > 0) {
@@ -94,9 +94,7 @@ authControllers.verifyUser = async (req, res, next) => {
         const isAuthenticated = await bcrypt.compare(user_password, userDBPassword);
 
         if (isAuthenticated) {
-          // res.locals.user = userID;
           res.locals.user = user;
-          // console.log('User successfully logged in with ID:', userID);
           return next();
         } else {
           // Propagate error to global handler
@@ -134,7 +132,6 @@ authControllers.verifyUser = async (req, res, next) => {
 // Set session cookie when login or signup
 authControllers.setSessionCookie = async (req, res, next) => {
   try {
-    // const userID = res.locals.user;
     const user = res.locals.user;
 
     // Use the JWT method sign, which takes the payload and secret as its arguments. The generated token is a string.

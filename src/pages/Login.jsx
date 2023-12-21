@@ -132,9 +132,9 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log(`This is the info: ${data.user}`);
+          // console.log(`This is the info: ${data.user}`);
           updateUserInfo(data.user);
-          console.log(`This is the info: ${userInfo}`);
+          // console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');
@@ -143,14 +143,14 @@ const LogIn = (props) => {
         const errorResponse = await response.json(); // Parse JSON response
         const errorMessage = errorResponse.error || 'An error occurred'; // Access the error property
         setIsError(true);
-        console.log('Login failed.', errorMessage);
+        // console.log('Login failed.', errorMessage);
         setServerRes(errorMessage);
       }
     } catch (error) {
       setIsError(true);
-      console.log('Error in LogIn Form: ', error);
+      // console.log('Error in LogIn Form: ', error);
     } finally {
-      console.log(userInfo);
+      // console.log(userInfo);
       setIsSubmitting(false);
       setValidateErrorMessage('');
       setFormData((prevData) => ({

@@ -80,18 +80,6 @@ const AlertSettings = () => {
     event.preventDefault();
 
     // Check to see if any changes were made before API call
-    const changesMade =
-      JSON.stringify(alertPreferences) !== JSON.stringify({
-        Email: false,
-        Slack: false,
-        InApp: false,
-      });
-
-    if (!changesMade) {
-      setSettingsFeedback('No changes were made.');
-      return;
-    }
-
     if (
       !alertPreferences.Email &&
       !alertPreferences.Slack &&
@@ -133,7 +121,7 @@ const AlertSettings = () => {
 
       // If successful, then update the saved preferences and feedback message on the front end
       if (response.ok) {
-        console.log('Alert preferences saved successfully.');
+        // console.log('Alert preferences saved successfully.');
         setSavedPreferences(alertPreferences);
         setSettingsFeedback('Alert preferences saved successfully.');
       } else {

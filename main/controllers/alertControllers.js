@@ -9,7 +9,7 @@ const alertControllers = {};
 alertControllers.updatePreferences = async (req, res, next) => {
   try {
     const { userID, preferences, preferredEmail, slackURL } = req.body;
-    console.log(userID, preferences);
+    // console.log(userID, preferences);
 
     // Validate user ID and preferences
     if (!userID || !preferences) {
@@ -32,7 +32,7 @@ alertControllers.updatePreferences = async (req, res, next) => {
       slackURL,
       userID,
     ]);
-    console.log(result);
+    // console.log(result);
 
     if (result.rowCount === 1) {
       // Successfully updated the alert preferences
@@ -54,7 +54,7 @@ alertControllers.updatePreferences = async (req, res, next) => {
 
 alertControllers.fetchPreferences = async (req, res, next) => {
   try {
-    const { userID } = req.params; // Use req.params to get the userID from the URL parameters
+    const { userID } = req.params; // Get the userID from the URL parameters
 
     // Validate user ID
     if (!userID) {

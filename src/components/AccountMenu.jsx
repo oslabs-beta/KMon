@@ -35,15 +35,10 @@ const AccountMenu = (props) => {
   const handleClose = () => {
     setMenuAnchorEl(null);
   };
-
-  // Navigate to the user settings page or open a modal for settings
-  const handleSettings = () => {
-    navigate('/Settings');
-    handleClose();
-  };
   
   const navigate = useNavigate();
 
+    // Navigate to the user settings page
   const handleSettingsClick = () => {
     navigate('/Settings')
   }

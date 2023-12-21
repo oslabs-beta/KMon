@@ -155,8 +155,9 @@ function SignUp(props) {
         setApiErrorMessage('Account with this email already exists.');
       }
     } catch (error) {
+      setIsError(true);
       // Log any errors that occur during the signup process
-      console.log('Error in Signup Form: ', error);
+      // console.log('Error in Signup Form: ', error);
     } finally {
       // Reset form data after submission
       setIsSubmitting(false);
