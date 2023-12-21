@@ -63,8 +63,8 @@ const LogIn = (props) => {
   const [validateErrorMessage, setValidateErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: 'darryl@test.com',
-    password: 'Test1234!',
+    email: '',
+    password: '',
   });
 
   // Handle change for form input

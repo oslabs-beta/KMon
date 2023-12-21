@@ -7,7 +7,7 @@ dotenv.config();
 
 // Ensure .env file is included
 // For saving the database URI in the env file instead:
-const pool = new Pool({ connectionString: process.env.DB_URI2 });
+const pool = new Pool({ connectionString: process.env.DB_URI });
 
 //const createTables = async () => {
   pool

@@ -14,7 +14,6 @@ services:
     ports:
     - '3000:3000'
     depends_on:
-      - prometheus
   alertmanager:
     image: prom/alertmanager:latest
     ports:
