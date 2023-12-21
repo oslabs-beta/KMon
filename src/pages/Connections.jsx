@@ -7,6 +7,7 @@ import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
 import { useAppContext } from "../AppContext";
 
+
 // TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
@@ -18,7 +19,7 @@ const Connections = () => {
   const theme = useTheme();
 
   const { userInfo, updateUserInfo } = useAppContext();
-  console.log('Conections - userInfo: ', userInfo);
+  
   const userID = userInfo.userID;
 
 
@@ -37,7 +38,11 @@ const Connections = () => {
     apiKey: '',
     apiSecret: '',
   });
-  
+  const [alertProps, setAlertProps] = useState({
+    visibility: 'hidden',
+    height: 0,
+    message: ''
+  })
 
   // useEffect to render saved connections upon first load;
   useEffect(() => {
@@ -51,12 +56,11 @@ const Connections = () => {
 
     const data = await response.json();
 
-    console.log('Connections - data: ', data);
-
     const connectionData = data.map((obj) => {
       return {
-        clusterID: obj.clusterid,
-        clusterName: obj.clustername,
+        id: obj.cluster_id,
+        name: obj.cluster_name,
+        uri: obj.cluster_uri,
         ports: obj.ports,
         created: obj.created_on
       }
@@ -64,36 +68,10 @@ const Connections = () => {
 
     setRows([...connectionData])
 
-    // const newRow = {
-    //   id: id,
-    //   name: clusterName,
-    //   uri: serverURI,
-    //   ports: ports,
-    //   created: createdDate
-    // }
-
-
   })();
   }, [])
 
 
-
-
-  // working on testing connections..... not working yet
-  // const testConnection = async (uri, ports) => {
-  //   setInterval(() => {
-  //     let failedFetch = 0;
-  //     ports.forEach((port) => {
-  //       fetch(`${uri}:${port}`)
-  //       .then((response) => {
-  //         if (response.ok) return;
-  //       }).catch((err) => {
-  //         console.error(err);
-  //         failedFetch++;
-  //       })
-  //     })
-  //   }, 60000)
-  // }
 
   const handleSubmit = async (event) => {
     
@@ -110,19 +88,7 @@ const Connections = () => {
       }
       else
         try {
-          const response = await fetch(`${apiUrl}/api/createConnection`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              ...formData
-            }),
-          });
-          
-          // Logic for creating new row when a server information is inputted and processed in back end.
-          // MOVE TO "if (response.ok)" BLOCK AFTER TESTING!!! AND UN-COMMENT LINES IN THE BACK END!!
-          
+
           const id = rows.length + 1;
           const {clusterName, serverURI, ports} = formData;
           const currDateStr = new Date();
@@ -145,32 +111,63 @@ const Connections = () => {
             body: JSON.stringify({...newRow, userID: userID})
           });
 
+
+          console.log('Connections - dbResponse: ', dbResponse);
+          if (dbResponse.status === 409) {
+            setAlertProps({
+              visibility: 'visible',
+              marginTop: '15px',
+              height: '100%',
+              message: 'Duplicate connections found in database'
+            })
+            return;
+          }
+
+          console.log("about to create config yamls")
+          const response = await fetch(`${apiUrl}/api/createConnection`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...formData
+            }),
+          });
           
+          console.log(response.ok);
 
-          const currRows = [...rows];
-          currRows.push(newRow);
-          setRows(currRows);
-
+          // Logic for creating new row when a server information is inputted and processed in back end.
+          // MOVE TO "if (response.ok)" BLOCK AFTER TESTING!!! AND UN-COMMENT LINES IN THE BACK END!!
 
           if (response.ok) {
             const data = await response.json();
             console.log('data submitted! data: ', data)
-
             
+            const currRows = [...rows];
+            currRows.push(newRow);
+            setRows(currRows);
+
+            setSubmitting(false);
+            setFormData({
+              clusterName: '',
+              serverURI: '',
+              ports: [],
+              apiKey: '',
+              apiSecret: '',
+            })
+
+            setAlertProps({
+              visibility: 'hidden',
+              marginTop: '15px',
+              height: '0',
+              message: ''
+            })
+
           } else {
             console.log('Failed to save credentials');
           }
         } catch (error) {
           console.log('Error in Credential Form: ', error);
-        } finally {
-          setSubmitting(false);
-          setFormData({
-            clusterName: '',
-            serverURI: '',
-            ports: [],
-            apiKey: '',
-            apiSecret: '',
-          });
         }
     }
     else {
@@ -182,7 +179,7 @@ const Connections = () => {
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox submitting={[submitting, setSubmitting]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit}/>
+        <ConnectionDialogBox submitting={[submitting, setSubmitting]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]}/>
       </div>
       <ConnectionsTable rows={[rows, setRows]}/>
     </Container>

@@ -21,7 +21,7 @@ authControllers.createUser = async (req, res, next) => {
     const { first_name, last_name, user_email, user_password } = req.body;
     console.log('createUser - body vars: ', first_name, last_name, user_email, user_password)
     // Query to check if account with the provided email exists, and if so, return
-    const checkUserQuery = 'SELECT * FROM "public"."users" WHERE user_email = $1';
+    const checkUserQuery = `SELECT * FROM "Users" WHERE user_email=$1`;
     const checkUserValues = [user_email];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
 
@@ -42,15 +42,17 @@ authControllers.createUser = async (req, res, next) => {
     // Different queries to insert new user info depending on whether user has provided last name
     if (last_name) {
       signupQuery =
-        "INSERT INTO users (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id";
+        'INSERT INTO "Users" (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id';
       signupValues = [first_name, last_name, user_email, hashedPassword];
     } else {
       signupQuery =
-        "INSERT INTO users (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id";
+        'INSERT INTO "Users" (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id';
       signupValues = [first_name, user_email, hashedPassword];
     }
 
     const result = await db.query(signupQuery, signupValues);
+
+    console.log('saving user - result: ', result);
 
     const userID = result.rows[0].user_id;
     // console.log('User successfully registered with ID:', userID);
@@ -77,7 +79,7 @@ authControllers.verifyUser = async (req, res, next) => {
       // const userQuery =
       //   'SELECT user_id, user_password FROM users WHERE user_email = $1';
       const userQuery =
-        'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE user_email = $1';
+        'SELECT user_id, first_name, last_name, user_password, user_email FROM "Users" WHERE user_email=$1';
       const result1 = await db.query(userQuery, values);
 
       if (result1.rows.length > 0) {

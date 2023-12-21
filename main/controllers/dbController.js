@@ -15,8 +15,27 @@ dbController.saveConnection = async (req, res, next) => {
   console.log('dbController - req.body: ', req.body);
   try {
     const {id, name, uri, ports, created, userID} = req.body;
+
+    const checkQuery = 'SELECT * FROM "Connections" WHERE cluster_uri=$1'
+    const checkValue = [uri];
+
+    const checkResponse = await db.query(checkQuery, checkValue);
+
+    console.log('saveConnection - checkResponse rows: ', checkResponse.rows)
+
+    let insert = true;
+
+    if (checkResponse.rows.length>1) {
+      for (let cluster of checkResponse.rows) {
+        for (port of ports) {
+          console.log(cluster.ports)
+          if (cluster.ports.includes(port)) insert = false;
+        }
+      }
+    }
+    if (insert) {
     const portsJSON = JSON.stringify(ports);
-    const query = 'INSERT INTO "public"."Connections" (cluster_id, user_id, cluster_name, cluster_uri, ports, created_on) VALUES ($1, $2, $3, $4, $5)';
+    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, cluster_uri, ports, created_on) VALUES ($1, $2, $3, $4, $5, $6)';
     const values = [id, userID, name, uri, portsJSON, created]
     
     const response = await db.query(query, values);
@@ -26,20 +45,31 @@ dbController.saveConnection = async (req, res, next) => {
 
     res.locals.response = response;
     return next();
+    }
+    else {
+      const error = {
+        log: 'Duplicate connections detected in database, error in dbController.saveConnection',
+        status: 409,
+        message: {
+          error: 'Duplicate connection(s) detected'
+        }
+      }
+      return next(error);
+    }
   }
   catch (error) {
     console.error(error);
     return next(error);
-
   }
 }
 
 dbController.getConnections = async (req, res, next) => {
   try {
-    const {userid} = req.params;
-    console.log('dbController.getConnections - req.params: ', req.params);
-    console.log(typeof userid)
-    const query = 'SELECT * FROM "public"."Connections" WHERE "user_id" = $1';
+    
+    // console.log('dbController.getConnections - req.params: ', req.params);
+    const userid = req.params.userid;
+    
+    const query = 'SELECT * FROM "Connections" WHERE user_id=$1';
     const value = [userid]
     
     const response = await db.query(query, value);

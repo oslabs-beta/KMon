@@ -30,14 +30,10 @@ const ConnectionDialogBox = (props) => {
   const [formData, setFormData] = props.formData;
   const [portIsClicked, setPortIsClicked] = props.portIsClicked;
   const [submitting, setSubmitting] = props.submitting;
-
   const [open, setOpen] = useState(false);
   // alert props to display in case of invalid form Input
-  const [alertProps, setAlertProps] = useState({
-    visibility: 'hidden',
-    height: 0,
-    message: ''
-  })
+  const [alertProps, setAlertProps] = props.alertProps;
+
   /************** Event Handlers *************/
 
   // Handle change for form input

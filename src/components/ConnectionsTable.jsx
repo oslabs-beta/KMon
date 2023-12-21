@@ -69,10 +69,10 @@ const headCells = [
     label: 'Kafka Server URI',
   },
   {
-    id: 'status',
+    id: 'ports',
     numeric: true,
     disablePadding: false,
-    label: 'Connection Status',
+    label: 'Ports',
   },
   {
     id: 'created',
@@ -253,42 +253,6 @@ const EnhancedTable = (props) => {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  // Determines number of rows that appear on page
-  // const visibleRows = React.useMemo(
-  //   () =>
-  //     stableSort(rows, getComparator(order, orderBy)).slice(
-  //       page * rowsPerPage,
-  //       page * rowsPerPage + rowsPerPage
-  //     ),
-  //   [order, orderBy, page, rowsPerPage]
-  // );
-
-  // trying to use a fetch request to test connection....
-  
-  // const testConnection = (uri, ports) => {
-  //   let status;
-  //   let failedFetch = 0;
-  //   setInterval(() => {
-  //     ports.forEach((port) => {
-  //       fetch(`${uri}:${port}`)
-  //       .then((response) => {
-  //         if (response.ok) return;
-  //       }).catch((err) => {
-  //         console.error(err);
-  //         failedFetch++;
-  //       })
-  //     })
-  //   }, 60000)
-  //   if (failedFetch === ports.length) status = "down"
-  //   else if (failedFetch < ports.length && failedFetch > 0) status = "warn"
-  //   else status = "ok"
-  //   console.log('status: ', status);
-  //   return status;
-  // }
-
-  // if (rows.length>0) testConnection(rows[0].uri, rows[0].ports)
-
-
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -312,6 +276,9 @@ const EnhancedTable = (props) => {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
+
+                console.log(row)
+                const portsStr = row.ports.join(', ')
 
                 return (
                   <TableRow
@@ -342,7 +309,7 @@ const EnhancedTable = (props) => {
                       {row.name}
                     </TableCell>
                     <TableCell align="right">{row.uri}</TableCell>
-                    <TableCell align="right">{'Should be Okay'}</TableCell>
+                    <TableCell align="right">{portsStr}</TableCell>
                     <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
                 );
