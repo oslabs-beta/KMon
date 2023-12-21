@@ -1,0 +1,19 @@
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    basicAuth: false
+    isDefault: false
+    editable: true
+  - name: Prometheus3
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus3:9090
+    basicAuth: false
+    isDefault: false
+    editable: true
+#TODO: map single data source to prometheus instance on 9093, see if it is a connection error, if it works, try adding second source as a second yaml file,
