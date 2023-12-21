@@ -56,7 +56,7 @@ const ConnectionDialogBox = (props) => {
     if (event.key === "Enter") {
       if (portIsClicked === true) {
         event.preventDefault();
-        handleCheckPort(event);
+        // handleCheckPort(event);
       }
       else {
         handleSubmit(event);
@@ -71,13 +71,11 @@ const ConnectionDialogBox = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
-
   // port handlers
   const ports = formData.ports;
   // console.log('port handlers - ports.map: ', ports.map);
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
-
     const portNum = event.target.value;
     if (event.key === "Enter" || event.key === "Space") {
 
@@ -86,19 +84,16 @@ const ConnectionDialogBox = (props) => {
         setPortIsValid(false);
         setHelperText("Invalid Port Number")
         event.target.value = null;
+        return;
       }
       else if (ports.includes(portNum)) {
         setPortIsValid(false);
         setHelperText('Duplicate Port Detected')
         event.target.value = null;
+        return;
       }
       else {
         setPortIsValid(true);
-        // setPorts((prevState) => {
-        //   return [...prevState, portNum];
-        // })
-        console.log('event target name in checkPort: ', event.target.name)
-        console.log('event target value in checkPort: ', event.target.value)
         const newPorts = [...ports, portNum]
         setFormData((prevFormData) => {
           return {

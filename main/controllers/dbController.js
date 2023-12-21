@@ -40,9 +40,6 @@ dbController.saveConnection = async (req, res, next) => {
     
     const response = await db.query(query, values);
 
-    console.log('dbController.saveConnection - response: ', response);
-    // const data = response.rows
-
     res.locals.response = response;
     return next();
     }
@@ -65,7 +62,7 @@ dbController.saveConnection = async (req, res, next) => {
 
 dbController.getConnections = async (req, res, next) => {
   try {
-    
+
     // console.log('dbController.getConnections - req.params: ', req.params);
     const userid = req.params.userid;
     

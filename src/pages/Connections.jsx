@@ -133,7 +133,8 @@ const Connections = () => {
               ...formData
             }),
           });
-          
+
+          console.log(response);
           console.log(response.ok);
 
           // Logic for creating new row when a server information is inputted and processed in back end.
@@ -154,7 +155,8 @@ const Connections = () => {
               ports: [],
               apiKey: '',
               apiSecret: '',
-            })
+            }
+            )
 
             setAlertProps({
               visibility: 'hidden',

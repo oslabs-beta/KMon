@@ -40,6 +40,9 @@ configController.getPrometheusPorts = (req, res, next) => {
     }
 
     res.locals.prometheusPorts = prometheusPorts;
+
+    console.log('got prometheus ports: ', res.locals.prometheusPorts)
+
     return next();
   }
   catch {
@@ -55,12 +58,15 @@ configController.getPrometheusPorts = (req, res, next) => {
 configController.createGrafanaYaml = (req, res, next) => {
 
   try {
+    console.log('starting grafana yaml creation...')
     const prometheusNum = res.locals.prometheusPorts.promCount;
+    const maxPort = res.locals.prometheusPorts.maxPort
 
     const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
-    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
+    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), 'utf-8'))
 
     console.log('datasourcesDoc: ', datasourcesDoc) // confirmed
+    console.log('dashboardsDoc: ', dashboardsDoc)
     
     // create new dataProvider object, replace the dataprovider in the original dashboard.yml and write this as a new dashboard file.
     const newDataProvider = {
@@ -76,16 +82,16 @@ configController.createGrafanaYaml = (req, res, next) => {
      }
     }
     
-    dashboardsDoc.providers[0] = newDataProvider;
+    dashboardsDoc.providers.push(newDataProvider);
     
     const newDatasource = {
       name: `prometheus${prometheusNum+1}`,
       type: 'prometheus',
       access: 'proxy',
       orgId: 1,
-      url: 'http://prometheus:9090',
+      url: `http://prometheus:${Number(maxPort) + 1}`,
       basicAuth: false,
-      isDefault: true,
+      isDefault: false,
       editable: true
     }
 
@@ -94,9 +100,19 @@ configController.createGrafanaYaml = (req, res, next) => {
     const newDashboardYaml = yaml.dump(dashboardsDoc);
     const newDatasourcesYaml = yaml.dump(datasourcesDoc)
 
-    fs.writeFileSync(path.resolve(__dirname, `../../grafana/provisioning/dashboards/dashboard${prometheusNum+1}.yml`), newDashboardYaml, 'utf-8')
-    fs.writeFileSync(path.resolve(__dirname, `../../grafana/provisioning/datasources/datasource.yml`), newDatasourcesYaml, 'utf-8')
+
+    console.log('about to update yaml files!')
+
+    console.log(newDashboardYaml)
+    console.log(newDatasourcesYaml)
+    console.log(path.resolve(__dirname, `../../grafana/provisioning/dashboards/dashboard.yml`))
+    console.log(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'))
+
+    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), newDatasourcesYaml, 'utf-8')
     
+    console.log('created dashboard ymls')
+
     return next();
   }
   catch {
@@ -167,18 +183,18 @@ configController.createConnection = (req, res, next) => {
     });
 
     // write new files to directory
-    // fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
-    // fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
+    fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
 
-    // exec('docker compose up -d', (err, stdout, stderr) => {
-    //   if (err) {
-    //     return next({
-    //       log: 'Error while restarting Docker container',
-    //       status: 500,
-    //       message: { error: 'Internal server error' },
-    //     })
-    //   }
-    // })
+    exec('docker compose up -d', (err, stdout, stderr) => {
+      if (err) {
+        return next({
+          log: 'Error while restarting Docker container',
+          status: 500,
+          message: { error: 'Internal server error' },
+        })
+      }
+    })
 
     return next();
   }

@@ -1,7 +1,24 @@
 apiVersion: 1
-
 providers:
-  - name: 'Prometheus'
+  - name: prometheus1
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: false
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+  - name: prometheus2
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: false
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+  - name: prometheus3
     orgId: 1
     folder: ''
     type: file
