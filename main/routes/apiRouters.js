@@ -5,7 +5,7 @@ const dbController = require('../controllers/dbController');
 
 
 
-router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res, next) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res) => {
   
   res.status(200).send(JSON.stringify('Connection created!'))
   
@@ -21,7 +21,7 @@ router.post('/saveConnection', dbController.saveConnection, (req, res)=> {
 router.get('/getConnections/:userid', dbController.getConnections, (req, res)=> {
 
   const data = res.locals.data;
-  console.log('apiRouters/getconnections - data: ', data);
+  
   res.status(200).send(JSON.stringify(data));
 
 })

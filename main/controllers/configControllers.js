@@ -65,9 +65,6 @@ configController.createGrafanaYaml = (req, res, next) => {
     const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
     const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), 'utf-8'))
 
-    console.log('datasourcesDoc: ', datasourcesDoc) // confirmed
-    console.log('dashboardsDoc: ', dashboardsDoc)
-    
     // create new dataProvider object, replace the dataprovider in the original dashboard.yml and write this as a new dashboard file.
     const newDataProvider = {
       name: `prometheus${prometheusNum+1}`,
@@ -82,36 +79,43 @@ configController.createGrafanaYaml = (req, res, next) => {
      }
     }
     
-    dashboardsDoc.providers.push(newDataProvider);
     
+    if (!dashboardsDoc.providers) {
+      dashboardsDoc.providers = [newDataProvider];
+    } else {
+      dashboardsDoc.providers.push(newDataProvider);
+    }
+
     const newDatasource = {
       name: `prometheus${prometheusNum+1}`,
       type: 'prometheus',
       access: 'proxy',
       orgId: 1,
-      url: `http://prometheus:${Number(maxPort) + 1}`,
+      url: `http://prometheus:${maxPort === 0 ? 9090 : Number(maxPort) + 1 }`,
       basicAuth: false,
       isDefault: false,
       editable: true
     }
+    
+    
+    if (!datasourcesDoc.datasources) {
+      datasourcesDoc.datasources = [newDatasource];
+    } else {
+      datasourcesDoc.datasources.push(newDatasource);
+    }
 
-    datasourcesDoc.datasources.push(newDatasource);
+    const newDashboardYaml = yaml.dump(dashboardsDoc, {
+      indent: 2,
+      noArrayIndent: true
+    });
+    const newDatasourcesYaml = yaml.dump(datasourcesDoc, {
+      indent: 2,
+      noArrayIndent: true
+    })
 
-    const newDashboardYaml = yaml.dump(dashboardsDoc);
-    const newDatasourcesYaml = yaml.dump(datasourcesDoc)
-
-
-    console.log('about to update yaml files!')
-
-    console.log(newDashboardYaml)
-    console.log(newDatasourcesYaml)
-    console.log(path.resolve(__dirname, `../../grafana/provisioning/dashboards/dashboard.yml`))
-    console.log(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'))
 
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8')
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yaml'), newDatasourcesYaml, 'utf-8')
-    
-    console.log('created dashboard ymls')
 
     return next();
   }
@@ -131,24 +135,37 @@ configController.createConnection = (req, res, next) => {
   // and the "cluster name" will be taken as the job name.
   // console.log(req.body, res.locals);
   try {
+    console.log('configController - createConnection: entering try block')
     const { clusterName, serverURI, ports } = req.body;
-    const prometheusPorts = res.locals.prometheusPorts;
-    // console.log(req.data);
-    console.log('createConnection - prometheusPorts: ', prometheusPorts);
-    const prometheusNum = prometheusPorts.promCount + 1;
+    console.log(clusterName, serverURI, ports)
 
+    const {promCount, maxPort} = res.locals.prometheusPorts;
+    
+    console.log(promCount, maxPort);
+
+    const prometheusNum = promCount + 1;
+
+    console.log('about to start composing docker-compose and prometheus yml files')
     // load dockerCompose file from YAML and add new prometheus port to services
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'))
     
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
-    dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`)
+
+    if (!dockerCompose.services.grafana.depends_on) {
+      dockerCompose.services.grafana.depends_on = [`prometheus${prometheusNum}`]
+    } else {
+      dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`)
+    }
+
+
+
     dockerCompose.services[`prometheus${prometheusNum}`] = {
       image: 'prom/prometheus:latest',
       volumes: [
         `./prometheus${prometheusNum}.yml:/etc/prometheus/prometheus.yml:ro`,
         `prometheus_data:/prometheus${prometheusNum}`
       ],
-      ports: [`${Number(prometheusPorts.maxPort) + 1}:9090`]
+      ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1 }:9090`]
     }
 
     // define new Prometheus config file
@@ -157,6 +174,9 @@ configController.createConnection = (req, res, next) => {
       global: { scrape_interval: '15s' },
       alerting: {
         alertmanagers: [{
+          static_configs: [
+            {targets: ['localhost:9093']}
+          ]
         }]
       },
       rule_files: ['/etc/prometheus/rules/*.yaml'],
@@ -182,9 +202,11 @@ configController.createConnection = (req, res, next) => {
       noArrayIndent: true
     });
 
+    console.log(path.resolve(__dirname, '../../docker-compose.yml'))
+    console.log(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`))
     // write new files to directory
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
-    fs.writeFileSync(`./prometheus${prometheusNum}.yml`, newPromYml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')
 
     exec('docker compose up -d', (err, stdout, stderr) => {
       if (err) {

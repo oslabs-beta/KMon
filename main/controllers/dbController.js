@@ -16,12 +16,11 @@ dbController.saveConnection = async (req, res, next) => {
   try {
     const {id, name, uri, ports, created, userID} = req.body;
 
+    // Check for duplicate host:ports in the database and return an error if so.
     const checkQuery = 'SELECT * FROM "Connections" WHERE cluster_uri=$1'
     const checkValue = [uri];
 
     const checkResponse = await db.query(checkQuery, checkValue);
-
-    console.log('saveConnection - checkResponse rows: ', checkResponse.rows)
 
     let insert = true;
 

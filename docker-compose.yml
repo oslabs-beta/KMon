@@ -11,20 +11,20 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: codesmith
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_PATHS_CONFIG: /etc/grafana/grafana.ini
-  alert_manager:
-    
-
     ports:
     - '3000:3000'
     depends_on:
-    - prometheus
+    - prometheus1
     - prometheus2
-    - prometheus3
-  prometheus:
+  alert_manager:
+    image: prom/alertmanager:latest
+    ports:
+    - '9093:9093'
+  prometheus1:
     image: prom/prometheus:latest
     volumes:
-    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus_data:/prometheus
+    - ./prometheus1.yml:/etc/prometheus/prometheus.yml:ro
+    - prometheus_data:/prometheus1
     ports:
     - '9090:9090'
   prometheus2:
@@ -34,13 +34,6 @@ services:
     - prometheus_data:/prometheus2
     ports:
     - '9091:9090'
-  prometheus3:
-    image: prom/prometheus:latest
-    volumes:
-    - ./prometheus3.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus_data:/prometheus3
-    ports:
-    - '9092:9090'
 volumes:
   prometheus_data: null
   grafana_data: null

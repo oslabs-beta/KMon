@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - localhost:9093
+rule_files:
+- /etc/prometheus/rules/*.yaml
+scrape_configs:
+- job_name: Demo
+  static_configs:
+  - targets:
+    - 10.0.10.137:8994
+    - 10.0.10.137:8995
+    - 10.0.10.137:8996
+    - 10.0.10.137:8997
+    - 10.0.10.137:8998
+    - 10.0.10.137:8999

@@ -65,12 +65,9 @@ const Connections = () => {
         created: obj.created_on
       }
     })
-
     setRows([...connectionData])
-
-  })();
+    })();
   }, [])
-
 
 
   const handleSubmit = async (event) => {
@@ -134,12 +131,7 @@ const Connections = () => {
             }),
           });
 
-          console.log(response);
-          console.log(response.ok);
-
           // Logic for creating new row when a server information is inputted and processed in back end.
-          // MOVE TO "if (response.ok)" BLOCK AFTER TESTING!!! AND UN-COMMENT LINES IN THE BACK END!!
-
           if (response.ok) {
             const data = await response.json();
             console.log('data submitted! data: ', data)
@@ -155,15 +147,14 @@ const Connections = () => {
               ports: [],
               apiKey: '',
               apiSecret: '',
-            }
-            )
+            });
 
             setAlertProps({
               visibility: 'hidden',
               marginTop: '15px',
               height: '0',
               message: ''
-            })
+            });
 
           } else {
             console.log('Failed to save credentials');
