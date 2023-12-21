@@ -12,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config ./webpack.config.js --watch",
-    "start": "NODE_ENV=production concurrently \"npm run build\" \"electron main/electron.js\"",
+    "start": "NODE_ENV=development concurrently \"npm run build\" \"electron main/electron.js\"",
     "dev": "NODE_ENV=development concurrently \"npm run build\" \"nodemon --exec electron main/electron.js\""
   },
   "repository": {
@@ -71,6 +71,7 @@
     "pg": "^8.11.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-resizable": "^3.0.5",
     "reactjs-popup": "^2.0.6",
     "validator": "^13.11.0"
   }
