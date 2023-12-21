@@ -55,6 +55,7 @@ const LogIn = (props) => {
   // Use the useAppContext hook to get access to the context
   const { userInfo, updateUserInfo } = useAppContext();
   
+  
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
@@ -62,8 +63,8 @@ const LogIn = (props) => {
   const [validateErrorMessage, setValidateErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'darryl@test.com',
+    password: 'Test1234!',
   });
 
   // Handle change for form input
@@ -128,9 +129,9 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log(`This is the info: ${data.user}`);
+          // console.log('Login - data.user: ',  data.user);
           updateUserInfo(data.user);
-          console.log(`This is the info: ${userInfo}`);
+          // console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');
           onLogin();
           navigate('/Overview');

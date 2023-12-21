@@ -19,11 +19,13 @@ const isDevelopment = process.env.NODE_ENV === "development";
 authControllers.createUser = async (req, res, next) => {
   try {
     const { first_name, last_name, user_email, user_password } = req.body;
-
+    console.log('createUser - body vars: ', first_name, last_name, user_email, user_password)
     // Query to check if account with the provided email exists, and if so, return
-    const checkUserQuery = "SELECT * FROM users WHERE user_email = $1";
+    const checkUserQuery = 'SELECT * FROM "public"."users" WHERE user_email = $1';
     const checkUserValues = [user_email];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
+
+    console.log(existingUser)
 
     if (existingUser.rows.length > 0) {
       return next({

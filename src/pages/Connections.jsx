@@ -1,10 +1,11 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ConnectionsTable from '../components/ConnectionsTable.jsx';
 import ConnectionDialogBox from '../components/ConnectionDialogBox.jsx';
 import { Container } from '@mui/material';
 import { styled } from '@mui/system';
 import { useTheme } from '@mui/material/styles';
+import { useAppContext } from "../AppContext";
 
 // TO DO: confirm apiUrl for production
 const apiUrl =
@@ -15,6 +16,10 @@ const apiUrl =
 
 const Connections = () => {
   const theme = useTheme();
+
+  const { userInfo, updateUserInfo } = useAppContext();
+  console.log('Conections - userInfo: ', userInfo);
+  const userID = userInfo.userID;
 
 
   const containerStyle = {
@@ -33,6 +38,48 @@ const Connections = () => {
     apiSecret: '',
   });
   
+
+  // useEffect to render saved connections upon first load;
+  useEffect(() => {
+   (async () => {
+    const response = await fetch(`${apiUrl}/api/getConnections/${userID}`, {
+      method: 'GET',
+      headers: {
+      'Content-Type': 'application/json'
+      }
+    })
+
+    const data = await response.json();
+
+    console.log('Connections - data: ', data);
+
+    const connectionData = data.map((obj) => {
+      return {
+        clusterID: obj.clusterid,
+        clusterName: obj.clustername,
+        ports: obj.ports,
+        created: obj.created_on
+      }
+    })
+
+    setRows([...connectionData])
+
+    // const newRow = {
+    //   id: id,
+    //   name: clusterName,
+    //   uri: serverURI,
+    //   ports: ports,
+    //   created: createdDate
+    // }
+
+
+  })();
+  }, [])
+
+
+
+
+  // working on testing connections..... not working yet
   // const testConnection = async (uri, ports) => {
   //   setInterval(() => {
   //     let failedFetch = 0;
@@ -48,9 +95,8 @@ const Connections = () => {
   //   }, 60000)
   // }
 
-
   const handleSubmit = async (event) => {
-    // console.log(portIsClicked);
+    
     event.preventDefault();
     if (!portIsClicked) {
       // check if form is valid, otherwise display alert.
@@ -74,9 +120,9 @@ const Connections = () => {
             }),
           });
           
-
           // Logic for creating new row when a server information is inputted and processed in back end.
           // MOVE TO "if (response.ok)" BLOCK AFTER TESTING!!! AND UN-COMMENT LINES IN THE BACK END!!
+          
           const id = rows.length + 1;
           const {clusterName, serverURI, ports} = formData;
           const currDateStr = new Date();
@@ -88,9 +134,18 @@ const Connections = () => {
             name: clusterName,
             uri: serverURI,
             ports: ports,
-            status: 'testConnection()',
             created: createdDate
           }
+
+          const dbResponse = await fetch(`${apiUrl}/api/saveConnection`, {
+            method: 'POST',
+            headers: {
+              'CONTENT-TYPE': 'application/json'
+            },
+            body: JSON.stringify({...newRow, userID: userID})
+          });
+
+          
 
           const currRows = [...rows];
           currRows.push(newRow);
@@ -99,8 +154,9 @@ const Connections = () => {
 
           if (response.ok) {
             const data = await response.json();
-
             console.log('data submitted! data: ', data)
+
+            
           } else {
             console.log('Failed to save credentials');
           }
@@ -121,8 +177,6 @@ const Connections = () => {
       event.preventDefault();
     }
   };
-
-
 
   return (
     <Container sx={containerStyle}>

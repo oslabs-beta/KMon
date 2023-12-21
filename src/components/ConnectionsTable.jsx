@@ -263,6 +263,33 @@ const EnhancedTable = (props) => {
   //   [order, orderBy, page, rowsPerPage]
   // );
 
+  // trying to use a fetch request to test connection....
+  
+  // const testConnection = (uri, ports) => {
+  //   let status;
+  //   let failedFetch = 0;
+  //   setInterval(() => {
+  //     ports.forEach((port) => {
+  //       fetch(`${uri}:${port}`)
+  //       .then((response) => {
+  //         if (response.ok) return;
+  //       }).catch((err) => {
+  //         console.error(err);
+  //         failedFetch++;
+  //       })
+  //     })
+  //   }, 60000)
+  //   if (failedFetch === ports.length) status = "down"
+  //   else if (failedFetch < ports.length && failedFetch > 0) status = "warn"
+  //   else status = "ok"
+  //   console.log('status: ', status);
+  //   return status;
+  // }
+
+  // if (rows.length>0) testConnection(rows[0].uri, rows[0].ports)
+
+
+
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -315,7 +342,7 @@ const EnhancedTable = (props) => {
                       {row.name}
                     </TableCell>
                     <TableCell align="right">{row.uri}</TableCell>
-                    <TableCell align="right">{row.status}</TableCell>
+                    <TableCell align="right">{'Should be Okay'}</TableCell>
                     <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
                 );

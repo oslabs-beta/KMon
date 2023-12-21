@@ -1,20 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const configController = require('../controllers/configControllers');
+const dbController = require('../controllers/dbController');
+
 
 
 router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res, next) => {
-  try {
-    res.status(200).send(JSON.stringify('Connection created!'))
-  }
-  catch {
-    return next({
-      log: 'Error in apiRouters - could not create connection',
-      status: 500,
-      message: { error: 'Internal server error' },
-    })
-  }
+  
+  res.status(200).send(JSON.stringify('Connection created!'))
+  
 })
 
+router.post('/saveConnection', dbController.saveConnection, (req, res)=> {
+
+  const response = res.locals.response;
+  res.status(200).send(JSON.stringify('Added to database!', response))
+
+}) 
+
+router.get('/getConnections/:userid', dbController.getConnections, (req, res)=> {
+
+  const data = res.locals.data;
+  console.log('apiRouters/getconnections - data: ', data);
+  res.status(200).send(JSON.stringify(data));
+
+})
 
 module.exports = router;
