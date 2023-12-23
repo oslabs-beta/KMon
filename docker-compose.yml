@@ -3,10 +3,10 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+    - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    - ./grafana/dashboards:/var/lib/grafana/dashboards
+    - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
       GF_SECURITY_ADMIN_PASSWORD: codesmith
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
@@ -14,14 +14,17 @@ services:
     ports:
     - '3000:3000'
     depends_on:
+    - prometheus1
+    - prometheus2
+    - prometheus3
+    - prometheus4
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-      - '9093:9093'
+    - '9093:9093'
     volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-      - alertmanager_data:/data
-      
+    - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    - alertmanager_data:/data
 volumes:
   prometheus_data: null
   grafana_data: null

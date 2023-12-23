@@ -56,7 +56,7 @@ const ConnectionDialogBox = (props) => {
     if (event.key === "Enter") {
       if (portIsClicked === true) {
         event.preventDefault();
-        // handleCheckPort(event);
+        
       }
       else {
         handleSubmit(event);
@@ -73,7 +73,8 @@ const ConnectionDialogBox = (props) => {
   };
   // port handlers
   const ports = formData.ports;
-  // console.log('port handlers - ports.map: ', ports.map);
+  
+
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
     const portNum = event.target.value;
@@ -126,7 +127,7 @@ const ConnectionDialogBox = (props) => {
       }
     })
     setHelperText(null);
-    console.log('handleCheckPort - formData: ', formData)
+    // console.log('handleCheckPort - formData: ', formData)
   }
 
   /******** sub-Components *******/

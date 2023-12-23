@@ -22,7 +22,6 @@ const Connections = () => {
   
   const userID = userInfo.userID;
 
-
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
     marginTop: theme.margins.headerMargin,
@@ -73,6 +72,7 @@ const Connections = () => {
   const handleSubmit = async (event) => {
     
     event.preventDefault();
+
     if (!portIsClicked) {
       // check if form is valid, otherwise display alert.
       if (!formData.clusterName || !formData.serverURI || !formData.ports.length) {
@@ -85,7 +85,6 @@ const Connections = () => {
       }
       else
         try {
-
           const id = rows.length + 1;
           const {clusterName, serverURI, ports} = formData;
           const currDateStr = new Date();

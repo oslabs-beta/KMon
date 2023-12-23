@@ -97,7 +97,7 @@ configController.createGrafanaYaml = (req, res, next) => {
       type: 'prometheus',
       access: 'proxy',
       orgId: 1,
-      url: `http://prometheus:${maxPort === 0 ? 9090 : Number(maxPort) + 1 }`,
+      url: `http://prometheus${prometheusNum + 1}:9090`,
       basicAuth: false,
       isDefault: false,
       editable: true
@@ -213,8 +213,8 @@ configController.createConnection = (req, res, next) => {
       noArrayIndent: true,
     });
 
-    console.log(path.resolve(__dirname, '../../docker-compose.yml'))
-    console.log(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`))
+    // console.log(path.resolve(__dirname, '../../docker-compose.yml'))
+    // console.log(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`))
     // write new files to directory
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
     fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')

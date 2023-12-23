@@ -56,17 +56,17 @@ export function DraggableBox({ children, id }) {
     const div = mouseUpEvent.target
     const rect = div.getBoundingClientRect();
 
-      const updateItems = [...selectedGraphs];
-      let activeItem;
-      for (let i = 0; i < updateItems.length; i++) {
-        if (updateItems[i]['id'] === id) {
-          activeItem = updateItems[i];
-        };
-      }
+    const updateItems = [...selectedGraphs];
+    let activeItem;
+    for (let i = 0; i < updateItems.length; i++) {
+      if (updateItems[i]['id'] === id) {
+        activeItem = updateItems[i];
+      };
+    }
 
-      activeItem.width = rect.width;
-      activeItem.height = rect.height;
-      setSelectedGraphs(updateItems);
+    activeItem.width = rect.width;
+    activeItem.height = rect.height;
+    setSelectedGraphs(updateItems);
 
     document.removeEventListener("mouseup", onMouseUp)
   }

@@ -32,6 +32,7 @@ dbController.saveConnection = async (req, res, next) => {
         }
       }
     }
+    
     if (insert) {
     const portsJSON = JSON.stringify(ports);
     const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, cluster_uri, ports, created_on) VALUES ($1, $2, $3, $4, $5, $6)';
