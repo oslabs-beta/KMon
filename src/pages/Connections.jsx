@@ -172,13 +172,18 @@ const Connections = () => {
     }
   };
 
+  const handleDelete = async (event) => {
+
+
+  }
+
   return (
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
         <ConnectionDialogBox submitting={[submitting, setSubmitting]} open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
-      <ConnectionsTable rows={[rows, setRows]} />
+      <ConnectionsTable rows={[rows, setRows]} handleDelete={handleDelete} />
     </Container>
   );
 };

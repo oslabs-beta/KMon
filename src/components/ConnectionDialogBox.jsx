@@ -46,8 +46,7 @@ const ConnectionDialogBox = (props) => {
   };
 
   // TO DO: 
-  // - update api call
-  // - need to fix up ports input event handlers. Currently, clicking "enter" with a valid port updates port numbers in state but also serves sets the state for "portIsValid" to false, which changes the appearance of the input box.
+  // - update api URI once hosted.
 
   const handleSubmit = props.handleSubmit;
 
@@ -73,7 +72,6 @@ const ConnectionDialogBox = (props) => {
   };
   // port handlers
   const ports = formData.ports;
-
 
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs

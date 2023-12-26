@@ -151,12 +151,15 @@ configController.createConnection = (req, res, next) => {
     );
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
+    console.log('checking if grafana has depends on dictionary...')
+    console.log((!dockerCompose.services.grafana.depends_on))
     if (!dockerCompose.services.grafana.depends_on) {
-      dockerCompose.services.grafana[depends_on] = [`prometheus${prometheusNum}`]
+      dockerCompose.services.grafana.depends_on = [`prometheus${prometheusNum}`]
     } else {
       dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`);
     };
 
+    console.log('adding prometheus to services...')
     dockerCompose.services[`prometheus${prometheusNum}`] = {
       image: 'prom/prometheus:latest',
       volumes: [
@@ -208,7 +211,7 @@ configController.createConnection = (req, res, next) => {
     fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')
 
     // compose any new containers (for prometheus instances). Remove anything that's been deleted.
-    exec('docker stop grafana && docker compose up -d --remove-orphans', (err, stdout, stderr) => {
+    exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
       if (err) {
         return next({
           log: 'Error while restarting Docker container',
