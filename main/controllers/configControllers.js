@@ -208,7 +208,7 @@ configController.createConnection = (req, res, next) => {
     fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')
 
     // compose any new containers (for prometheus instances). Remove anything that's been deleted.
-    exec('docker stop grafana && docker compose up -d --remove-orphans', (err, stdout, stderr) => {
+    exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
       if (err) {
         return next({
           log: 'Error while restarting Docker container',
