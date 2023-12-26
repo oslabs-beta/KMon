@@ -82,11 +82,7 @@ configController.createGrafanaYaml = (req, res, next) => {
     }
 
 
-    if (!dashboardsDoc.providers) {
-      dashboardsDoc.providers = [newDataProvider];
-    } else {
-      dashboardsDoc.providers.push(newDataProvider);
-    }
+
 
     const newDatasource = {
       name: `prometheus${prometheusNum + 1}`,
@@ -99,13 +95,18 @@ configController.createGrafanaYaml = (req, res, next) => {
       editable: true
     }
     // if the providers/datasources libraries are empty, add it. If there's an entry already, push.
-    !dashboardsDoc.providers ?
-      dashboardsDoc.providers = [newDataProvider] :
-      dashboardsDoc.providers.push(newDataProvider);
 
-    !datasourcesDoc.datasources ?
-      datasourcesDoc.datasources = [newDatasource] :
+    if (!dashboardsDoc.providers) {
+      dashboardsDoc.providers = [newDataProvider];
+    } else {
+      dashboardsDoc.providers.push(newDataProvider);
+    }
+
+    if (!datasourcesDoc.datasources) {
+      datasourcesDoc.datasources = [newDatasource];
+    } else {
       datasourcesDoc.datasources.push(newDatasource);
+    };
 
     const newDashboardYaml = yaml.dump(dashboardsDoc, {
       indent: 2,
@@ -150,15 +151,18 @@ configController.createConnection = (req, res, next) => {
     );
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
-    !dockerCompose.services.grafana.depends_on ?
-      dockerCompose.services.grafana[depends_on] = [`prometheus${prometheusNum}`] :
+    if (!dockerCompose.services.grafana.depends_on) {
+      dockerCompose.services.grafana[depends_on] = [`prometheus${prometheusNum}`]
+    } else {
       dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`);
+    };
 
     dockerCompose.services[`prometheus${prometheusNum}`] = {
       image: 'prom/prometheus:latest',
       volumes: [
         `./prometheus${prometheusNum}.yml:/etc/prometheus/prometheus.yml:ro`,
         `prometheus_data:/prometheus${prometheusNum}`,
+        './kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml'
       ],
       ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1}:9090`]
     };

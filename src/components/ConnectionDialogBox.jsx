@@ -30,7 +30,7 @@ const ConnectionDialogBox = (props) => {
   const [formData, setFormData] = props.formData;
   const [portIsClicked, setPortIsClicked] = props.portIsClicked;
   const [submitting, setSubmitting] = props.submitting;
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = props.open;
   // alert props to display in case of invalid form Input
   const [alertProps, setAlertProps] = props.alertProps;
 
@@ -56,7 +56,7 @@ const ConnectionDialogBox = (props) => {
     if (event.key === "Enter") {
       if (portIsClicked === true) {
         event.preventDefault();
-        
+
       }
       else {
         handleSubmit(event);
@@ -73,7 +73,7 @@ const ConnectionDialogBox = (props) => {
   };
   // port handlers
   const ports = formData.ports;
-  
+
 
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs

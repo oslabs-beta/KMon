@@ -27,6 +27,8 @@ const Connections = () => {
     marginTop: theme.margins.headerMargin,
   };
 
+  // State for child components;
+  const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [portIsClicked, setPortIsClicked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -43,31 +45,33 @@ const Connections = () => {
     message: ''
   })
 
+  // function for fetching connections from database.
+  const loadConnections = async () => {
+    const response = await fetch(`${apiUrl}/api/getConnections/${userID}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const data = await response.json();
+
+    const connectionData = data.map((obj) => {
+      return {
+        id: obj.cluster_id,
+        name: obj.cluster_name,
+        uri: obj.cluster_uri,
+        ports: obj.ports,
+        created: obj.created_on
+      }
+    })
+    setRows([...connectionData])
+  }
+
   // useEffect to render saved connections upon first load;
   useEffect(() => {
-    (async () => {
-      const response = await fetch(`${apiUrl}/api/getConnections/${userID}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      const data = await response.json();
-
-      const connectionData = data.map((obj) => {
-        return {
-          id: obj.cluster_id,
-          name: obj.cluster_name,
-          uri: obj.cluster_uri,
-          ports: obj.ports,
-          created: obj.created_on
-        }
-      })
-      setRows([...connectionData])
-    })();
+    loadConnections();
   }, [])
-
 
   const handleSubmit = async (event) => {
 
@@ -99,6 +103,7 @@ const Connections = () => {
             created: createdDate
           }
 
+          // confirming ports...
           const dbResponse = await fetch(`${apiUrl}/api/saveConnection`, {
             method: 'POST',
             headers: {
@@ -155,6 +160,9 @@ const Connections = () => {
               message: ''
             });
 
+            loadConnections();
+            setOpen(false)
+
           } else {
             console.log('Failed to save credentials');
           }
@@ -168,7 +176,7 @@ const Connections = () => {
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox submitting={[submitting, setSubmitting]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
+        <ConnectionDialogBox submitting={[submitting, setSubmitting]} open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
       <ConnectionsTable rows={[rows, setRows]} />
     </Container>

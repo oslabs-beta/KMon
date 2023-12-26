@@ -276,8 +276,6 @@ const EnhancedTable = (props) => {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
-                console.log(row)
                 const portsStr = row.ports.join(', ')
 
                 return (
