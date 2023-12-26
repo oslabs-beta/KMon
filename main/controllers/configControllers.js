@@ -152,7 +152,7 @@ configController.createConnection = (req, res, next) => {
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
     if (!dockerCompose.services.grafana.depends_on) {
-      dockerCompose.services.grafana[depends_on] = [`prometheus${prometheusNum}`]
+      dockerCompose.services.grafana.depends_on = [`prometheus${prometheusNum}`]
     } else {
       dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`);
     };
