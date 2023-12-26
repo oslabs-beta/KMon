@@ -19,7 +19,7 @@ const Connections = () => {
   const theme = useTheme();
 
   const { userInfo, updateUserInfo } = useAppContext();
-  
+
   const userID = userInfo.userID;
 
   const containerStyle = {
@@ -45,32 +45,32 @@ const Connections = () => {
 
   // useEffect to render saved connections upon first load;
   useEffect(() => {
-   (async () => {
-    const response = await fetch(`${apiUrl}/api/getConnections/${userID}`, {
-      method: 'GET',
-      headers: {
-      'Content-Type': 'application/json'
-      }
-    })
+    (async () => {
+      const response = await fetch(`${apiUrl}/api/getConnections/${userID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    const data = await response.json();
+      const data = await response.json();
 
-    const connectionData = data.map((obj) => {
-      return {
-        id: obj.cluster_id,
-        name: obj.cluster_name,
-        uri: obj.cluster_uri,
-        ports: obj.ports,
-        created: obj.created_on
-      }
-    })
-    setRows([...connectionData])
+      const connectionData = data.map((obj) => {
+        return {
+          id: obj.cluster_id,
+          name: obj.cluster_name,
+          uri: obj.cluster_uri,
+          ports: obj.ports,
+          created: obj.created_on
+        }
+      })
+      setRows([...connectionData])
     })();
   }, [])
 
 
   const handleSubmit = async (event) => {
-    
+
     event.preventDefault();
 
     if (!portIsClicked) {
@@ -86,7 +86,7 @@ const Connections = () => {
       else
         try {
           const id = rows.length + 1;
-          const {clusterName, serverURI, ports} = formData;
+          const { clusterName, serverURI, ports } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
           const createdDate = `${month}/${date}/${year}`
@@ -104,7 +104,7 @@ const Connections = () => {
             headers: {
               'CONTENT-TYPE': 'application/json'
             },
-            body: JSON.stringify({...newRow, userID: userID})
+            body: JSON.stringify({ ...newRow, userID: userID })
           });
 
 
@@ -134,7 +134,7 @@ const Connections = () => {
           if (response.ok) {
             const data = await response.json();
             console.log('data submitted! data: ', data)
-            
+
             const currRows = [...rows];
             currRows.push(newRow);
             setRows(currRows);
@@ -162,18 +162,15 @@ const Connections = () => {
           console.log('Error in Credential Form: ', error);
         }
     }
-    else {
-      event.preventDefault();
-    }
   };
 
   return (
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox submitting={[submitting, setSubmitting]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]}/>
+        <ConnectionDialogBox submitting={[submitting, setSubmitting]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
-      <ConnectionsTable rows={[rows, setRows]}/>
+      <ConnectionsTable rows={[rows, setRows]} />
     </Container>
   );
 };

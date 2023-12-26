@@ -81,6 +81,13 @@ configController.createGrafanaYaml = (req, res, next) => {
       }
     }
 
+
+    if (!dashboardsDoc.providers) {
+      dashboardsDoc.providers = [newDataProvider];
+    } else {
+      dashboardsDoc.providers.push(newDataProvider);
+    }
+
     const newDatasource = {
       name: `prometheus${prometheusNum + 1}`,
       type: 'prometheus',
@@ -91,7 +98,6 @@ configController.createGrafanaYaml = (req, res, next) => {
       isDefault: false,
       editable: true
     }
-
     // if the providers/datasources libraries are empty, add it. If there's an entry already, push.
     !dashboardsDoc.providers ?
       dashboardsDoc.providers = [newDataProvider] :
@@ -198,7 +204,7 @@ configController.createConnection = (req, res, next) => {
     fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')
 
     // compose any new containers (for prometheus instances). Remove anything that's been deleted.
-    exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
+    exec('docker stop grafana && docker compose up -d --remove-orphans', (err, stdout, stderr) => {
       if (err) {
         return next({
           log: 'Error while restarting Docker container',
@@ -207,18 +213,8 @@ configController.createConnection = (req, res, next) => {
         })
       }
     })
-
-    // exec('docker compose up -d', (err, stdout, stderr) => {
-    //   if (err) {
-    //     return next({
-    //       log: 'Error while restarting Docker container',
-    //       status: 500,
-    //       message: { error: 'Internal server error' },
-    //     })
-    //   }
-    // })
-
     return next();
+
   } catch {
     const error = {
       log: 'Error occurred in configControllers.createConnection middleware function',
