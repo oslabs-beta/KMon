@@ -46,7 +46,7 @@ configController.getPrometheusPorts = (req, res, next) => {
     }
 
     res.locals.prometheusPorts = prometheusPorts;
-    console.log('got prometheus ports: ', res.locals.prometheusPorts)
+    // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
   } catch {
@@ -61,6 +61,7 @@ configController.getPrometheusPorts = (req, res, next) => {
 
 configController.createGrafanaYaml = (req, res, next) => {
   try {
+    const { id } = req.body;
     const prometheusNum = res.locals.prometheusPorts.promCount;
     const maxPort = res.locals.prometheusPorts.maxPort
 
@@ -69,7 +70,7 @@ configController.createGrafanaYaml = (req, res, next) => {
 
     // create new dataProvider and dataSource objects to append to yml files.
     const newDataProvider = {
-      name: `prometheus${prometheusNum + 1}`,
+      name: `prometheus${id}`,
       orgId: 1,
       folder: '',
       type: 'file',
@@ -81,15 +82,12 @@ configController.createGrafanaYaml = (req, res, next) => {
       }
     }
 
-
-
-
     const newDatasource = {
-      name: `prometheus${prometheusNum + 1}`,
+      name: `prometheus${id}`,
       type: 'prometheus',
       access: 'proxy',
       orgId: 1,
-      url: `http://prometheus${prometheusNum + 1}:9090`,
+      url: `http://prometheus${id}:9090`,
       basicAuth: false,
       isDefault: false,
       editable: true
@@ -132,14 +130,11 @@ configController.createGrafanaYaml = (req, res, next) => {
 };
 
 configController.createConnection = (req, res, next) => {
-  // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
-  // and the "cluster name" will be taken as the job name.
-  // console.log(req.body, res.locals);
   try {
-
-    const { clusterName, serverURI, ports } = req.body;
+    // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
+    // and the "cluster name" will be taken as the job name.
+    const { clusterName, serverURI, ports, id } = req.body;
     const { promCount, maxPort } = res.locals.prometheusPorts;
-    const prometheusNum = promCount + 1;
 
     console.log('about to start composing docker-compose and prometheus yml files')
     // load dockerCompose file from YAML and add new prometheus port to services
@@ -154,17 +149,17 @@ configController.createConnection = (req, res, next) => {
     console.log('checking if grafana has depends on dictionary...')
     console.log((!dockerCompose.services.grafana.depends_on))
     if (!dockerCompose.services.grafana.depends_on) {
-      dockerCompose.services.grafana.depends_on = [`prometheus${prometheusNum}`]
+      dockerCompose.services.grafana.depends_on = [`prometheus${id}`]
     } else {
-      dockerCompose.services.grafana.depends_on.push(`prometheus${prometheusNum}`);
+      dockerCompose.services.grafana.depends_on.push(`prometheus${id}`);
     };
 
     console.log('adding prometheus to services...')
-    dockerCompose.services[`prometheus${prometheusNum}`] = {
+    dockerCompose.services[`prometheus${id}`] = {
       image: 'prom/prometheus:latest',
       volumes: [
-        `./prometheus${prometheusNum}.yml:/etc/prometheus/prometheus.yml:ro`,
-        `prometheus_data:/prometheus${prometheusNum}`,
+        `./prometheus${id}.yml:/etc/prometheus/prometheus.yml:ro`,
+        `prometheus_data:/prometheus${id}`,
         './kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml'
       ],
       ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1}:9090`]
@@ -208,7 +203,7 @@ configController.createConnection = (req, res, next) => {
 
     // write new files to directory
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
-    fs.writeFileSync(path.resolve(__dirname, `../../prometheus${prometheusNum}.yml`), newPromYml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, `../../prometheus${id}.yml`), newPromYml, 'utf-8')
 
     // compose any new containers (for prometheus instances). Remove anything that's been deleted.
     exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
@@ -231,5 +226,34 @@ configController.createConnection = (req, res, next) => {
     return next(error);
   }
 };
+
+configController.deleteConnections = (req, res, next) => {
+  try {
+    const { userid, clusters } = req.body;
+
+    const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
+    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
+    const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
+
+    // dashboardDoc datasources is an array of objects.
+    // so we should iterate through dashboardsDoc.datasources
+    // and for each object, we will check the name.
+    // if the name matches "prometheus{clusters[i]}," we'll remove that property from the datasources array.
+
+
+
+
+
+    // we'll have to do the same for the dashboardsDoc.providers array.
+
+    // for dockerCompose, we'll have to do this process for the depends_on array, making sure to delete the property entirely if the array is empty after deletion.
+    // and we'll have to go through the services dictionary and delete each object that has the format of prometheus${cluster[i]}.
+
+
+  }
+  catch {
+
+  }
+}
 
 module.exports = configController;

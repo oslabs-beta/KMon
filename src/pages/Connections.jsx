@@ -32,10 +32,11 @@ const Connections = () => {
   const [rows, setRows] = useState([]);
   const [portIsClicked, setPortIsClicked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selected, setSelected] = useState([]);
   const [formData, setFormData] = useState({
-    clusterName: 'Demo',
-    serverURI: '10.0.10.137',
-    ports: ['8994', '8995', '8996', '8997', '8998', '8999'],
+    clusterName: '',
+    serverURI: '',
+    ports: [],
     apiKey: '',
     apiSecret: '',
   });
@@ -89,7 +90,16 @@ const Connections = () => {
       }
       else
         try {
-          const id = rows.length + 1;
+          // need to generate fresh ID even if one is deleted;
+          const getNewId = (rows) => {
+            let maxId = 0;
+            for (let row of rows) {
+              if (row.id > maxId) maxId = row.id
+            }
+            return maxId + 1;
+          }
+          const id = getNewId(rows)
+          console.log('Connections - getting new id: ', id);
           const { clusterName, serverURI, ports } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
@@ -131,7 +141,7 @@ const Connections = () => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              ...formData
+              ...formData, id
             }),
           });
 
@@ -173,8 +183,31 @@ const Connections = () => {
   };
 
   const handleDelete = async (event) => {
+    console.log(event.target);
+    console.log(selected);
+
+    const deleteInfo = {
+      userid: userID,
+      clusters: selected
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/api/deleteConnections`, {
+        method: 'DELETE',
+        headers: {
+          'CONTENT-TYPE': 'application/json'
+        },
+        body: JSON.stringify(deleteInfo)
+      })
+
+      const responseData = response.json();
+      console.log(responseData);
 
 
+    }
+    catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -183,7 +216,7 @@ const Connections = () => {
         <h1>Saved Connections</h1>
         <ConnectionDialogBox submitting={[submitting, setSubmitting]} open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
-      <ConnectionsTable rows={[rows, setRows]} handleDelete={handleDelete} />
+      <ConnectionsTable rows={[rows, setRows]} handleDelete={handleDelete} selected={[selected, setSelected]} />
     </Container>
   );
 };

@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React from 'react';
+import { useState } from 'react';
 import {
   Box,
   Checkbox,
@@ -149,7 +150,7 @@ EnhancedTableHead.propTypes = {
 
 // Component for the table toolbar (at the top of the table) with info about selected items
 const EnhancedTableToolbar = (props) => {
-  const { numSelected } = props;
+  const { numSelected, handleDelete } = props;
 
   return (
     <Toolbar
@@ -187,7 +188,7 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 && (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={handleDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -203,11 +204,11 @@ EnhancedTableToolbar.propTypes = {
 
 // Main component w/ sorting, pagination, and selection features that gets returned
 const EnhancedTable = (props) => {
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('calories');
+  const [selected, setSelected] = props.selected;
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = props.rows;
 
   // Handles sorting request
@@ -257,7 +258,7 @@ const EnhancedTable = (props) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} handleDelete={props.handleDelete} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}

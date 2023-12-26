@@ -6,23 +6,28 @@ const dbController = require('../controllers/dbController');
 
 
 router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res) => {
-  
+
   res.status(200).send(JSON.stringify('Connection created!'))
-  
+
 })
 
-router.post('/saveConnection', dbController.saveConnection, (req, res)=> {
+router.post('/saveConnection', dbController.saveConnection, (req, res) => {
 
   const response = res.locals.response;
   res.status(200).send(JSON.stringify('Added to database!', response))
 
-}) 
+})
 
-router.get('/getConnections/:userid', dbController.getConnections, (req, res)=> {
+router.get('/getConnections/:userid', dbController.getConnections, (req, res) => {
 
   const data = res.locals.data;
-  
   res.status(200).send(JSON.stringify(data));
+
+})
+
+router.delete('/deleteConnections', dbController.deleteConnections, configController.deleteConnections, (req, res) => {
+
+
 
 })
 

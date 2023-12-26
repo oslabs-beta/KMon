@@ -82,4 +82,33 @@ dbController.getConnections = async (req, res, next) => {
   }
 }
 
+dbController.deleteConnections = async (req, res, next) => {
+
+  try {
+    // req.body should contain two pieces of information: userid and the array of ports.
+    const { userid, clusters } = req.body;
+    // we'll first delete those particular rows from the database
+
+    const clustersQuery = clusters.map((node, index) => {
+      return `$${index + 2}`
+    })
+
+    console.log(clustersQuery.join(', '));
+
+    const query = `DELETE FROM "Connections" WHERE (userid=$1 AND clusterid IN (${clustersQuery}))`
+    const values = [userid, ...clusters];
+    console.log(values);
+
+    const dbResponse = await db.query(query, values)
+
+    console.log(dbResponse);
+
+    return next();
+  }
+  catch (error) {
+    console.error(error);
+    return next(error);
+  }
+}
+
 module.exports = dbController;
