@@ -237,42 +237,35 @@ configController.deleteConnections = (req, res, next) => {
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
 
-    res.locals.configResponse = {};
-    // console.log(
-    //   'configcontroller.deleteConnections - dashboardDoc: ', '\n', dashboardDoc, 'configcontroller.deleteConnections - datasourceDoc: ', '\n', datasourceDoc, 'configcontroller.deleteConnections - dockerCompose: ', '\n', dockerCompose
-    // )
-
-    // let's just go through the clusters and go through the documents one by one, adding what we need.
+    // let's just go through the clusters and go through the documents one by one, deleting what we need.
     for (let id of clusters) {
-      // the id is cluster[i].
+      // index for searching through documents arrays.
       let ind = 0;
-      // let's update dashboardDoc by taking out the provider with the name 'prometheus${id}'
+
+      // splicing out dashboard providers.
       for (let provider of dashboardDoc.providers) {
         if (provider.name === `prometheus${id}`) {
-          // we'll splice out that part of the array. We'll also break the current loop.
           dashboardDoc.providers.splice(ind, 1)
           break;
         }
         ind++;
       }
-      // once we're out of the loop, we'll reset the index so we can keep searching.
+
       ind = 0;
-      res.locals.configResponse.dashboard = 'Removed clusters from dashboard!'
-      // we'll have to do the same for the datasources.datasources array.
-      for (let provider of datasourceDoc.datasources) {
-        if (provider.name === `prometheus${id}`) {
-          // we'll splice out that part of the array.
+
+      // splicing out datasource from datasources
+      for (let datasource of datasourceDoc.datasources) {
+        if (datasource.name === `prometheus${id}`) {
           datasourceDoc.datasources.splice(ind, 1)
           break;
         }
         ind++;
       }
       ind = 0;
-      res.locals.configResponse.datasource = 'Removed clusters from datasources!!'
-      // for dockerCompose, we'll have to do this process for just the depends_on array, making sure to delete the property entirely if the array is empty after deletion.
+
+      // for dockerCompose, we'll have to do this process for just the depends_on array.
       for (let dep of dockerCompose.services.grafana.depends_on) {
         if (dep === `prometheus${id}`) {
-          // we'll splice out that part of the array.
           dockerCompose.services.grafana.depends_on.splice(ind, 1)
           break;
         }
@@ -281,7 +274,6 @@ configController.deleteConnections = (req, res, next) => {
       // and delete each property in dockerCompose.services that has the name prometheus${id}.
       delete dockerCompose.services[`prometheus${id}`]
 
-      res.locals.configResponse.dockerCompose = 'Removed clusters from Docker Compose file!'
       exec(`rm prometheus${id}.yml`, (err, stdout, stderr) => {
         if (err) {
           return next({
@@ -292,19 +284,14 @@ configController.deleteConnections = (req, res, next) => {
         }
       })
 
-      res.locals.configResponse.prometheus = 'Removed Prometheus Files!'
-
     }
 
+    // if the depends_on array is empty, make sure it is deleted.
     if (!dockerCompose.services.grafana.depends_on.length) {
       delete dockerCompose.services.grafana.depends_on;
     }
-    // dockerCompose can now be re-written to yaml without reassignment.
 
-    // now, write the files back to their directories and run docker compose up -d --remove-orphans
-
-    // and don't forget to delete the prometheus${id}.yml files from the directory.
-
+    // Write files back to yaml.
     const newDashboardYaml = yaml.dump(dashboardDoc, {
       indent: 2,
       noArrayIndent: true
@@ -318,11 +305,12 @@ configController.deleteConnections = (req, res, next) => {
       noArrayIndent: true,
     });
 
-
+    // Write them into the directory
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8')
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), newDatasourcesYaml, 'utf-8')
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
 
+    // Restart docker, get rid of old containers.
     exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
       if (err) {
         return next({
@@ -333,13 +321,16 @@ configController.deleteConnections = (req, res, next) => {
       }
     })
 
+    res.locals.configResponse = 'Successfully removed clusters and udpated configurations.'
     return next();
   }
   catch (error) {
-    console.error(error);
-
-    return next(error)
-
+    const err = Object.assign({}, error, {
+      log: 'Error occurred while deleting connections from config files',
+      status: 500,
+      message: "Couldn't delete from configurations"
+    })
+    return next(error);
   }
 }
 

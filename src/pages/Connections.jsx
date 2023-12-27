@@ -193,8 +193,9 @@ const Connections = () => {
 
       const responseData = await response.json();
 
-      console.log(responseData);
+      console.log('Connections.jsx - responseData: ', responseData);
 
+      loadConnections();
     }
     catch (error) {
       console.error(error);

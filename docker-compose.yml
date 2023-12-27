@@ -3,96 +3,23 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+    - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    - ./grafana/dashboards:/var/lib/grafana/dashboards
+    - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
       GF_SECURITY_ADMIN_PASSWORD: codesmith
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_PATHS_CONFIG: /etc/grafana/grafana.ini
     ports:
-      - '3000:3000'
-    depends_on:
-      - prometheus1
-      - prometheus3
-      - prometheus4
-      - prometheus6
-      - prometheus7
-      - prometheus9
-      - prometheus10
-      - prometheus11
+    - '3000:3000'
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-      - '6093:6093'
+    - '6093:6093'
     volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-      - alertmanager_data:/data
-  prometheus1:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus1.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus1
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9090:9090'
-  prometheus3:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus3.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus3
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9092:9090'
-  prometheus4:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus4.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus4
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9093:9090'
-  prometheus6:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus6.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus6
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9095:9090'
-  prometheus7:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus7.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus7
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9096:9090'
-  prometheus9:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus9.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus9
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9098:9090'
-  prometheus10:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus10.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus10
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9099:9090'
-  prometheus11:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus11.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus11
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9100:9090'
+    - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    - alertmanager_data:/data
 volumes:
   prometheus_data: null
   grafana_data: null
