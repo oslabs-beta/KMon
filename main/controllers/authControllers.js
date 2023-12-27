@@ -28,7 +28,7 @@ authControllers.createUser = async (req, res, next) => {
     const checkUserValues = [user_email];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
 
-    console.log(existingUser)
+    // console.log(existingUser)
 
     if (existingUser.rows.length > 0) {
       return next({
@@ -82,7 +82,7 @@ authControllers.verifyUser = async (req, res, next) => {
       const userQuery =
         'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE LOWER(user_email)=$1';
       const result1 = await db.query(userQuery, values);
-      console.log(result1);
+      // console.log(result1);
 
       if (result1.rows.length > 0) {
         // const userID = result1.rows[0].user_id;
