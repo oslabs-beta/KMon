@@ -178,12 +178,11 @@ const Connections = () => {
     console.log(event.target);
     console.log(selected);
 
-    const deleteInfo = {
-      userid: userID,
-      clusters: selected
-    }
-
     try {
+      const deleteInfo = {
+        userid: userID,
+        clusters: selected
+      }
       const response = await fetch(`${apiUrl}/api/deleteConnections`, {
         method: 'DELETE',
         headers: {
@@ -192,9 +191,9 @@ const Connections = () => {
         body: JSON.stringify(deleteInfo)
       })
 
-      const responseData = response.json();
-      console.log(responseData);
+      const responseData = await response.json();
 
+      console.log(responseData);
 
     }
     catch (error) {

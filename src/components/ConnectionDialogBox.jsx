@@ -187,6 +187,7 @@ const ConnectionDialogBox = (props) => {
                 name="ports"
                 label="Port(s):"
                 variant="filled"
+                placeholder='Press Enter to Input Ports'
                 onFocus={() => {
                   setPortIsClicked(true);
                 }}

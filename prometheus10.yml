@@ -8,7 +8,7 @@ alerting:
 rule_files:
 - /etc/prometheus/rules/*.yml
 scrape_configs:
-- job_name: Demo2
+- job_name: Demo1
   static_configs:
   - targets:
-    - 2.3.4.5:2345
+    - 1.2.3.4:1234

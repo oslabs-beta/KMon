@@ -8,14 +8,6 @@ datasources:
   basicAuth: false
   isDefault: false
   editable: true
-- name: prometheus2
-  type: prometheus
-  access: proxy
-  orgId: 1
-  url: http://prometheus2:9090
-  basicAuth: false
-  isDefault: false
-  editable: true
 - name: prometheus3
   type: prometheus
   access: proxy
@@ -32,14 +24,6 @@ datasources:
   basicAuth: false
   isDefault: false
   editable: true
-- name: prometheus5
-  type: prometheus
-  access: proxy
-  orgId: 1
-  url: http://prometheus5:9090
-  basicAuth: false
-  isDefault: false
-  editable: true
 - name: prometheus6
   type: prometheus
   access: proxy
@@ -53,6 +37,30 @@ datasources:
   access: proxy
   orgId: 1
   url: http://prometheus7:9090
+  basicAuth: false
+  isDefault: false
+  editable: true
+- name: prometheus9
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://prometheus9:9090
+  basicAuth: false
+  isDefault: false
+  editable: true
+- name: prometheus10
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://prometheus10:9090
+  basicAuth: false
+  isDefault: false
+  editable: true
+- name: prometheus11
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://prometheus11:9090
   basicAuth: false
   isDefault: false
   editable: true

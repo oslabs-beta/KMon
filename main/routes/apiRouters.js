@@ -19,7 +19,8 @@ router.get('/getConnections/:userid', dbController.getConnections, (req, res) =>
 
 router.delete('/deleteConnections', dbController.deleteConnections, configController.deleteConnections, (req, res) => {
 
-
+  const { dbResponse, configResponse } = res.locals.response;
+  res.status(200).send(JSON.stringify(dbResponse, configResponse));
 
 })
 

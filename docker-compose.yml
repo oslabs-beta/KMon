@@ -15,12 +15,13 @@ services:
       - '3000:3000'
     depends_on:
       - prometheus1
-      - prometheus2
       - prometheus3
       - prometheus4
-      - prometheus5
       - prometheus6
       - prometheus7
+      - prometheus9
+      - prometheus10
+      - prometheus11
   alertmanager:
     image: prom/alertmanager:latest
     ports:
@@ -36,14 +37,6 @@ services:
       - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
     ports:
       - '9090:9090'
-  prometheus2:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus2.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus2
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9091:9090'
   prometheus3:
     image: prom/prometheus:latest
     volumes:
@@ -60,14 +53,6 @@ services:
       - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
     ports:
       - '9093:9090'
-  prometheus5:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus5.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus5
-      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
-    ports:
-      - '9094:9090'
   prometheus6:
     image: prom/prometheus:latest
     volumes:
@@ -84,6 +69,30 @@ services:
       - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
     ports:
       - '9096:9090'
+  prometheus9:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus9.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus9
+      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
+    ports:
+      - '9098:9090'
+  prometheus10:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus10.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus10
+      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
+    ports:
+      - '9099:9090'
+  prometheus11:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus11.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus11
+      - ./kafka_controller_alerts.yml:/etc/prometheus/kafka_controller_alerts.yml
+    ports:
+      - '9100:9090'
 volumes:
   prometheus_data: null
   grafana_data: null

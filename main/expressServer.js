@@ -59,12 +59,15 @@ app.use((err, req, res, next) => {
     status: 500,
     message: { error: "An error occured" },
   };
+
   const errObj = Object.assign({}, defaultErr, err);
+
   if (req.accepts("json")) {
     res.status(errObj.status).json(errObj.message);
   } else {
     res.status(errObj.status).send(errObj.message.error);
   }
+
 });
 
 module.exports = app;

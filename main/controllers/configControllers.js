@@ -56,8 +56,8 @@ configController.createGrafanaYaml = (req, res, next) => {
   try {
     const { id } = req.body;
 
-    const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
-    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
+    const dashboardDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
+    const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
 
     // create new dataProvider and dataSource objects to append to yml files.
     const newDataProvider = {
@@ -88,23 +88,23 @@ configController.createGrafanaYaml = (req, res, next) => {
     }
     // if the providers/datasources libraries are empty, add it. If there's an entry already, push.
 
-    if (!dashboardsDoc.providers) {
-      dashboardsDoc.providers = [newDataProvider];
+    if (!dashboardDoc.providers) {
+      dashboardDoc.providers = [newDataProvider];
     } else {
-      dashboardsDoc.providers.push(newDataProvider);
+      dashboardDoc.providers.push(newDataProvider);
     }
 
-    if (!datasourcesDoc.datasources) {
-      datasourcesDoc.datasources = [newDatasource];
+    if (!datasourceDoc.datasources) {
+      datasourceDoc.datasources = [newDatasource];
     } else {
-      datasourcesDoc.datasources.push(newDatasource);
+      datasourceDoc.datasources.push(newDatasource);
     };
 
-    const newDashboardYaml = yaml.dump(dashboardsDoc, {
+    const newDashboardYaml = yaml.dump(dashboardDoc, {
       indent: 2,
       noArrayIndent: true
     });
-    const newDatasourcesYaml = yaml.dump(datasourcesDoc, {
+    const newDatasourcesYaml = yaml.dump(datasourceDoc, {
       indent: 2,
       noArrayIndent: true
     })
@@ -158,12 +158,8 @@ configController.updateDocker = (req, res, next) => {
       ],
       ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1}:9090`]
     };
-    // console.log('updated dockerCompose services!')
 
-    // define new Prometheus config file
-    // config MUST return strings for ports.
-    // console.log('creating new Prom configs')
-    // console.log('name and ports: ', name, ports)
+    // Defining new targets for scraping. Currently configured to map ports to URI for development cluster, but should be reconfigured for production environments to map IP addresses/URIs to new targets.
     const newTargets = ports.map((port) => {
       return `${uri}:${port}`;
     })
@@ -220,6 +216,7 @@ configController.updateDocker = (req, res, next) => {
         })
       }
     })
+
     return next();
 
   } catch {
@@ -234,67 +231,114 @@ configController.updateDocker = (req, res, next) => {
 
 configController.deleteConnections = (req, res, next) => {
   try {
-    const { userid, clusters } = req.body;
+    const { clusters } = req.body;
 
-    const dashboardsDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
-    const datasourcesDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
+    const dashboardDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'))
+    const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
 
-    // dashboardDoc providers is an array of objects.
-    // so we should iterate through dashboardsDoc.providers
-    const newProviders = [];
-    for (let i = 0; i < dashboardsDoc.providers.length; i++) {
-      // and for each object, we will check its name against the clusterIDs that were provided.
-      clusters.forEach((id) => {
-        console.log('configControllers.deleteConnections forEach - prometheus${val}: ', `prometheus${id}`)
-        // if the name matches "prometheus{clusters[i]}," we won't include it in the updated datasources.
-        if (dashboardsDoc.providers[i].name !== `prometheus${id}`) {
-          newDatasources.push(dashboardsDoc.providers[i]);
-        }
-      })
-    }
+    res.locals.configResponse = {};
+    // console.log(
+    //   'configcontroller.deleteConnections - dashboardDoc: ', '\n', dashboardDoc, 'configcontroller.deleteConnections - datasourceDoc: ', '\n', datasourceDoc, 'configcontroller.deleteConnections - dockerCompose: ', '\n', dockerCompose
+    // )
 
-    const newDashboardsDoc = Object.assign(dashboardsDoc, { providers: newProviders })
-
-    // we'll have to do the same for the datasources.datasources array.
-    const newDatasources = [];
-    for (let i = 0; i < datasourcesDoc.datasources.length; i++) {
-      clusters.forEach((id) => {
-        if (datasourcesDoc.datasources[i].name !== `prometheus${id}`) {
-          newDatasources.push(dashboardsDoc.datasources[i]);
-        }
-      })
-    }
-
-    const newDatasourcesDoc = Object.assign(datasourcesDoc, { datasources: newDatasources })
-
-
-    // for dockerCompose, we'll have to do this process for just the depends_on array, making sure to delete the property entirely if the array is empty after deletion.
-    const newGrafanaDeps = [];
-    for (let i = 0; i < dockerCompose.grafana.depends_on.length; i++) {
-      clusters.forEach((val) => {
-        if (dockerCompose.grafana.depends_on[i].name !== `prometheus${val}`) {
-          newGrafanaDeps.push(dashboardsDoc[i]);
-        }
-      })
-    }
-
-    if (!newGrafanaDeps.length) {
-      delete dockerCompose.grafana.depends_on;
-    } else {
-      dockerCompose.grafana.depends_on = newGrafanaDeps;
-    }
-
-    // and we'll go through the clusterIDs and delete each property in dockerCompose.services that has the name prometheus${id}.
+    // let's just go through the clusters and go through the documents one by one, adding what we need.
     for (let id of clusters) {
+      // the id is cluster[i].
+      let ind = 0;
+      // let's update dashboardDoc by taking out the provider with the name 'prometheus${id}'
+      for (let provider of dashboardDoc.providers) {
+        if (provider.name === `prometheus${id}`) {
+          // we'll splice out that part of the array. We'll also break the current loop.
+          dashboardDoc.providers.splice(ind, 1)
+          break;
+        }
+        ind++;
+      }
+      // once we're out of the loop, we'll reset the index so we can keep searching.
+      ind = 0;
+      res.locals.configResponse.dashboard = 'Removed clusters from dashboard!'
+      // we'll have to do the same for the datasources.datasources array.
+      for (let provider of datasourceDoc.datasources) {
+        if (provider.name === `prometheus${id}`) {
+          // we'll splice out that part of the array.
+          datasourceDoc.datasources.splice(ind, 1)
+          break;
+        }
+        ind++;
+      }
+      ind = 0;
+      res.locals.configResponse.datasource = 'Removed clusters from datasources!!'
+      // for dockerCompose, we'll have to do this process for just the depends_on array, making sure to delete the property entirely if the array is empty after deletion.
+      for (let dep of dockerCompose.services.grafana.depends_on) {
+        if (dep === `prometheus${id}`) {
+          // we'll splice out that part of the array.
+          dockerCompose.services.grafana.depends_on.splice(ind, 1)
+          break;
+        }
+        ind++;
+      }
+      // and delete each property in dockerCompose.services that has the name prometheus${id}.
       delete dockerCompose.services[`prometheus${id}`]
+
+      res.locals.configResponse.dockerCompose = 'Removed clusters from Docker Compose file!'
+      exec(`rm prometheus${id}.yml`, (err, stdout, stderr) => {
+        if (err) {
+          return next({
+            log: 'Error while removing Prometheus yaml files.',
+            status: 500,
+            message: { error: 'Failed to update Prometheus instances' },
+          })
+        }
+      })
+
+      res.locals.configResponse.prometheus = 'Removed Prometheus Files!'
+
     }
 
+    if (!dockerCompose.services.grafana.depends_on.length) {
+      delete dockerCompose.services.grafana.depends_on;
+    }
     // dockerCompose can now be re-written to yaml without reassignment.
 
+    // now, write the files back to their directories and run docker compose up -d --remove-orphans
 
+    // and don't forget to delete the prometheus${id}.yml files from the directory.
+
+    const newDashboardYaml = yaml.dump(dashboardDoc, {
+      indent: 2,
+      noArrayIndent: true
+    });
+    const newDatasourcesYaml = yaml.dump(datasourceDoc, {
+      indent: 2,
+      noArrayIndent: true
+    })
+    const newDockerYml = yaml.dump(dockerCompose, {
+      indent: 2,
+      noArrayIndent: true,
+    });
+
+
+    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), newDatasourcesYaml, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8')
+
+    exec('docker compose up -d --remove-orphans', (err, stdout, stderr) => {
+      if (err) {
+        return next({
+          log: 'Error while restarting Docker container',
+          status: 500,
+          message: { error: 'Failed to update Prometheus instances' },
+        })
+      }
+    })
+
+    return next();
   }
-  catch {
+  catch (error) {
+    console.error(error);
+
+    return next(error)
 
   }
 }

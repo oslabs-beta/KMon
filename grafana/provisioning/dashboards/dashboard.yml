@@ -9,15 +9,6 @@ providers:
   allowUiUpdates: true
   options:
     path: /etc/grafana/provisioning/dashboards
-- name: prometheus2
-  orgId: 1
-  folder: ''
-  type: file
-  disableDeletion: false
-  editable: false
-  allowUiUpdates: true
-  options:
-    path: /etc/grafana/provisioning/dashboards
 - name: prometheus3
   orgId: 1
   folder: ''
@@ -36,15 +27,6 @@ providers:
   allowUiUpdates: true
   options:
     path: /etc/grafana/provisioning/dashboards
-- name: prometheus5
-  orgId: 1
-  folder: ''
-  type: file
-  disableDeletion: false
-  editable: false
-  allowUiUpdates: true
-  options:
-    path: /etc/grafana/provisioning/dashboards
 - name: prometheus6
   orgId: 1
   folder: ''
@@ -55,6 +37,33 @@ providers:
   options:
     path: /etc/grafana/provisioning/dashboards
 - name: prometheus7
+  orgId: 1
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboards
+- name: prometheus9
+  orgId: 1
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboards
+- name: prometheus10
+  orgId: 1
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboards
+- name: prometheus11
   orgId: 1
   folder: ''
   type: file

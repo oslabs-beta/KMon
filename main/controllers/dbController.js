@@ -60,20 +60,23 @@ dbController.deleteConnections = async (req, res, next) => {
       return `$${index + 2}`
     })
 
-    console.log(clustersQuery.join(', '));
+    const clustersQueryStr = clustersQuery.join(', ')
 
-    const query = `DELETE FROM "Connections" WHERE (userid=$1 AND clusterid IN (${clustersQuery}))`
+    const query = `DELETE FROM "Connections" WHERE (user_id=$1 AND cluster_id IN (${clustersQueryStr}))`
     const values = [userid, ...clusters];
-    console.log(values);
 
     const dbResponse = await db.query(query, values)
 
-    console.log(dbResponse);
+    res.locals.dbResponse = dbResponse;
 
     return next();
   }
   catch (error) {
-    console.error(error);
+    const err = Object.assign({}, error, {
+      log: 'Error occurred while deleting connections from database',
+      status: 500,
+      message: "Couldn't delete from database"
+    })
     return next(error);
   }
 }
