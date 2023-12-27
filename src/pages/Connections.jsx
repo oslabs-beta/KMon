@@ -90,7 +90,7 @@ const Connections = () => {
       }
       else
         try {
-          // need to generate fresh ID even if one is deleted;
+          //find new ID from rows;
           const getNewId = (rows) => {
             let maxId = 0;
             for (let row of rows) {
@@ -99,7 +99,6 @@ const Connections = () => {
             return maxId + 1;
           }
           const id = getNewId(rows)
-          console.log('Connections - getting new id: ', id);
           const { clusterName, serverURI, ports } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
@@ -113,43 +112,36 @@ const Connections = () => {
             created: createdDate
           }
 
-          // confirming ports...
-          const dbResponse = await fetch(`${apiUrl}/api/saveConnection`, {
-            method: 'POST',
-            headers: {
-              'CONTENT-TYPE': 'application/json'
-            },
-            body: JSON.stringify({ ...newRow, userID: userID })
-          });
+          for (let row of rows) {
+            if (row.uri === serverURI) {
+              for (let port of row.ports) {
+                if (ports.includes(port)) {
+                  setAlertProps({
+                    visibility: 'visible',
+                    marginTop: '15px',
+                    height: '100%',
+                    message: 'Duplicate connection found!'
+                  })
+                  throw new Error('Duplicate connection detected')
+                };
+              };
+            };
+          };
 
-
-          console.log('Connections - dbResponse: ', dbResponse);
-          if (dbResponse.status === 409) {
-            setAlertProps({
-              visibility: 'visible',
-              marginTop: '15px',
-              height: '100%',
-              message: 'Duplicate connections found in database'
-            })
-            return;
-          }
-
-          console.log("about to create config yamls")
+          // console.log("about to create config yamls")
           const response = await fetch(`${apiUrl}/api/createConnection`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              ...formData, id
+              ...newRow,
+              userID
             }),
           });
 
           // Logic for creating new row when a server information is inputted and processed in back end.
           if (response.ok) {
-            const data = await response.json();
-            console.log('data submitted! data: ', data)
-
             const currRows = [...rows];
             currRows.push(newRow);
             setRows(currRows);

@@ -4,17 +4,9 @@ const configController = require('../controllers/configControllers');
 const dbController = require('../controllers/dbController');
 
 
-
-router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.createConnection, (req, res) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.updateDocker, dbController.saveConnection, (req, res) => {
 
   res.status(200).send(JSON.stringify('Connection created!'))
-
-})
-
-router.post('/saveConnection', dbController.saveConnection, (req, res) => {
-
-  const response = res.locals.response;
-  res.status(200).send(JSON.stringify('Added to database!', response))
 
 })
 

@@ -54,7 +54,7 @@ const LogIn = (props) => {
   const { onLogin } = props;
   // Use the useAppContext hook to get access to the context
   const { userInfo, updateUserInfo } = useAppContext();
-  
+
   const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
@@ -132,7 +132,7 @@ const LogIn = (props) => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          console.log(`This is the info: ${data.user}`);
+          // console.log(`This is the info: ${data.user}`);
           updateUserInfo(data.user);
           // console.log(`This is the info: ${userInfo}`);
           // console.log('Login successful. Navigating to /Overview...');

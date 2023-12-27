@@ -102,10 +102,8 @@ const ConnectionDialogBox = (props) => {
         })
         setHelperText(null);
         event.target.value = null;
-      }
-    }
-
-    console.log('handleCheckPort - formData: ', formData)
+      };
+    };
 
   }
 

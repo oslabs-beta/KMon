@@ -23,6 +23,7 @@ Thumbs.db
 ehthumbs.db    
 
 # Miscellaneous files
+.ssl_certificates/
 node_modules    
 *.log            
 .env            
