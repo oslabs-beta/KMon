@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
   // State to hold user information
   const [userInfo, setUserInfo] = useState(null);
   const [selectedGraphs, setSelectedGraphs] = useState([]);
+  // remove for production;
   const [items, setItems] = useState([
     { id: 1, graphId: 2, width: 550, height: 250},
     { id: 2, graphId: 3, width: 550, height: 250},

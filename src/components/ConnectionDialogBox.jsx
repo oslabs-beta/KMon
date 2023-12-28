@@ -18,40 +18,21 @@ import { styled } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 
 
-// TO DO: confirm apiUrl for production
-const apiUrl =
-  process.env.NODE_ENV === 'production'
-    ? 'https://api.kmon.com'
-    : 'http://localhost:3010';
-
-
-const ConnectionDialogBox = () => {
+const ConnectionDialogBox = (props) => {
 
   /************** Component States ****************/
 
   // states for port entry
-  const [portIsClicked, setPortIsClicked] = useState(false);
   const [portIsValid, setPortIsValid] = useState(true)
   const [helperText, setHelperText] = useState(null)
   // clear hard-coded faults for production
-  // const [ports, setPorts] = useState(['1234', '2345', '3456']);
   // form states
-  const [submitting, setSubmitting] = useState(false);
-  // clear hard-coded formData for production;
-  const [formData, setFormData] = useState({
-    clusterName: 'Demo',
-    serverURI: '10.0.10.137',
-    ports: ['8994', '8995', '8996', '8997', '8998', '8999'],
-    apiKey: '',
-    apiSecret: '',
-  });
-  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = props.formData;
+  const [portIsClicked, setPortIsClicked] = props.portIsClicked;
+  const [submitting, setSubmitting] = props.submitting;
+  const [open, setOpen] = props.open;
   // alert props to display in case of invalid form Input
-  const [alertProps, setAlertProps] = useState({
-    visibility: 'hidden',
-    height: 0,
-    message: ''
-  })
+  const [alertProps, setAlertProps] = props.alertProps;
 
   /************** Event Handlers *************/
 
@@ -65,72 +46,16 @@ const ConnectionDialogBox = () => {
   };
 
   // TO DO: 
-  // - update api call
-  // - need to fix up ports input event handlers. Currently, clicking "enter" with a valid port updates port numbers in state but also serves sets the state for "portIsValid" to false, which changes the appearance of the input box.
-  const handleSubmit = async (event) => {
-    console.log(portIsClicked);
-    event.preventDefault();
-    if (!portIsClicked) {
-      // check if form is valid, otherwise display alert.
-      if (!formData.clusterName || !formData.serverURI || !formData.ports.length) {
-        setAlertProps({
-          visibility: 'visible',
-          marginTop: '15px',
-          height: '100%',
-          message: 'Please provide cluster name, server URI, and port numbers'
-        })
-      }
-      else
-        try {
-          const response = await fetch(`${apiUrl}/api/createConnection`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              ...formData
-            }),
-          });
-          console.log(response);
+  // - update api URI once hosted.
 
-          if (response.ok) {
-            const data = await response.json();
-            setSubmitting(false);
-            setFormData({
-              clusterName: '',
-              serverURI: '',
-              ports: [],
-              apiKey: '',
-              apiSecret: '',
-            });
-            console.log('data submitted! data: ', data)
-          } else {
-            console.log('Failed to save credentials');
-          }
-        } catch (error) {
-          console.log('Error in Credential Form: ', error);
-        } finally {
-          setSubmitting(false);
-          setFormData({
-            clusterName: '',
-            serverURI: '',
-            ports: [],
-            apiKey: '',
-            apiSecret: '',
-          });
-        }
-    }
-    else {
-      event.preventDefault();
-    }
-  };
+  const handleSubmit = props.handleSubmit;
 
   const handleSubmitKey = (event) => {
 
     if (event.key === "Enter") {
       if (portIsClicked === true) {
         event.preventDefault();
-        handleCheckPort(event);
+
       }
       else {
         handleSubmit(event);
@@ -145,13 +70,11 @@ const ConnectionDialogBox = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
   // port handlers
   const ports = formData.ports;
-  // console.log('port handlers - ports.map: ', ports.map);
+
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
-
     const portNum = event.target.value;
     if (event.key === "Enter" || event.key === "Space") {
 
@@ -160,19 +83,16 @@ const ConnectionDialogBox = () => {
         setPortIsValid(false);
         setHelperText("Invalid Port Number")
         event.target.value = null;
+        return;
       }
       else if (ports.includes(portNum)) {
         setPortIsValid(false);
         setHelperText('Duplicate Port Detected')
         event.target.value = null;
+        return;
       }
       else {
         setPortIsValid(true);
-        // setPorts((prevState) => {
-        //   return [...prevState, portNum];
-        // })
-        console.log('event target name in checkPort: ', event.target.name)
-        console.log('event target value in checkPort: ', event.target.value)
         const newPorts = [...ports, portNum]
         setFormData((prevFormData) => {
           return {
@@ -182,10 +102,8 @@ const ConnectionDialogBox = () => {
         })
         setHelperText(null);
         event.target.value = null;
-      }
-    }
-
-    console.log('handleCheckPort - formData: ', formData)
+      };
+    };
 
   }
 
@@ -205,7 +123,7 @@ const ConnectionDialogBox = () => {
       }
     })
     setHelperText(null);
-    console.log('handleCheckPort - formData: ', formData)
+    // console.log('handleCheckPort - formData: ', formData)
   }
 
   /******** sub-Components *******/
@@ -269,6 +187,7 @@ const ConnectionDialogBox = () => {
                 name="ports"
                 label="Port(s):"
                 variant="filled"
+                placeholder='Press Enter to Input Ports'
                 onFocus={() => {
                   setPortIsClicked(true);
                 }}

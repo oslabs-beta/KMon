@@ -24,9 +24,11 @@ authControllers.createUser = async (req, res, next) => {
     const user_email_lowercase = user_email.toLowerCase();
 
     // Query to check if account with the provided email exists, and if so, return
-    const checkUserQuery = "SELECT * FROM users WHERE LOWER(user_email) = $1";
-    const checkUserValues = [user_email_lowercase];
+    const checkUserQuery = `SELECT * FROM "Users" WHERE user_email=$1`;
+    const checkUserValues = [user_email];
     const existingUser = await db.query(checkUserQuery, checkUserValues);
+
+    // console.log(existingUser)
 
     if (existingUser.rows.length > 0) {
       return next({
@@ -43,15 +45,17 @@ authControllers.createUser = async (req, res, next) => {
     // Different queries to insert new user info depending on whether user has provided last name
     if (last_name) {
       signupQuery =
-        "INSERT INTO users (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id";
+        'INSERT INTO "Users" (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id';
       signupValues = [first_name, last_name, user_email, hashedPassword];
     } else {
       signupQuery =
-        "INSERT INTO users (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id";
+        'INSERT INTO "Users" (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id';
       signupValues = [first_name, user_email, hashedPassword];
     }
 
     const result = await db.query(signupQuery, signupValues);
+
+    console.log('saving user - result: ', result);
 
     const userID = result.rows[0].user_id;
     // console.log('User successfully registered with ID:', userID);
@@ -76,8 +80,9 @@ authControllers.verifyUser = async (req, res, next) => {
     if (user_email && user_password) {
       const values = [user_email];
       const userQuery =
-        'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE LOWER(user_email) = $1';
+        'SELECT user_id, first_name, last_name, user_password, user_email FROM users WHERE LOWER(user_email)=$1';
       const result1 = await db.query(userQuery, values);
+      // console.log(result1);
 
       if (result1.rows.length > 0) {
         // const userID = result1.rows[0].user_id;

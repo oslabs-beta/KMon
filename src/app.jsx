@@ -71,10 +71,10 @@ export const AppContext = createContext();
 
 const App = () => {
   // TO DO: uncomment and set isLoggedIn to false for production setting
-  // const [isLoggedIn, setLoggedIn] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
   // For development mode, isLoggedIn is set to true
-  const [isLoggedIn, setLoggedIn] = useState(true);
+  // const [isLoggedIn, setLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setLoggedIn(true);

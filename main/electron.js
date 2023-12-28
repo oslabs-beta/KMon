@@ -12,16 +12,16 @@ const expressServer = require('./expressServer');
 const env = process.env.NODE_ENV || 'development';
 
 // If dev environment, enable auto-reloading during dev
-if (env === 'development') {
-  try {
-    const electronReloader = require('electron-reloader');
-    electronReloader(module, {
-      ignore: [path.join(__dirname), path.join(__dirname, '..', 'src')],
-    });
-  } catch {
-    console.log('electron reloader failed');
-  }
-}
+// if (env === 'development') {
+//   try {
+//     const electronReloader = require('electron-reloader');
+//     electronReloader(module, {
+//       ignore: [path.join(__dirname), path.join(__dirname, '..', 'src')],
+//     });
+//   } catch {
+//     console.log('electron reloader failed');
+//   }
+// }
 
 // Open web page in a browser window
 const createWindow = () => {

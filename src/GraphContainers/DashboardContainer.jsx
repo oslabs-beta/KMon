@@ -28,9 +28,9 @@ function DashboardContainer() {
     [active, selectedGraphs]
   );
 
-    const onDragStart = ({ active }) => {
-      setActive(active);
-    }
+  const onDragStart = ({ active }) => {
+    setActive(active);
+  }
 
   const onDragEnd = ({ active, over }) => {
     if (over && active.id !== over?.id) {

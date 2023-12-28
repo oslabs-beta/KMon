@@ -26,10 +26,10 @@ app.use(express.json());
 
 // Ensure .env file is included / Generate a secret for the session
 const secret =
- 
+
   process.env.NODE_ENV === "production"
-      ? process.env.SESSION_SECRET
-      : crypto.randomBytes(64).toString("hex");
+    ? process.env.SESSION_SECRET
+    : crypto.randomBytes(64).toString("hex");
 
 // Create a session
 app.use(
@@ -44,14 +44,13 @@ app.use(
 // Use routes
 app.use('/auth', authRouters);
 
-console.log('expressServer.js - about to hit /api');
 app.use('/api', apiRouters);
 
 app.use('/alert', alertRouters);
 //app.use("/graph", graphRouters);
 
 // Handle unknown routes
-app.use((req, res) => res.sendStatus(404));
+app.use('/*', (req, res) => res.sendStatus(404));
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -60,12 +59,15 @@ app.use((err, req, res, next) => {
     status: 500,
     message: { error: "An error occured" },
   };
+
   const errObj = Object.assign({}, defaultErr, err);
+
   if (req.accepts("json")) {
     res.status(errObj.status).json(errObj.message);
   } else {
     res.status(errObj.status).send(errObj.message.error);
   }
+
 });
 
 module.exports = app;

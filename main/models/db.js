@@ -14,6 +14,7 @@ const pool = new Pool({ connectionString: process.env.DB_URI });
     .connect()
     .then(() => {
       console.log("Database is connected");
+      // console.log(process.env.DB_URI2)
     })
     .catch((error) => {
       console.log("Database connection error: ", error);
@@ -44,4 +45,5 @@ module.exports = {
     console.log("Executed Query: ", text);
     return pool.query(text, params, callback);
   },
+  
 };
