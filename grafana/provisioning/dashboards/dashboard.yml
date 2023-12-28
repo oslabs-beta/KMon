@@ -1,2 +1,11 @@
 apiVersion: 1
-providers: []
+providers:
+- name: Prometheus Provider
+  orgId: 1
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboards

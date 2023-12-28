@@ -1,22 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "PrometheusUID",
-      "label": "Prometheus3",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    },
-    {
-      "name": "PrometheusUID",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
   "__elements": {},
   "__requires": [
     {
@@ -1020,7 +1002,9 @@
         "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1086,7 +1070,9 @@
         "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1222,22 +1208,18 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "selected": false,
-          "text": "Prometheus3",
-          "value": "P651E715B918C0831"
-        },
+        "name": "PrometheusUID",
+        "label": "Select Data Source",
         "hide": 0,
         "includeAll": false,
         "multi": false,
-        "name": "PrometheusUID",
         "options": [],
+        "type": "datasource",
         "query": "prometheus",
         "queryValue": "",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "type": "datasource"
+        "skipUrlSync": false
       }
     ]
   },
