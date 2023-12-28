@@ -10,7 +10,7 @@
     ]
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack --config ./webpack.config.js --watch",
     "start": "NODE_ENV=development concurrently \"npm run build\" \"electron main/electron.js\" \"docker-compose up -d --remove-orphans\"",
     "dev": "NODE_ENV=development concurrently \"npm run build\" \"nodemon --exec electron main/electron.js\""
