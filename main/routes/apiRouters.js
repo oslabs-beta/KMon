@@ -4,7 +4,7 @@ const configController = require('../controllers/configControllers');
 const dbController = require('../controllers/dbController');
 
 
-router.post('/createConnection', configController.getPrometheusPorts, configController.createGrafanaYaml, configController.updateDocker, dbController.saveConnection, (req, res) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.updateGrafana, configController.updateDocker, dbController.saveConnection, (req, res) => {
 
   res.status(200).send(JSON.stringify('Connection created!'))
 
