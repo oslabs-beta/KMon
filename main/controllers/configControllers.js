@@ -143,7 +143,7 @@ configController.updateDocker = (req, res, next) => {
       alerting: {
         alertmanagers: [{
           static_configs: [
-            { targets: ['localhost:9093'] }
+            { targets: ['localhost:6063'] }
           ]
         }]
       },

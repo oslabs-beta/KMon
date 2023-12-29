@@ -16,7 +16,7 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-    - '6093:6093'
+    - '6093:9093'
     volumes:
     - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     - alertmanager_data:/data
