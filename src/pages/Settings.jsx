@@ -20,6 +20,9 @@ const apiUrl =
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
 
+const MAX_EMAIL_LENGTH = 255;
+const MAX_SLACK_URL_LENGTH = 100;
+
 const AlertSettings = () => {
   const theme = useTheme();
   const containerStyle = {
@@ -49,32 +52,40 @@ const AlertSettings = () => {
   };
 
   // Use global context to access user info
-  const { userInfo, updateUserInfo } = useAppContext();
+  const { userInfo } = useAppContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/alert/get-preferences/${userInfo.userID}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-  
+        const response = await fetch(
+          `${apiUrl}/alert/get-preferences/${userInfo.userID}`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+
         if (response.ok) {
           const preferencesData = await response.json();
           setSavedPreferences(preferencesData.data.preferences);
+          // Initialize alertPreferences based on savedPreferences after fetching
+          setAlertPreferences({
+            Email: preferencesData.data.preferences.Email || false,
+            Slack: preferencesData.data.preferences.Slack || false,
+            InApp: preferencesData.data.preferences.InApp || false,
+          });
           // console.log('Alert preferences received.');
         }
       } catch (error) {
         console.error('Error while getting saved alert preferences:', error);
       }
     };
-  
+
     // Fetch data when user is on Settings page. Optional chaining to allow reading the value of userInfo.userID even if userInfo is null or undefined without causing an error.
     if (userInfo?.userID) {
       fetchData();
     }
   }, [userInfo?.userID, settingsFeedback]);
-  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -99,10 +110,24 @@ const AlertSettings = () => {
       ? document.getElementById('emailAddress').value
       : '';
 
+    if (isEmailRequired && preferredEmail.length > MAX_EMAIL_LENGTH) {
+      setSettingsFeedback(
+        'Please enter a valid email.'
+      );
+      return;
+    }
+
     // If slack URL required, extract the slack URL from the field. Otherwise, slackURL will be empty
     const slackURL = isSlackURLRequired
       ? document.getElementById('slack').value
       : '';
+
+    if (isSlackURLRequired && slackURL.length > MAX_SLACK_URL_LENGTH) {
+      setSettingsFeedback(
+        'Please enter a valid URL.'
+      );
+      return;
+    }
 
     // Put request to update the preferences in db
     try {
@@ -130,30 +155,40 @@ const AlertSettings = () => {
     } catch (error) {
       console.error('Error while saving alert preferences:', error);
       // setSettingsFeedback('Failed to save alert preferences.');
-      setSettingsFeedback(`Error while saving alert preferences: ${response.status}`);
+      setSettingsFeedback(
+        `Error while saving alert preferences: ${response.status}`
+      );
     }
   };
 
   return (
     <Container sx={containerStyle}>
       <Grid container spacing={2}>
-        <Grid item xs={5} md={4}>
-          <Paper elevation={1} style={{ padding: '15px', marginBottom: '10px' }}>
-            <Typography variant="h6" paddingBottom={'10px'}>Current Preferences:</Typography>
-            <List>
-              {Object.entries(savedPreferences).map(([key, value]) => (
-                <ListItem key={key}>
-                  <ListItemText primary={`${key}: ${value ? 'Yes' : 'No'}`} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </Grid>
         <Grid item xs={8} md={5}>
-          <Paper elevation={1} style={{ padding: '15px', marginBottom: '10px' }}>
-            <Typography variant="h4" paddingBottom={'10px'}>Alert Preferences</Typography>
+          <Paper
+            elevation={1}
+            style={{ padding: '15px', marginBottom: '20px' }}
+          >
+            <Typography variant="h4" paddingBottom={'10px'}>
+              Alert Preferences
+            </Typography>
             <form onSubmit={handleSubmit}>
-              <Grid container spacing={1}>
+              {/* Current Preferences Section */}
+              <Paper
+                elevation={1}
+                sx={{ padding: '15px', marginBottom: '10px' }}
+              >
+                <Typography variant="h7" paddingBottom={'10px'}>
+                  {/* filter the keys to only include those with the truthy value */}
+                  Current Preferences: {Object.keys(savedPreferences)
+                    .filter((key) => savedPreferences[key])
+                    .map((key) => `${key} Alerts`)
+                    .join(', ')}
+                </Typography>
+              </Paper>
+
+              <Grid container spacing={2}>
+                {/* Email Checkbox and Field */}
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={
@@ -173,9 +208,12 @@ const AlertSettings = () => {
                       name="emailAddress"
                       sx={{ width: '100%' }}
                       required={isEmailRequired}
+                      aria-labelledby="emailAddressLabel"
                     />
                   )}
                 </Grid>
+
+                {/* Slack Checkbox and Field */}
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={
@@ -195,9 +233,12 @@ const AlertSettings = () => {
                       name="slackURL"
                       sx={{ width: '100%' }}
                       required={isSlackURLRequired}
+                      aria-labelledby="slackURLLabel"
                     />
                   )}
                 </Grid>
+
+                {/* InApp Checkbox */}
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={
@@ -209,6 +250,8 @@ const AlertSettings = () => {
                     label={`Receive In App Alerts`}
                   />
                 </Grid>
+
+                {/* Password Field */}
                 <Grid item xs={12}>
                   <TextField
                     label="Password"
@@ -219,18 +262,28 @@ const AlertSettings = () => {
                     sx={{ width: '50%' }}
                   />
                 </Grid>
+
+                {/* Submit Button */}
                 <Grid item xs={12}>
-                  <Button type="submit" variant="outlined" sx={{ width: '75%' }}>
+                  <Button
+                    type="submit"
+                    variant="outlined"
+                    sx={{ width: '100%' }}
+                  >
                     Save Preferences
                   </Button>
                 </Grid>
+
+                {/* Feedback Message */}
                 <Grid item xs={12}>
                   {/* condiitonal rendering of feedback message */}
                   {settingsFeedback ? (
                     <Typography
                       variant="body2"
                       color={
-                        settingsFeedback.includes('success') ? 'success' : 'error'
+                        settingsFeedback.includes('success')
+                          ? 'success'
+                          : 'error'
                       }
                     >
                       {settingsFeedback}
