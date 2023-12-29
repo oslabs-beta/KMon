@@ -10,7 +10,7 @@ const mockReq = () => {
   }
 }
 
-// this way, we can test what res.status, res.json, and res.send were called with ('toHaveBeenCalledWith')
+// this way, we can test what res.status, res.json, and res.send were called with ('toHaveBeenCalledWith(....)'). We can also provide res.locals so we can check what has been saved by the function.
 const mockRes = () => {
   const res = {};
   res.locals = {};
@@ -20,8 +20,12 @@ const mockRes = () => {
   return res;
 }
 
+// we can check if next is called with nothing, or we expect it "to have been called witH" an objected expected to contain the properties of the error object from the middleware function.
+
+// syntax: expect(next).toHaveBeenCalledWith(expect.objectContaining({errorObjFromMiddleware}))
 const mockNext = jest.fn();
 
+// function to generate mock configuration files that can be destructured.
 const getMockConfigs = () => {
 
   const mockDockerCompose = {
@@ -42,7 +46,7 @@ const getMockConfigs = () => {
   const mockDatasourceYml = {
     apiVersion: '1',
     dataSources: []
-  }
+  };
 
   const mockDatasources = {
     name: 'prometheus1'
@@ -59,7 +63,7 @@ const getMockConfigs = () => {
         ]
       }
     ]
-  }
+  };
 
   return {
     dockerCompose: mockDockerCompose,
@@ -67,12 +71,12 @@ const getMockConfigs = () => {
     datasourceYml: mockDatasourceYml,
     datasources: mockDatasources,
     prometheus: mockPrometheus
-  }
-}
+  };
+};
 
 module.exports = {
   mockReq,
   mockRes,
   mockNext,
   getMockConfigs
-}
+};

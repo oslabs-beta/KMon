@@ -6,7 +6,7 @@ const { mockRes, mockReq, mockNext, getMockConfigs } = require('../__mocks__/exp
 jest.mock('fs');
 jest.mock('js-yaml');
 
-describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
+describe('configControllers.getPrometheusPorts', () => {
 
   let dockerCompose;
   let prometheusService;
@@ -19,7 +19,7 @@ describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
     res = mockRes();
     req = mockReq();
     yaml.load.mockReturnValue(dockerCompose);
-  })
+  });
 
   it('should save an object called prometheusPorts to res.locals', () => {
 
@@ -27,7 +27,7 @@ describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
 
     expect(res.locals.prometheusPorts).toBeInstanceOf(Object);
     expect(next).toHaveBeenCalledWith();
-  })
+  });
 
   it('should have maxPort of 0 if there are no prometheus services', () => {
 
@@ -35,7 +35,7 @@ describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
 
     expect(res.locals.prometheusPorts.maxPort).toBe(0);
     expect(next).toHaveBeenCalledWith();
-  })
+  });
 
   it('should assign maxPort equal to port of any prometheus instances', () => {
 
@@ -53,16 +53,8 @@ describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
 
   it('should return an error if the directory is invalid', () => {
 
-    console.log(dockerCompose.services)
-
     fs.readFileSync.mockImplementation(() => {
       throw new Error()
-    })
-
-    yaml.load.mockImplementation((input) => {
-      if (input instanceof Error) {
-        throw new Error();
-      }
     })
 
     configControllers.getPrometheusPorts(req, res, next);
@@ -89,6 +81,56 @@ describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
       status: 500,
       message: { err: 'Error occurred while trying to identify ports' },
     }));
+  });
+
+});
+
+describe('configControllers.updateGrafana', () => {
+
+  let id;
+  let datasourceDoc;
+  let datasources;
+  let res;
+  let req;
+  const next = mockNext;
+
+  beforeEach(() => {
+    id = 5;
+    res = mockRes();
+    req = mockReq();
+    req.body.id = id;
+    ({ datasourceDoc, datasources } = getMockConfigs());
   })
+
+  it('should return an error if the directory is invalid', () => {
+
+    fs.readFileSync.mockImplementation(() => {
+      throw new Error();
+    })
+
+    configControllers.updateGrafana(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.createGrafanaYaml middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to create connection' },
+    }));
+  });
+
+  it('should return an error if the yaml file is corrupted or malwritten', () => {
+
+    yaml.load.mockImplementation(() => {
+      throw new Error();
+    })
+
+    configControllers.updateGrafana(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.createGrafanaYaml middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to create connection' },
+    }));
+  });
+
 
 });
