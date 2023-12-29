@@ -2,18 +2,22 @@
  * Defining mock utility objects/functions for express back end.
  */
 
-const mockReq = () => ({
-  body: {},
-  params: {},
-  query: {}
-})
+const mockReq = () => {
+  return {
+    body: {},
+    params: {},
+    query: {}
+  }
+}
 
 // this way, we can test what res.status, res.json, and res.send were called with ('toHaveBeenCalledWith')
 const mockRes = () => {
   const res = {};
+  res.locals = {};
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
   res.send = jest.fn().mockReturnValue(res);
+  return res;
 }
 
 const mockNext = jest.fn();

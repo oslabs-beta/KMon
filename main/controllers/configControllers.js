@@ -1,6 +1,6 @@
-const Store = require('electron-store');
+// const Store = require('electron-store');
 const fs = require('fs');
-const Buffer = require('node:buffer')
+// const Buffer = require('node:buffer')
 const path = require('path');
 const { exec } = require('node:child_process');
 
@@ -39,6 +39,7 @@ configController.getPrometheusPorts = (req, res, next) => {
     }
 
     res.locals.prometheusPorts = prometheusPorts;
+    console.log(res.locals);
     // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
