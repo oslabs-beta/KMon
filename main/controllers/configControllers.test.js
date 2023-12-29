@@ -3,41 +3,92 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 const { mockRes, mockReq, mockNext, getMockConfigs } = require('../__mocks__/express')
 
-const res = mockRes();
-const req = mockReq();
-const next = mockNext;
-
 jest.mock('fs');
 jest.mock('js-yaml');
 
 describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
 
+  let dockerCompose;
+  let prometheusService;
+  let res;
+  let req;
+  const next = mockNext;
 
-  const { dockerCompose, prometheusService } = getMockConfigs()
-  yaml.load.mockReturnValue(dockerCompose);
+  beforeEach(() => {
+    ({ dockerCompose, prometheusService } = getMockConfigs());
+    res = mockRes();
+    req = mockReq();
+    yaml.load.mockReturnValue(dockerCompose);
+  })
 
   it('should save an object called prometheusPorts to res.locals', () => {
 
     configControllers.getPrometheusPorts(req, res, next)
 
     expect(res.locals.prometheusPorts).toBeInstanceOf(Object);
-
+    expect(next).toHaveBeenCalledWith();
   })
 
   it('should have maxPort of 0 if there are no prometheus services', () => {
 
-    configControllers.getPrometheusPorts()
+    configControllers.getPrometheusPorts(req, res, next)
 
-    expect(res.locals.prometheusPorts.maxPorts).toBe(0)
+    expect(res.locals.prometheusPorts.maxPort).toBe(0);
+    expect(next).toHaveBeenCalledWith();
   })
 
   it('should assign maxPort equal to port of any prometheus instances', () => {
 
-    dockerCompose.services.prometheus1 = prometheusService;
+    dockerCompose.services.prometheus1 = { ...prometheusService };
+    dockerCompose.services.prometheus2 = { ...prometheusService };
+    dockerCompose.services.prometheus3 = { ...prometheusService };
+    dockerCompose.services.prometheus2.ports = ['9095:9090'];
+    dockerCompose.services.prometheus3.ports = ['9092:9090'];
 
-    configControllers.getPrometheusPorts();
+    configControllers.getPrometheusPorts(req, res, next);
 
-    expect(res.locals.prometheusPorts.maxPorts).toBe('9093')
+    expect(res.locals.prometheusPorts.maxPort).toBe('9095');
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it('should return an error if the directory is invalid', () => {
+
+    console.log(dockerCompose.services)
+
+    fs.readFileSync.mockImplementation(() => {
+      throw new Error()
+    })
+
+    yaml.load.mockImplementation((input) => {
+      if (input instanceof Error) {
+        throw new Error();
+      }
+    })
+
+    configControllers.getPrometheusPorts(req, res, next);
+
+    expect(res.locals.prometheusPorts).toBe(undefined)
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.getPrometheusPorts middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to identify ports' },
+    }));
+  });
+
+  it('should return an error if the yaml file is corrupted or malwritten', () => {
+
+    yaml.load.mockImplementation(() => {
+      throw new Error()
+    })
+
+    configControllers.getPrometheusPorts(req, res, next);
+
+    expect(res.locals.prometheusPorts).toBe(undefined)
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.getPrometheusPorts middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to identify ports' },
+    }));
   })
 
-})
+});

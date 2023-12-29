@@ -32,14 +32,14 @@ configController.getPrometheusPorts = (req, res, next) => {
           /\:\d*/,
           ''
         );
-        if (Number(outerPort) > prometheusPorts.maxPort) {
+        if (Number(outerPort) > Number(prometheusPorts.maxPort)) {
           prometheusPorts.maxPort = outerPort;
         }
       }
     }
 
     res.locals.prometheusPorts = prometheusPorts;
-    console.log(res.locals);
+    // console.log(res.locals);
     // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
