@@ -1,23 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const configController = require('../controllers/configControllers');
-const dbController = require('../controllers/dbController');
+const dbControllers = require('../controllers/dbControllers');
 
 
-router.post('/createConnection', configController.getPrometheusPorts, configController.updateGrafana, configController.updateDocker, dbController.saveConnection, (req, res) => {
+router.post('/createConnection', configController.getPrometheusPorts, configController.updateGrafana, configController.updateDocker, dbControllers.saveConnection, (req, res) => {
 
   res.status(200).send(JSON.stringify('Connection created!'))
 
 })
 
-router.get('/getConnections/:userid', dbController.getConnections, (req, res) => {
+router.get('/getConnections/:userid', dbControllers.getConnections, (req, res) => {
 
   const data = res.locals.data;
   res.status(200).send(JSON.stringify(data));
 
 })
 
-router.delete('/deleteConnections', dbController.deleteConnections, configController.deleteConnections, (req, res) => {
+router.delete('/deleteConnections', dbControllers.deleteConnections, configController.deleteConnections, (req, res) => {
 
   const { dbResponse, configResponse } = res.locals.response;
   res.status(200).send(JSON.stringify(dbResponse, configResponse));

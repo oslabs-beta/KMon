@@ -1,7 +1,7 @@
-const configControllers = require('./configControllers');
+const configControllers = require('../configControllers');
 const fs = require('fs');
 const yaml = require('js-yaml');
-const { mockRes, mockReq, mockNext, getMockConfigs } = require('../__mocks__/express')
+const { mockRes, mockReq, mockNext, getMockConfigs } = require('../../__mocks__/express')
 
 jest.mock('fs');
 jest.mock('js-yaml');
@@ -95,7 +95,7 @@ describe('configControllers.updateGrafana', () => {
   const next = mockNext;
 
   beforeEach(() => {
-    id = 5;
+    id = Math.floor(1 + (9 * Math.random()));
     res = mockRes();
     req = mockReq();
     req.body.id = id;
@@ -106,10 +106,12 @@ describe('configControllers.updateGrafana', () => {
 
     fs.readFileSync.mockImplementation(() => {
       throw new Error();
-    })
-
+    });
+    // fs.writeFileSync.mockImplementation(() => { });
+    // console.log('updateGrafana.describe datasourceDoc, datasources', datasourceDoc, datasources)
     configControllers.updateGrafana(req, res, next);
 
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.objectContaining({
       log: 'Error occurred in configControllers.createGrafanaYaml middleware function',
       status: 500,
@@ -117,7 +119,7 @@ describe('configControllers.updateGrafana', () => {
     }));
   });
 
-  it('should return an error if the yaml file is corrupted or malwritten', () => {
+  it('should return an error if the yaml file is corrupted or malformed', () => {
 
     yaml.load.mockImplementation(() => {
       throw new Error();
@@ -125,12 +127,27 @@ describe('configControllers.updateGrafana', () => {
 
     configControllers.updateGrafana(req, res, next);
 
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.objectContaining({
       log: 'Error occurred in configControllers.createGrafanaYaml middleware function',
       status: 500,
       message: { err: 'Error occurred while trying to create connection' },
     }));
   });
+
+  it('should add a new datasource to the yaml file with the correct id', () => {
+
+    yaml.load.mockImplementation(() => {
+      return datasourceDoc;
+    })
+
+    configControllers.updateGrafana(req, res, next);
+
+    expect(datasourceDoc.datasources)
+
+  })
+
+
 
 
 });

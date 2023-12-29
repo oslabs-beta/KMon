@@ -43,7 +43,7 @@ const getMockConfigs = () => {
     ]
   };
 
-  const mockDatasourceYml = {
+  const mockDatasourceDoc = {
     apiVersion: '1',
     dataSources: []
   };
@@ -68,7 +68,7 @@ const getMockConfigs = () => {
   return {
     dockerCompose: mockDockerCompose,
     prometheusService: mockPrometheusService,
-    datasourceYml: mockDatasourceYml,
+    datasourceYml: mockDatasourceDoc,
     datasources: mockDatasources,
     prometheus: mockPrometheus
   };

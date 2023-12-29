@@ -1,13 +1,13 @@
 const db = require("../models/db");
 
-const dbController = {};
+const dbControllers = {};
 
 // postgres - Connections:
 // db: clusterID, userID, clusterName, ports, created_on
 // primary key: clusterID + userID
 
 
-dbController.saveConnection = async (req, res, next) => {
+dbControllers.saveConnection = async (req, res, next) => {
 
   try {
     const { id, name, uri, ports, created, userID } = req.body;
@@ -28,7 +28,7 @@ dbController.saveConnection = async (req, res, next) => {
   }
 }
 
-dbController.getConnections = async (req, res, next) => {
+dbControllers.getConnections = async (req, res, next) => {
   try {
 
     const userid = req.params.userid;
@@ -49,7 +49,7 @@ dbController.getConnections = async (req, res, next) => {
   }
 }
 
-dbController.deleteConnections = async (req, res, next) => {
+dbControllers.deleteConnections = async (req, res, next) => {
 
   try {
     // req.body should contain two pieces of information: userid and the array of ports.
@@ -81,4 +81,4 @@ dbController.deleteConnections = async (req, res, next) => {
   }
 }
 
-module.exports = dbController;
+module.exports = dbControllers;
