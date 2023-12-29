@@ -143,7 +143,7 @@ configController.updateDocker = (req, res, next) => {
       alerting: {
         alertmanagers: [{
           static_configs: [
-            { targets: ['localhost:9093'] }
+            { targets: ['host.docker.internal:6093'] }
           ]
         }]
       },
@@ -203,7 +203,6 @@ configController.deleteConnections = (req, res, next) => {
   try {
     const { clusters } = req.body;
 
-    const dashboardDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'));
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'));
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
 
@@ -211,17 +210,6 @@ configController.deleteConnections = (req, res, next) => {
     for (let id of clusters) {
       // index for searching through documents arrays.
       let ind = 0;
-
-      // splicing out dashboard providers.
-      for (let provider of dashboardDoc.providers) {
-        if (provider.name === `prometheus${id}`) {
-          dashboardDoc.providers.splice(ind, 1)
-          break;
-        };
-        ind++;
-      };
-
-      ind = 0;
 
       // splicing out datasource from datasources
       for (let datasource of datasourceDoc.datasources) {
@@ -275,7 +263,6 @@ configController.deleteConnections = (req, res, next) => {
     });
 
     // Write them into the directory
-    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8');
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), newDatasourcesYaml, 'utf-8');
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8');
 

@@ -1,23 +1,24 @@
-const configControllers = require('./configControllers')
+const fs = require('fs');
+const yaml = require('js-yaml');
+const configControllers = require('./configControllers');
+const { mockRes, mockReq, mockNext } = require('../__mocks__/express')
 
-test('getPrometheusPorts finds and returns maximum Promtheus port', () => {
 
-  const testDockerCompose = {
-    version: '3.8',
-    services: {
-      grafana: {
-        image: 'grafana'
-      }
-    }
-  }
+const getMockYmls = () => {
 
-  const testPrometheus = {
-    prometheus: {
+  const mockDockerComposeYml = `
+  version: 3.8
+  services:
+    grafana:
+      - image: grafana
+  `
 
-    }
-  }
+}
 
-  beforeEach()
+
+
+describe('getPrometheusPorts finds and returns maximum Promtheus port', () => {
+
 
 
 
