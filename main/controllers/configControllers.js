@@ -11,9 +11,9 @@ const yaml = require('js-yaml');
 // not sure what this is...
 const { default: cluster } = require('cluster');
 
-const configController = {};
+const configControllers = {};
 
-configController.getPrometheusPorts = (req, res, next) => {
+configControllers.getPrometheusPorts = (req, res, next) => {
   // console.log('getting max Prometheus port number!')
   try {
     const dockerCompose = yaml.load(
@@ -53,16 +53,16 @@ configController.getPrometheusPorts = (req, res, next) => {
   }
 };
 
-configController.updateGrafana = (req, res, next) => {
+configControllers.updateGrafana = (req, res, next) => {
   // console.log('creating Grafana Yamls!')
   try {
     const { id } = req.body;
-
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
 
     // create dataSource object to append to yml files.
     // Only a single provisioning provider is necessary to provision the Grafana dashboard with multiple prometheus datasources, since we are using templating to allow users to pick which prometheus instance they will be pulling from.
     // If we want more separation, we will have to generate a new dashboard.json file for each dashboard we create.
+
 
     const newDatasource = {
       name: `prometheus${id}`,
@@ -82,6 +82,8 @@ configController.updateGrafana = (req, res, next) => {
       datasourceDoc.datasources.push(newDatasource);
     };
 
+
+
     const newDatasourcesYaml = yaml.dump(datasourceDoc, {
       indent: 2,
       noArrayIndent: true
@@ -100,7 +102,7 @@ configController.updateGrafana = (req, res, next) => {
   }
 };
 
-configController.updateDocker = (req, res, next) => {
+configControllers.updateDocker = (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
   try {
@@ -200,7 +202,7 @@ configController.updateDocker = (req, res, next) => {
   };
 };
 
-configController.deleteConnections = (req, res, next) => {
+configControllers.deleteConnections = (req, res, next) => {
   try {
     const { clusters } = req.body;
 
@@ -291,4 +293,4 @@ configController.deleteConnections = (req, res, next) => {
   };
 };
 
-module.exports = configController;
+module.exports = configControllers;

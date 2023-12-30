@@ -1,10 +1,46 @@
 const configControllers = require('../configControllers');
 const fs = require('fs');
 const yaml = require('js-yaml');
-const { mockRes, mockReq, mockNext, getMockConfigs } = require('../../__mocks__/express')
+const { exec } = require('node:child_process');
+const { mockRes, mockReq, mockNext, getMockConfigs } = require('../../__mocks__/express');
+const { config } = require('dotenv');
 
 jest.mock('fs');
 jest.mock('js-yaml');
+jest.mock('node:child_process')
+
+describe('configControllers', () => {
+
+  it('should be an object', () => {
+
+    expect(configControllers).toBeInstanceOf(Object);
+  });
+
+  it('should have a getPrometheusPorts method', () => {
+
+    expect(configControllers.getPrometheusPorts).not.toBe(undefined);
+    expect(configControllers.getPrometheusPorts).toBeInstanceOf(Function);
+  });
+
+  it('should have a updateGrafana method', () => {
+
+    expect(configControllers.updateGrafana).not.toBe(undefined);
+    expect(configControllers.updateGrafana).toBeInstanceOf(Function);
+  });
+
+  it('should have a updateDocker method', () => {
+
+    expect(configControllers.updateDocker).not.toBe(undefined);
+    expect(configControllers.updateDocker).toBeInstanceOf(Function);
+  });
+
+  it('should have a deleteConnections method', () => {
+
+    expect(configControllers.deleteConnections).not.toBe(undefined);
+    expect(configControllers.deleteConnections).toBeInstanceOf(Function);
+  });
+
+})
 
 describe('configControllers.getPrometheusPorts', () => {
 
@@ -15,11 +51,18 @@ describe('configControllers.getPrometheusPorts', () => {
   const next = mockNext;
 
   beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
     ({ dockerCompose, prometheusService } = getMockConfigs());
     res = mockRes();
     req = mockReq();
     yaml.load.mockReturnValue(dockerCompose);
   });
+
+  afterAll(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  })
 
   it('should save an object called prometheusPorts to res.locals', () => {
 
@@ -42,6 +85,7 @@ describe('configControllers.getPrometheusPorts', () => {
     dockerCompose.services.prometheus1 = { ...prometheusService };
     dockerCompose.services.prometheus2 = { ...prometheusService };
     dockerCompose.services.prometheus3 = { ...prometheusService };
+    dockerCompose.services.prometheus1.ports = ['9094:9090']
     dockerCompose.services.prometheus2.ports = ['9095:9090'];
     dockerCompose.services.prometheus3.ports = ['9092:9090'];
 
@@ -95,6 +139,8 @@ describe('configControllers.updateGrafana', () => {
   const next = mockNext;
 
   beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
     id = Math.floor(1 + (9 * Math.random()));
     res = mockRes();
     req = mockReq();
@@ -102,13 +148,17 @@ describe('configControllers.updateGrafana', () => {
     ({ datasourceDoc, datasources } = getMockConfigs());
   })
 
+  afterAll(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  })
+
   it('should return an error if the directory is invalid', () => {
 
     fs.readFileSync.mockImplementation(() => {
       throw new Error();
     });
-    // fs.writeFileSync.mockImplementation(() => { });
-    // console.log('updateGrafana.describe datasourceDoc, datasources', datasourceDoc, datasources)
+
     configControllers.updateGrafana(req, res, next);
 
     expect(fs.writeFileSync).not.toHaveBeenCalled();
@@ -137,17 +187,339 @@ describe('configControllers.updateGrafana', () => {
 
   it('should add a new datasource to the yaml file with the correct id', () => {
 
+    // console.log(req.body);
+    // console.log(datasourceDoc, datasources)
+    fs.readFileSync.mockImplementation(() => { })
+
     yaml.load.mockImplementation(() => {
       return datasourceDoc;
     })
 
     configControllers.updateGrafana(req, res, next);
 
-    expect(datasourceDoc.datasources)
+    // console.log(datasourceDoc, datasources)
+
+    expect(datasourceDoc.datasources[0].name).toBe(`prometheus${id}`)
+  });
+
+  it('should write this updated object to yaml', () => {
+    fs.readFileSync.mockImplementation(() => { })
+
+    yaml.load.mockImplementation(() => {
+      return datasourceDoc;
+    })
+
+    yaml.dump.mockReturnValue(`mockYaml`)
+
+    configControllers.updateGrafana(req, res, next);
+
+    expect(yaml.dump).toHaveBeenCalledWith(
+      expect.objectContaining(datasourceDoc),
+      expect.objectContaining({
+        indent: 2, noArrayIndent: true
+      }));
+  });
+});
+
+describe('configControllers.updateDocker', () => {
+
+  let id, res, req, name, uri, ports, dockerCompose, maxPort;
+  const next = mockNext;
+
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    id = Math.floor(1 + (9 * Math.random()));
+    maxPort = 9090 + Math.floor(9 * Math.random());
+    res = mockRes();
+    req = mockReq();
+    res.locals.prometheusPorts = {};
+    res.locals.prometheusPorts.maxPort = maxPort;
+    req.body.id = id;
+    req.body.name = 'test';;
+    req.body.uri = '1.2.3.4';
+    req.body.ports = ['1234', '2345', '3456'];
+    ({ dockerCompose } = getMockConfigs());
+  })
+
+  afterAll(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  })
+
+  it('should return an error if the directory is invalid', () => {
+
+    fs.readFileSync.mockImplementation(() => {
+      throw new Error();
+    });
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.createConnection middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to create connection' },
+    }));
+  });
+
+  it('should return an error if the yaml file is corrupted or malformed', () => {
+
+    yaml.load.mockImplementation(() => {
+      throw new Error();
+    })
+
+    fs.readFileSync.mockImplementation(() => {
+      return ``
+    })
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred in configControllers.createConnection middleware function',
+      status: 500,
+      message: { err: 'Error occurred while trying to create connection' },
+    }));
+  });
+
+  it('should add prometheus instance to the grafana dependencies array', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(dockerCompose.services.grafana.depends_on.includes(`prometheus${id}`)).toBe(true);
+  })
+
+  it('should add new prometheus instance to dockerCompose.services', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(dockerCompose.services[`prometheus${id}`]).toBeInstanceOf(Object);
+
+  })
+
+  it('should assign a port number greater than the current max Prometheus port to the new Prometheus instance', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(dockerCompose.services[`prometheus${id}`].ports).toEqual([`${maxPort + 1}:9090`]);
+
+  })
+
+  it('should create an array of targets using the URI and Ports for creating prometheus yaml', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(yaml.dump).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scrape_configs: [
+          {
+            job_name: 'test',
+            static_configs: [
+              { targets: ['1.2.3.4:1234', '1.2.3.4:2345', '1.2.3.4:3456'] }
+            ]
+          }
+        ]
+      }),
+      expect.objectContaining({
+        indent: 2, noArrayIndent: true
+      }))
+  })
+
+  it('should try to write these files to a path', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    yaml.dump.mockImplementation(() => {
+      return `mockyaml`
+    })
+
+    fs.writeFileSync.mockImplementation(() => { });
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
+  })
+
+  // could add a test case for writeFileSync throwing an error
+
+  it('should run a CLI command to restart docker and remove any orphan containers', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+
+    yaml.load.mockReturnValue(dockerCompose);
+
+    configControllers.updateDocker(req, res, next);
+
+    expect(exec.mock.calls[0][0]).toEqual('docker compose up -d --remove-orphans');
+  })
+
+  // can also check for the error message in 'exec' command in case docker-compose command doesn't work.
+
+})
+
+describe('deleteConnections', () => {
+
+  let clusters, datasourceDoc, datasource, dockerCompose, prometheusService, req, res
+  const next = mockNext;
+
+  const generateRandomClusterIds = () => {
+    // create 5 random unique numbers between 1 and m.
+    const ids = [];
+    while (ids.length < 3) {
+      const id = 1 + Math.floor((10 * Math.random()));
+      if (!ids.includes(id)) {
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+
+  const generateDatasourceDoc = () => {
+    ({ datasourceDoc, datasource } = getMockConfigs());
+
+    for (let i = 1; i < 11; i++) {
+      datasource.name = `prometheus${i}`
+      datasourceDoc.datasources.push({ ...datasource })
+    }
+
+    return datasourceDoc;
+  }
+
+  const generateDockerCompose = () => {
+
+    ({ dockerCompose, prometheusService } = getMockConfigs());
+    dockerCompose.services.grafana.depends_on = [];
+
+    for (let i = 1; i < 11; i++) {
+      const newPrometheusService = { ...prometheusService };
+      newPrometheusService.ports.push(`${9089 + i}:9090`);
+      dockerCompose.services.grafana.depends_on.push(`prometheus${i}`);
+      dockerCompose.services[`prometheus${i}`] = newPrometheusService;
+    }
+
+    return dockerCompose;
+  }
+
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    clusters = generateRandomClusterIds();
+    req = mockReq();
+    res = mockRes();
+    req.body.clusters = clusters;
+    // mock up yaml.load to provide new datasourceDoc on first call, dockerCompose on second call.
+  })
+
+  afterAll(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  })
+
+  it('should return an error if the directory is invalid', () => {
+
+    fs.readFileSync.mockImplementation(() => {
+      throw new Error();
+    });
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred while deleting connections from config files',
+      status: 500,
+      message: "Couldn't delete from configurations"
+    }));
+  });
+
+  it('should return an error if the yaml file is corrupted or malformed', () => {
+
+    yaml.load.mockImplementation(() => {
+      throw new Error();
+    })
+
+    fs.readFileSync.mockImplementation(() => {
+      return ``
+    })
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred while deleting connections from config files',
+      status: 500,
+      message: "Couldn't delete from configurations"
+    }));
+  });
+
+  it('should remove specified prometheus instances from datasourceDoc.datasources', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+    datasourceDoc = generateDatasourceDoc();
+    dockerCompose = generateDockerCompose();
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
+
+    configControllers.deleteConnections(req, res, next);
+
+    for (let id of clusters) {
+      for (let datasource of datasourceDoc.datasources) {
+        expect(datasource.name !== `prometheus${id}`).toBe(true);
+      }
+    };
+  });
+
+  it('should remove specified prometheus instances from dockerCompose', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+    datasourceDoc = generateDatasourceDoc();
+    dockerCompose = generateDockerCompose();
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
+
+    configControllers.deleteConnections(req, res, next);
+
+    for (let id of clusters) {
+
+      for (let dep of dockerCompose.services.grafana.depends_on) {
+        expect(dep !== `prometheus${id}`).toBe(true);
+      }
+
+      expect(dockerCompose.services[`prometheus${id}`]).toBe(undefined);
+    };
+  });
+
+  it('should get rid of the grafana.depends_on properly completely if it is emptied', () => {
+
+    fs.readFileSync.mockImplementation(() => { });
+    datasourceDoc = generateDatasourceDoc();
+    dockerCompose = generateDockerCompose();
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
+
+    req.body.clusters = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+
 
   })
 
 
-
-
-});
+})

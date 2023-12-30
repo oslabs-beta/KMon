@@ -38,18 +38,16 @@ const getMockConfigs = () => {
   };
 
   const mockPrometheusService = {
-    ports: [
-      '9093:9090'
-    ]
+    ports: []
   };
 
   const mockDatasourceDoc = {
     apiVersion: '1',
-    dataSources: []
+    datasources: []
   };
 
-  const mockDatasources = {
-    name: 'prometheus1'
+  const mockDatasource = {
+    name: ''
   }
 
   const mockPrometheus = {
@@ -68,8 +66,8 @@ const getMockConfigs = () => {
   return {
     dockerCompose: mockDockerCompose,
     prometheusService: mockPrometheusService,
-    datasourceYml: mockDatasourceDoc,
-    datasources: mockDatasources,
+    datasourceDoc: mockDatasourceDoc,
+    datasource: mockDatasource,
     prometheus: mockPrometheus
   };
 };
