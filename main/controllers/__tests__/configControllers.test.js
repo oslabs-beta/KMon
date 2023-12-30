@@ -427,6 +427,9 @@ describe('deleteConnections', () => {
     res = mockRes();
     req.body.clusters = clusters;
     // mock up yaml.load to provide new datasourceDoc on first call, dockerCompose on second call.
+    fs.readFileSync.mockReturnValue();
+    datasourceDoc = generateDatasourceDoc();
+    dockerCompose = generateDockerCompose();
   })
 
   afterAll(() => {
@@ -472,10 +475,6 @@ describe('deleteConnections', () => {
 
   it('should remove specified prometheus instances from datasourceDoc.datasources', () => {
 
-    fs.readFileSync.mockImplementation(() => { });
-    datasourceDoc = generateDatasourceDoc();
-    dockerCompose = generateDockerCompose();
-
     yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
 
     configControllers.deleteConnections(req, res, next);
@@ -489,10 +488,6 @@ describe('deleteConnections', () => {
 
   it('should remove specified prometheus instances from dockerCompose', () => {
 
-    fs.readFileSync.mockImplementation(() => { });
-    datasourceDoc = generateDatasourceDoc();
-    dockerCompose = generateDockerCompose();
-
     yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
 
     configControllers.deleteConnections(req, res, next);
@@ -501,25 +496,87 @@ describe('deleteConnections', () => {
 
       for (let dep of dockerCompose.services.grafana.depends_on) {
         expect(dep !== `prometheus${id}`).toBe(true);
-      }
+      };
 
       expect(dockerCompose.services[`prometheus${id}`]).toBe(undefined);
     };
   });
 
-  it('should get rid of the grafana.depends_on properly completely if it is emptied', () => {
+  it('should run a command to remove the id', () => {
 
-    fs.readFileSync.mockImplementation(() => { });
-    datasourceDoc = generateDatasourceDoc();
-    dockerCompose = generateDockerCompose();
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
+
+    configControllers.deleteConnections(req, res, next);
+
+    for (let i = 0; i < clusters.length; i++) {
+      expect(exec.mock.calls[i][0]).toBe(`rm prometheus${clusters[i]}.yml`);
+    };
+  })
+
+  it('should throw an error if a malformed command is entered', () => {
+
+    exec.mockImplementation(() => { throw new Error() });
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      log: 'Error occurred while deleting connections from config files',
+      status: 500,
+      message: "Couldn't delete from configurations"
+    }))
+
+    exec.mockReset();
+  })
+
+  it('should get rid of the grafana.depends_on property completely if it is emptied', () => {
 
     yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose)
 
     req.body.clusters = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+    configControllers.deleteConnections(req, res, next);
 
-
+    expect(dockerCompose.services.grafana.depends_on).toBe(undefined);
   })
 
+  it('should write these files to yaml', () => {
 
-})
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose);
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(yaml.dump).toHaveBeenCalledTimes(2);
+
+    expect(yaml.dump.mock.calls[0][0]).toEqual(expect.objectContaining(datasourceDoc));
+    expect(yaml.dump.mock.calls[1][0]).toEqual(expect.objectContaining(dockerCompose));
+
+  });
+
+  it('should write these files to a directory', () => {
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose);
+
+    yaml.dump.mockReturnValueOnce(`yaml1`).mockReturnValueOnce('yaml2')
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
+
+    expect(fs.writeFileSync.mock.calls[0][1]).toBe(`yaml1`);
+    expect(fs.writeFileSync.mock.calls[1][1]).toBe(`yaml2`);
+  });
+
+  it('should restart Docker', () => {
+
+    yaml.load.mockReturnValueOnce(datasourceDoc).mockReturnValueOnce(dockerCompose);
+
+    configControllers.deleteConnections(req, res, next);
+
+    expect(exec.mock.calls[clusters.length][0]).toBe('docker compose up -d --remove-orphans');
+    expect(res.locals.configResponse).toBe('Successfully removed clusters and udpated configurations.');
+    expect(next).toHaveBeenCalledWith();
+  });
+
+});

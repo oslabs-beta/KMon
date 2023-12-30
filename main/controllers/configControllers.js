@@ -119,11 +119,14 @@ configControllers.updateDocker = (req, res, next) => {
     );
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
+
+
     if (!dockerCompose.services.grafana.depends_on) {
       dockerCompose.services.grafana.depends_on = [`prometheus${id}`]
     } else {
       dockerCompose.services.grafana.depends_on.push(`prometheus${id}`);
     };
+
 
     dockerCompose.services[`prometheus${id}`] = {
       image: 'prom/prometheus:latest',
@@ -206,6 +209,7 @@ configControllers.deleteConnections = (req, res, next) => {
   try {
     const { clusters } = req.body;
 
+
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'));
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
 
@@ -213,7 +217,6 @@ configControllers.deleteConnections = (req, res, next) => {
     for (let id of clusters) {
       // index for searching through documents arrays.
       let ind = 0;
-
       // splicing out datasource from datasources
       for (let datasource of datasourceDoc.datasources) {
         if (datasource.name === `prometheus${id}`) {
@@ -252,10 +255,10 @@ configControllers.deleteConnections = (req, res, next) => {
     };
 
     // Write files back to yaml.
-    const newDashboardYaml = yaml.dump(dashboardDoc, {
-      indent: 2,
-      noArrayIndent: true
-    });
+    // const newDashboardYaml = yaml.dump(dashboardDoc, {
+    //   indent: 2,
+    //   noArrayIndent: true
+    // });
     const newDatasourcesYaml = yaml.dump(datasourceDoc, {
       indent: 2,
       noArrayIndent: true
@@ -284,12 +287,12 @@ configControllers.deleteConnections = (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, error, {
+    const err = Object.assign({}, {
       log: 'Error occurred while deleting connections from config files',
       status: 500,
       message: "Couldn't delete from configurations"
-    })
-    return next(error);
+    }, error)
+    return next(err);
   };
 };
 

@@ -18,6 +18,8 @@ dbControllers.saveConnection = async (req, res, next) => {
 
     const response = await db.query(query, values);
 
+    // console.log('dbController.saveConnections - response: ', '\n', response)
+
     res.locals.response = response;
     return next();
 
