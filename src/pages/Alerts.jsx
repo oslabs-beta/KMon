@@ -14,8 +14,21 @@ const Alerts = () => {
     marginTop: theme.margins.headerMargin,
   };
 
+  // showAlert determines if alerts should be shown
   const [showAlert, setShowAlert] = useState(false);
+  // notifications is an array to store alert data
   const [notifications, setNotifications] = useState([]);
+
+  /* Data for simulating fetching data from Prometheus for just one notification 
+
+  Breakdown of the data structure: 
+  notifications (Array): An array containing notification objects.
+    notification (Object): Each notification object.
+      data (Object): An object containing data related to the notification.
+        alerts (Array): An array of alert objects.
+          alert (Object): Each alert object.
+            For each alert, there are properties like labels, annotations, state, activeAt, value, etc.
+  */
 
   const dummyData = {
     data: {
@@ -83,11 +96,9 @@ const Alerts = () => {
   //   return () => clearInterval(interval);
   // }, []);
 
-
-  // Simulate fetching data from the server with dummy data
+  // Simulate fetching data from the server with dummy data, runs once component mounts
   useEffect(() => {
     const fetchData = () => {
-      // Simulate fetching data from the server with dummy data
       const data = dummyData.data;
 
       if (data.alerts.length !== 0) {
@@ -102,24 +113,34 @@ const Alerts = () => {
     fetchData();
   }, []);
 
+  // Remove an alert from the notifications array when the user clicks on the 'x' (close) button for the alert
   const handleRemoveAlert = (alertNameToRemove) => {
-    // Remove the alert from the notifications state
     setNotifications((prevNotifications) => {
-      const updatedNotifications = prevNotifications.map((notification) => ({
-        ...notification,
-        data: {
-          ...notification.data,
-          alerts: notification.data.alerts.filter(
-            (alert) => alert.labels.alertname !== alertNameToRemove
-          ),
-        },
-      }));
-      // Hide the alerts if there are no more
-      setShowAlert(
-        updatedNotifications.some(
-          (notification) => notification.data.alerts.length !== 0
-        )
+      // Create a new notifications array by iterating over each notification in the previous state
+      const updatedNotifications = prevNotifications.map((notification) => {
+        // For each notification, create a new object
+        const updatedNotification = {
+          ...notification, // Spread existing properties of the notification
+          data: {
+            ...notification.data, // Spread existing properties of the data object within the notification
+            // Update the alerts array by not including the alert to be removed
+            alerts: notification.data.alerts.filter(
+              (alert) => alert.labels.alertname !== alertNameToRemove
+            ),
+          },
+        };
+        return updatedNotification;
+      });
+
+      // Check if at least one notification has alerts remaining, return boolean value
+      const hasRemainingAlerts = updatedNotifications.some(
+        (notification) => notification.data.alerts.length !== 0
       );
+
+      // Set showAlert to true if there are remaining alerts, false if not
+      setShowAlert(hasRemainingAlerts);
+
+      // Return the updated notifications array
       return updatedNotifications;
     });
   };
@@ -132,7 +153,9 @@ const Alerts = () => {
           // If there are alerts, display each alert
           <div>
             {notifications.map((notification) =>
+              // Map over the alerts array within each notification 
               notification.data.alerts.map((alert) => (
+                // Render an AlertCard component for each alert with properties passed from the alert object
                 <AlertCard
                   key={alert.labels.alertname}
                   alertname={alert.labels.alertname}
