@@ -21,12 +21,16 @@ dbControllers.saveConnection = async (req, res, next) => {
     // console.log('dbController.saveConnections - response: ', '\n', response)
 
     res.locals.response = response;
-    return next();
 
+    return next();
   }
   catch (error) {
-    console.error(error);
-    return next(error);
+    const err = Object.assign({}, {
+      log: 'Error occurred while saving connection to database',
+      status: 500,
+      message: "Couldn't save to database"
+    }, error)
+    return next(err);
   }
 }
 
@@ -45,9 +49,12 @@ dbControllers.getConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    console.error(error);
-    return next(error);
-
+    const err = Object.assign({}, {
+      log: 'Error occurred while getting connections from database',
+      status: 500,
+      message: "Couldn't get from database"
+    }, error)
+    return next(err);
   }
 }
 
@@ -74,12 +81,12 @@ dbControllers.deleteConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, error, {
+    const err = Object.assign({}, {
       log: 'Error occurred while deleting connections from database',
       status: 500,
       message: "Couldn't delete from database"
-    })
-    return next(error);
+    }, error)
+    return next(err);
   }
 }
 
