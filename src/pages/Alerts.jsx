@@ -22,8 +22,7 @@ const Alerts = () => {
   /* Data for simulating fetching data from Prometheus for just one notification 
 
   Breakdown of the data structure: 
-  notifications (Array): An array containing notification objects.
-    notification (Object): Each notification object.
+    notification (Object): Notification object that gets stored in the notifications array
       data (Object): An object containing data related to the notification.
         alerts (Array): An array of alert objects.
           alert (Object): Each alert object.
@@ -70,7 +69,7 @@ const Alerts = () => {
   };
 
   /*
-    Uncomment the following block to fetch alerts from Prometheus 
+    TO DO: Uncomment the following block to fetch alerts from Prometheus 
     /api/v1/alerts endpoint to retrieve information about alerts at regular intervals (every 5 seconds)
   */
   // useEffect(() => {
@@ -96,7 +95,10 @@ const Alerts = () => {
   //   return () => clearInterval(interval);
   // }, []);
 
-  // Simulate fetching data from the server with dummy data, runs once component mounts
+  /* 
+    TO DO: Comment out the following block for production
+    Simulate fetching data from the server with dummy data, runs once component mounts
+  */
   useEffect(() => {
     const fetchData = () => {
       const data = dummyData.data;
