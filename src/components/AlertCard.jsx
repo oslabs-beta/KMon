@@ -11,13 +11,14 @@ const AlertCard = ({ alertname, description, title, service, severity, state, ac
 
   return (
     <Card style={{ maxWidth: 800, margin: '0', border: `2px solid ${borderColor}`, padding: "10px", position: 'relative' }}>
-      <IconButton
+      { /* Remove button only be rendered if the onRemove prop is provided */ }
+      {onRemove && <IconButton
         aria-label="close"
         onClick={onRemove}
         style={{ position: 'absolute', top: 5, right: 5 }}
       >
         <CloseIcon />
-      </IconButton>
+      </IconButton>}
       <CardContent>
         <Typography style={{ fontSize: 15, fontWeight: 'bold', marginBottom: 10 }} color="text.primary" gutterBottom>
           Alert Name: {alertname}

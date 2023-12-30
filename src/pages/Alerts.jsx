@@ -28,7 +28,6 @@ const Alerts = () => {
           alert (Object): Each alert object.
             For each alert, there are properties like labels, annotations, state, activeAt, value, etc.
   */
-
   const dummyData = {
     data: {
       alerts: [
@@ -155,7 +154,7 @@ const Alerts = () => {
           // If there are alerts, display each alert
           <div>
             {notifications.map((notification) =>
-              // Map over the alerts array within each notification 
+              // Map over the alerts array within each notification
               notification.data.alerts.map((alert) => (
                 // Render an AlertCard component for each alert with properties passed from the alert object
                 <AlertCard
@@ -169,7 +168,7 @@ const Alerts = () => {
                   activeAt={alert.activeAt.toString()}
                   value={alert.value}
                   instance={alert.labels.instance}
-                  onRemove={() => handleRemoveAlert(alert.labels.alertname)}
+                  // onRemove={() => handleRemoveAlert(alert.labels.alertname)}
                 />
               ))
             )}
