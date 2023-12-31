@@ -1,13 +1,13 @@
 const db = require("../models/db");
 
-const dbController = {};
+const dbControllers = {};
 
 // postgres - Connections:
 // db: clusterID, userID, clusterName, ports, created_on
 // primary key: clusterID + userID
 
 
-dbController.saveConnection = async (req, res, next) => {
+dbControllers.saveConnection = async (req, res, next) => {
 
   try {
     const { id, name, uri, ports, created, userID } = req.body;
@@ -18,17 +18,23 @@ dbController.saveConnection = async (req, res, next) => {
 
     const response = await db.query(query, values);
 
-    res.locals.response = response;
-    return next();
+    // console.log('dbController.saveConnections - response: ', '\n', response)
 
+    res.locals.response = response;
+
+    return next();
   }
   catch (error) {
-    console.error(error);
-    return next(error);
+    const err = Object.assign({}, {
+      log: 'Error occurred while saving connection to database',
+      status: 500,
+      message: "Couldn't save to database"
+    }, error)
+    return next(err);
   }
 }
 
-dbController.getConnections = async (req, res, next) => {
+dbControllers.getConnections = async (req, res, next) => {
   try {
 
     const userid = req.params.userid;
@@ -43,13 +49,16 @@ dbController.getConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    console.error(error);
-    return next(error);
-
+    const err = Object.assign({}, {
+      log: 'Error occurred while getting connections from database',
+      status: 500,
+      message: "Couldn't get from database"
+    }, error)
+    return next(err);
   }
 }
 
-dbController.deleteConnections = async (req, res, next) => {
+dbControllers.deleteConnections = async (req, res, next) => {
 
   try {
     // req.body should contain two pieces of information: userid and the array of ports.
@@ -72,13 +81,13 @@ dbController.deleteConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, error, {
+    const err = Object.assign({}, {
       log: 'Error occurred while deleting connections from database',
       status: 500,
       message: "Couldn't delete from database"
-    })
-    return next(error);
+    }, error)
+    return next(err);
   }
 }
 
-module.exports = dbController;
+module.exports = dbControllers;

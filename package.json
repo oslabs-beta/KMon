@@ -10,7 +10,7 @@
     ]
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack --config ./webpack.config.js --watch",
     "start": "NODE_ENV=development concurrently \"npm run build\" \"electron main/electron.js\" \"docker-compose up -d --remove-orphans\"",
     "dev": "NODE_ENV=development concurrently \"npm run build\" \"nodemon --exec electron main/electron.js\""
@@ -29,6 +29,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
+    "@types/jest": "^29.5.11",
     "babel-loader": "^9.1.3",
     "concurrently": "^8.2.2",
     "css-loader": "^6.8.1",

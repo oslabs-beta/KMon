@@ -1,6 +1,6 @@
-const Store = require('electron-store');
+// const Store = require('electron-store');
 const fs = require('fs');
-const Buffer = require('node:buffer')
+// const Buffer = require('node:buffer')
 const path = require('path');
 const { exec } = require('node:child_process');
 
@@ -11,9 +11,9 @@ const yaml = require('js-yaml');
 // not sure what this is...
 const { default: cluster } = require('cluster');
 
-const configController = {};
+const configControllers = {};
 
-configController.getPrometheusPorts = (req, res, next) => {
+configControllers.getPrometheusPorts = (req, res, next) => {
   // console.log('getting max Prometheus port number!')
   try {
     const dockerCompose = yaml.load(
@@ -32,13 +32,14 @@ configController.getPrometheusPorts = (req, res, next) => {
           /\:\d*/,
           ''
         );
-        if (Number(outerPort) > prometheusPorts.maxPort) {
+        if (Number(outerPort) > Number(prometheusPorts.maxPort)) {
           prometheusPorts.maxPort = outerPort;
         }
       }
     }
 
     res.locals.prometheusPorts = prometheusPorts;
+    // console.log(res.locals);
     // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
@@ -52,16 +53,16 @@ configController.getPrometheusPorts = (req, res, next) => {
   }
 };
 
-configController.updateGrafana = (req, res, next) => {
+configControllers.updateGrafana = (req, res, next) => {
   // console.log('creating Grafana Yamls!')
   try {
     const { id } = req.body;
-
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
 
     // create dataSource object to append to yml files.
     // Only a single provisioning provider is necessary to provision the Grafana dashboard with multiple prometheus datasources, since we are using templating to allow users to pick which prometheus instance they will be pulling from.
     // If we want more separation, we will have to generate a new dashboard.json file for each dashboard we create.
+
 
     const newDatasource = {
       name: `prometheus${id}`,
@@ -81,6 +82,8 @@ configController.updateGrafana = (req, res, next) => {
       datasourceDoc.datasources.push(newDatasource);
     };
 
+
+
     const newDatasourcesYaml = yaml.dump(datasourceDoc, {
       indent: 2,
       noArrayIndent: true
@@ -99,7 +102,7 @@ configController.updateGrafana = (req, res, next) => {
   }
 };
 
-configController.updateDocker = (req, res, next) => {
+configControllers.updateDocker = (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
   try {
@@ -116,11 +119,14 @@ configController.updateDocker = (req, res, next) => {
     );
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
+
+
     if (!dockerCompose.services.grafana.depends_on) {
       dockerCompose.services.grafana.depends_on = [`prometheus${id}`]
     } else {
       dockerCompose.services.grafana.depends_on.push(`prometheus${id}`);
     };
+
 
     dockerCompose.services[`prometheus${id}`] = {
       image: 'prom/prometheus:latest',
@@ -143,7 +149,7 @@ configController.updateDocker = (req, res, next) => {
       alerting: {
         alertmanagers: [{
           static_configs: [
-            { targets: ['localhost:9093'] }
+            { targets: ['host.docker.internal:6093'] }
           ]
         }]
       },
@@ -199,11 +205,11 @@ configController.updateDocker = (req, res, next) => {
   };
 };
 
-configController.deleteConnections = (req, res, next) => {
+configControllers.deleteConnections = (req, res, next) => {
   try {
     const { clusters } = req.body;
 
-    const dashboardDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), 'utf-8'));
+
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'));
     const dockerCompose = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../docker-compose.yml'), 'utf-8'));
 
@@ -211,18 +217,6 @@ configController.deleteConnections = (req, res, next) => {
     for (let id of clusters) {
       // index for searching through documents arrays.
       let ind = 0;
-
-      // splicing out dashboard providers.
-      for (let provider of dashboardDoc.providers) {
-        if (provider.name === `prometheus${id}`) {
-          dashboardDoc.providers.splice(ind, 1)
-          break;
-        };
-        ind++;
-      };
-
-      ind = 0;
-
       // splicing out datasource from datasources
       for (let datasource of datasourceDoc.datasources) {
         if (datasource.name === `prometheus${id}`) {
@@ -261,10 +255,10 @@ configController.deleteConnections = (req, res, next) => {
     };
 
     // Write files back to yaml.
-    const newDashboardYaml = yaml.dump(dashboardDoc, {
-      indent: 2,
-      noArrayIndent: true
-    });
+    // const newDashboardYaml = yaml.dump(dashboardDoc, {
+    //   indent: 2,
+    //   noArrayIndent: true
+    // });
     const newDatasourcesYaml = yaml.dump(datasourceDoc, {
       indent: 2,
       noArrayIndent: true
@@ -275,7 +269,6 @@ configController.deleteConnections = (req, res, next) => {
     });
 
     // Write them into the directory
-    fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/dashboards/dashboard.yml'), newDashboardYaml, 'utf-8');
     fs.writeFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), newDatasourcesYaml, 'utf-8');
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8');
 
@@ -294,13 +287,13 @@ configController.deleteConnections = (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, error, {
+    const err = Object.assign({}, {
       log: 'Error occurred while deleting connections from config files',
       status: 500,
       message: "Couldn't delete from configurations"
-    })
-    return next(error);
+    }, error)
+    return next(err);
   };
 };
 
-module.exports = configController;
+module.exports = configControllers;
