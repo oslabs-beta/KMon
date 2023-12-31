@@ -5,7 +5,7 @@ const path = require('path');
 const { exec } = require('node:child_process');
 
 // external JS libraries for writing Kafka scripts and for writing YAML files
-const kafka = require('kafkajs');
+const { Kafka } = require('kafkajs');
 const yaml = require('js-yaml');
 
 // not sure what this is...
@@ -107,7 +107,7 @@ configControllers.updateDocker = (req, res, next) => {
   // and the "cluster name" will be taken as the job name.
   try {
 
-    const { id, name, uri, ports } = req.body;
+    const { id, name, seedBrokers } = req.body;
     const { maxPort } = res.locals.prometheusPorts;
 
     // load dockerCompose file from YAML for editing.
@@ -138,9 +138,9 @@ configControllers.updateDocker = (req, res, next) => {
       ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1}:9090`]
     };
 
-    // Defining new targets for scraping. Currently configured to map ports to URI for development cluster, but should be reconfigured for production environments to map IP addresses/URIs to new targets.
-    const newTargets = ports.map((port) => {
-      return `${uri}:${port}`;
+    // Defining new targets for scraping.
+    const newTargets = seedBrokers.map((broker) => {
+      return `${broker}`;
     });
     // console.log('newTargets: ', newTargets);
 

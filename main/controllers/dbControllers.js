@@ -3,18 +3,18 @@ const db = require("../models/db");
 const dbControllers = {};
 
 // postgres - Connections:
-// db: clusterID, userID, clusterName, ports, created_on
+// db: clusterID, userID, clusterName, seedBrokers, created_on
 // primary key: clusterID + userID
 
 
 dbControllers.saveConnection = async (req, res, next) => {
 
   try {
-    const { id, name, uri, ports, created, userID } = req.body;
+    const { id, name, seedBrokers, created, userID } = req.body;
 
-    const portsJSON = JSON.stringify(ports);
-    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, cluster_uri, ports, created_on) VALUES ($1, $2, $3, $4, $5, $6)';
-    const values = [id, userID, name, uri, portsJSON, created]
+    const seedBrokersJSON = JSON.stringify(seedBrokers);
+    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, seed_brokers, created_on) VALUES ($1, $2, $3, $4, $5)';
+    const values = [id, userID, name, seedBrokersJSON, created]
 
     const response = await db.query(query, values);
 

@@ -9,10 +9,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   Stack,
   TextField,
   Chip,
   Alert,
+  Grid,
 } from '@mui/material';
 import { styled } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
@@ -25,15 +27,20 @@ const ConnectionDialogBox = (props) => {
   // states for port entry
 
   /********** Need to refactor "port is clicked" and "port is valid" states to reflect changes to connection handling **********/
+  const [open, setOpen] = props.open;
+  const [currPort, setCurrPort] = useState('');
+  const [portIsValid, setPortIsValid] = props.portIsValid;
+  const [portIsClicked, setPortIsClicked] = props.portIsClicked;
+  const [portHelperText, setPortHelperText] = props.portHelperText
 
-  const [portIsValid, setPortIsValid] = useState(true)
-  const [helperText, setHelperText] = useState(null)
+  const [currUri, setCurrUri] = useState('');
+  const [uriIsClicked, setUriIsClicked] = props.uriIsClicked
+  const [uriIsValid, setUriIsValid] = props.uriIsValid
+  const [uriHelperText, setUriHelperText] = props.uriHelperText
+  const [submitting, setSubmitting] = props.submitting;
   // clear hard-coded faults for production
   // form states
   const [formData, setFormData] = props.formData;
-  const [portIsClicked, setPortIsClicked] = props.portIsClicked;
-  const [submitting, setSubmitting] = props.submitting;
-  const [open, setOpen] = props.open;
   // alert props to display in case of invalid form Input
   const [alertProps, setAlertProps] = props.alertProps;
 
@@ -50,15 +57,24 @@ const ConnectionDialogBox = (props) => {
 
   // TO DO: 
   // - update api URI once hosted.
+  const seedBrokers = formData.seedBrokers;
 
   const handleSubmit = props.handleSubmit;
 
   const handleSubmitKey = (event) => {
 
     if (event.key === "Enter") {
-      if (portIsClicked === true) {
+      if (portIsClicked === true || uriIsClicked === true) {
         event.preventDefault();
 
+      }
+      else if (!seedBrokers.length) {
+        setAlertProps({
+          visibility: 'visible',
+          marginTop: '15px',
+          height: '100%',
+          message: 'At least one seed broker address needed'
+        })
       }
       else {
         handleSubmit(event);
@@ -74,58 +90,115 @@ const ConnectionDialogBox = (props) => {
     setOpen(false);
   };
   // port handlers
-  const ports = formData.ports;
 
-  /**********  Need to refactor checkPort to checkConnection with accompanying logic. **********/
+
+
   /**********  Could potentially only provide one or two seed brokers and utilize kafkaJS to automatically discover other ports... **********/
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
     const portNum = event.target.value;
-    if (event.key === "Enter" || event.key === "Space") {
+    setCurrPort(portNum)
+    console.log('checkPort - portNum: ', portNum);
+    if (!Number(portNum) || portNum.length < 4 || portNum.length > 5) {
+      if (Number(portNum) < 1028 || Number(portNum > 65535)) {
+        setPortIsValid(false);
+        setPortHelperText("Invalid Port Number")
+        return;
+      }
+    }
+    else {
+      setPortIsValid(true);
+      setPortHelperText(null);
+    };
+  };
 
+  const handleCheckUri = (event) => {
+
+    const uri = event.target.value
+    setCurrUri(uri);
+    const ipv4Regex = /(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/
+    const hostnameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+
+    console.log('handleCheckUri - uri: ', uri);
+
+    if (uri.match(hostnameRegex)?.length === 1) {
+      console.log('correct match', uri.match(ipv4Regex), uri.match(hostnameRegex))
+      setUriIsValid(true);
+      setUriHelperText(null);
+      return;
+    }
+    if (uri.match(ipv4Regex)?.length === 1) {
+      console.log('correct match', uri.match(ipv4Regex), uri.match(hostnameRegex))
+      setUriIsValid(true);
+      setUriHelperText(null);
+      return;
+    }
+    if (!uri.match(ipv4Regex) && !uri.match(hostnameRegex)) {
+      console.error('no match', uri.match(ipv4Regex), uri.match(hostnameRegex))
+      setUriIsValid(false);
+      setUriHelperText('Enter valid URI!');
+    }
+    else if (uri.match(ipv4Regex)?.length > 1) {
+      console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
+      setUriIsValid(false);
+      setUriHelperText('Input one address at a time');
+    }
+    else if (uri.match(hostnameRegex)?.length > 1) {
+      console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
+      setUriIsValid(false);
+      setUriHelperText('Input one address at a time');
+    }
+  };
+
+  const handleSeedBroker = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      if (!Number(portNum) || portNum.length < 4 || portNum.length > 5) {
-        setPortIsValid(false);
-        setHelperText("Invalid Port Number")
-        event.target.value = null;
-        return;
-      }
-      else if (ports.includes(portNum)) {
-        setPortIsValid(false);
-        setHelperText('Duplicate Port Detected')
-        event.target.value = null;
-        return;
-      }
-      else {
-        setPortIsValid(true);
-        const newPorts = [...ports, portNum]
+      if (portIsValid && uriIsValid) {
+        // form the new seedBroker address
+        const seedBroker = `${currUri}:${currPort}`;
+        // check if it's already in the array of seedBrokers
+        if (seedBrokers.includes(seedBroker)) {
+          setAlertProps({
+            visibility: 'visible',
+            marginTop: '15px',
+            height: '100%',
+            message: 'Duplicate address detected.'
+          })
+          setCurrPort('');
+          setCurrUri('');
+          return;
+        }
+
         setFormData((prevFormData) => {
-          return {
-            ...prevFormData,
-            ports: [...newPorts]
-          }
+          return { ...prevFormData, seedBrokers: [...seedBrokers, seedBroker] };
+        });
+        setAlertProps({
+          visibility: 'hidden',
+          marginTop: '15px',
+          height: '0',
+          message: ''
         })
-        setHelperText(null);
-        event.target.value = null;
+        setCurrPort('');
+        setCurrUri('');
       };
     };
-  }
+  };
 
   /**********  Need to deleteChip to reflect URI:PORT combinations. **********/
 
   const handleDeleteChip = (event) => {
     const deleteChip = event.currentTarget.parentNode.firstChild
 
-    const deletePort = deleteChip.innerText
+    const deleteBroker = deleteChip.innerText
 
-    const newPorts = ports.filter((port, index) => {
-      return port !== deletePort
+    const newSeedBrokers = seedBrokers.filter((broker, index) => {
+      return broker !== deleteBroker
     })
     // setPorts([...newPorts])
     setFormData((prevFormData) => {
       return {
         ...prevFormData,
-        ports: [...newPorts]
+        seedBrokers: [...newSeedBrokers]
       }
     })
     setHelperText(null);
@@ -136,22 +209,26 @@ const ConnectionDialogBox = (props) => {
 
   // render Tags
 
-  const portChips = ports.map((port, index) => {
-    return <Chip
-      id={`chip${index}`}
-      key={`chip${index}`}
-      label={port}
-      variant='filled'
-      onDelete={(e) => {
-        handleDeleteChip(e);
-      }}
-      sx={{
-        width: '100%',
-        marginLeft: 0,
-        marginRight: 0
-      }}
-    />
-  })
+  const brokerChips = seedBrokers.map((broker, index) => {
+    return (
+      <Grid>
+        <Chip
+          id={`chip${index}`}
+          key={`chip${index}`}
+          label={broker}
+          variant='filled'
+          onDelete={(e) => {
+            handleDeleteChip(e);
+          }}
+          sx={{
+            width: '100%',
+            marginLeft: 0,
+            marginRight: 0
+          }}
+        />
+      </Grid>
+    );
+  });
 
 
   return (
@@ -175,30 +252,40 @@ const ConnectionDialogBox = (props) => {
                 value={formData.clusterName}
               />
             </Stack>
-            {/* Maybe need to put uriInput and portsInput in the same stack and have them both be required. */}
-            {/* Could make it so that clicking in "uriInput" and "portInput" checks the other for emptiness */}
-            {/* And if "enter" is submitted while the focus is on either of those fields, then it runs a check on the values added */}
-            {/* If either the port number is invalid (not 4 or 5 digits between 1024 and 65535) or what is entered is not a valid URL or IP address, display error alert*/}
-            {/* If both are valid, then add this to a chip and display it below the fields. */}
-            <Stack className='uriInputStack' spacing={2} direction="column" sx={{ marginBottom: 4 }}>
+            <Stack className='addressInputStack' spacing={2} direction="row" sx={{
+              marginBottom: 4,
+              maxWidth: 417,
+            }}>
               <TextField
                 id="uri-input"
                 name="serverURI"
-                required
-                label="Kafka Server URI:"
+                label="Kafka Seed Broker URI:"
                 variant="filled"
-                onChange={handleChange}
-                value={formData.serverURI}
+                sx={{
+                  flexGrow: 3,
+                  width: "75%"
+                }}
+                onFocus={() => {
+                  setUriIsClicked(true);
+                }}
+                onBlur={() => {
+                  setUriIsClicked(false);
+                }}
+                error={!uriIsValid}
+                helperText={uriHelperText}
+                onChange={handleCheckUri}
+                value={currUri}
+                onKeyDown={handleSeedBroker}
               />
-            </Stack>
-            {/* Check port numbers and display ports as chips */}
-            <Stack className='portsInputStack' spacing={2} direction="column" sx={{ marginBottom: 4, maxWidth: 417 }}>
               <TextField
                 id="ports-input"
-                name="ports"
-                label="Port(s):"
+                name="port"
+                label="Port:"
                 variant="filled"
-                placeholder='Press Enter to Input Ports'
+                sx={{
+                  flexGrow: 1,
+                  width: "25%"
+                }}
                 onFocus={() => {
                   setPortIsClicked(true);
                 }}
@@ -206,24 +293,29 @@ const ConnectionDialogBox = (props) => {
                   setPortIsClicked(false);
                 }}
                 error={!portIsValid}
-                helperText={helperText}
-                onKeyDown={handleCheckPort}
+                helperText={portHelperText}
+                onChange={handleCheckPort}
+                value={currPort}
+                onKeyDown={handleSeedBroker}
               />
-              <Stack
-                className="tagStack"
-                spacing={2}
-                direction="row"
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                  gridAutoRows: true,
-                  gridGap: '5px 2px',
-                  maxWidth: '85%'
-                }}>
-                {portChips}
-              </Stack>
             </Stack>
-            <Stack className='apiStack' spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            <Grid
+              container
+              className="tagStack"
+              spacing={2}
+              direction="row"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gridAutoRows: true,
+                gridGap: '2px',
+                maxWidth: '417px',
+                marginLeft: 0,
+                marginBottom: '10px'
+              }}>
+              {brokerChips}
+            </Grid>
+            <Stack className='apiStack' spacing={2} direction="column" sx={{ marginBottom: 4 }}>
               <TextField
                 name="apiKey"
                 // required
@@ -243,6 +335,7 @@ const ConnectionDialogBox = (props) => {
                 onChange={handleChange}
                 value={formData.apiSecret}
               />
+
             </Stack>
             <Button type="submit" variant="contained">Submit</Button>
             <Alert id='portAlert' severity='error' variant='outlined' sx={{ ...alertProps }}>
