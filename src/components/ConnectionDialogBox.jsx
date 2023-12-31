@@ -23,6 +23,9 @@ const ConnectionDialogBox = (props) => {
   /************** Component States ****************/
 
   // states for port entry
+
+  /********** Need to refactor "port is clicked" and "port is valid" states to reflect changes to connection handling **********/
+
   const [portIsValid, setPortIsValid] = useState(true)
   const [helperText, setHelperText] = useState(null)
   // clear hard-coded faults for production
@@ -73,6 +76,8 @@ const ConnectionDialogBox = (props) => {
   // port handlers
   const ports = formData.ports;
 
+  /**********  Need to refactor checkPort to checkConnection with accompanying logic. **********/
+  /**********  Could potentially only provide one or two seed brokers and utilize kafkaJS to automatically discover other ports... **********/
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
     const portNum = event.target.value;
@@ -104,8 +109,9 @@ const ConnectionDialogBox = (props) => {
         event.target.value = null;
       };
     };
-
   }
+
+  /**********  Need to deleteChip to reflect URI:PORT combinations. **********/
 
   const handleDeleteChip = (event) => {
     const deleteChip = event.currentTarget.parentNode.firstChild
@@ -169,6 +175,11 @@ const ConnectionDialogBox = (props) => {
                 value={formData.clusterName}
               />
             </Stack>
+            {/* Maybe need to put uriInput and portsInput in the same stack and have them both be required. */}
+            {/* Could make it so that clicking in "uriInput" and "portInput" checks the other for emptiness */}
+            {/* And if "enter" is submitted while the focus is on either of those fields, then it runs a check on the values added */}
+            {/* If either the port number is invalid (not 4 or 5 digits between 1024 and 65535) or what is entered is not a valid URL or IP address, display error alert*/}
+            {/* If both are valid, then add this to a chip and display it below the fields. */}
             <Stack className='uriInputStack' spacing={2} direction="column" sx={{ marginBottom: 4 }}>
               <TextField
                 id="uri-input"
