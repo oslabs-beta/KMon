@@ -81,13 +81,13 @@ configControllers.getPrometheusPorts = (req, res, next) => {
     // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
-  } catch {
-    const error = {
+  } catch (error) {
+    const err = Object.assign({
       log: 'Error occurred in configControllers.getPrometheusPorts middleware function',
       status: 500,
       message: { err: 'Error occurred while trying to identify ports' },
-    };
-    return next(error);
+    }, error);
+    return next(err);
   }
 };
 
@@ -230,13 +230,13 @@ configControllers.updateDocker = async (req, res, next) => {
 
     return next();
 
-  } catch {
-    const error = {
+  } catch (error) {
+    const err = Object.assign({
       log: 'Error occurred in configControllers.createConnection middleware function',
       status: 500,
-      message: { err: 'Error occurred while trying to create connection' },
-    };
-    return next(error);
+      message: { error: 'Error occurred while trying to create connection' },
+    }, error);
+    return next(err);
   };
 };
 
@@ -322,10 +322,10 @@ configControllers.deleteConnections = (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while deleting connections from config files',
       status: 500,
-      message: "Couldn't delete from configurations"
+      message: { error: "Couldn't delete from configurations" }
     }, error)
     return next(err);
   };

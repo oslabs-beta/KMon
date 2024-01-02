@@ -61,7 +61,6 @@ const ConnectionDialogBox = (props) => {
   // TO DO: 
   // - update api URI once hosted.
   const seedBrokers = formData.seedBrokers;
-
   const handleSubmit = props.handleSubmit;
 
   const handleSubmitKey = (event) => {
@@ -92,16 +91,13 @@ const ConnectionDialogBox = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
-  // port handlers
 
-
-
-  /**********  Could potentially only provide one or two seed brokers and utilize kafkaJS to automatically discover other ports... **********/
+  // port and URI validators
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
     const portNum = event.target.value;
     setCurrPort(portNum)
-    console.log('checkPort - portNum: ', portNum);
+
     if (!Number(portNum) || portNum.length < 4 || portNum.length > 5) {
       if (Number(portNum) < 1028 || Number(portNum > 65535)) {
         setPortIsValid(false);
@@ -121,8 +117,6 @@ const ConnectionDialogBox = (props) => {
     setCurrUri(uri);
     const ipv4Regex = /(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/
     const hostnameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-
-    console.log('handleCheckUri - uri: ', uri);
 
     const isValidIP = (uri) => {
       return uri.match(hostnameRegex)?.length === 1
@@ -161,9 +155,7 @@ const ConnectionDialogBox = (props) => {
     handleError(uri);
 
   };
-
-
-
+  // combine port and uri into address
   const handleSeedBroker = (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -202,8 +194,6 @@ const ConnectionDialogBox = (props) => {
     };
   };
 
-  /**********  Need to deleteChip to reflect URI:PORT combinations. **********/
-
   const handleDeleteChip = (event) => {
     const deleteChip = event.currentTarget.parentNode.firstChild
 
@@ -225,14 +215,13 @@ const ConnectionDialogBox = (props) => {
 
   /******** sub-Components *******/
 
-  // render Tags
-
+  // render address Tags
   const brokerChips = seedBrokers.map((broker, index) => {
     return (
-      <Grid>
+      <Grid key={`gridItem${index}`}>
         <Chip
           id={`chip${index}`}
-          key={`chip${index}`}
+          key={`broker${index}`}
           label={broker}
           variant='filled'
           onDelete={(e) => {
@@ -249,8 +238,12 @@ const ConnectionDialogBox = (props) => {
   });
 
   const loadingBar = () => {
-    return <linearProgress id="loadingBar" />;
-  }
+    return (
+      <Stack >
+        <LinearProgress id="loadingBar" />
+      </Stack>
+    );
+  };
 
   return (
     <React.Fragment>
@@ -364,6 +357,8 @@ const ConnectionDialogBox = (props) => {
             <Alert id='portAlert' severity='error' variant='outlined' sx={{ ...alertProps }}>
               {alertProps.message}
             </Alert>
+
+            {dataIsFetching && loadingBar()}
 
           </form>
           <Box

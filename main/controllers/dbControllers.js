@@ -18,12 +18,12 @@ dbControllers.saveConnection = async (req, res, next) => {
     const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, brokers, created_on, api_key, api_secret) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     const values = [id, userID, name, brokersJSON, created, apiKey, apiSecret]
 
-    const dbResponse = await db.query(query, values);
+    await db.query(query, values);
 
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while saving connection to database',
       status: 500,
       message: "Couldn't save to database"
@@ -47,7 +47,7 @@ dbControllers.getConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while getting connections from database',
       status: 500,
       message: "Couldn't get from database"
@@ -57,7 +57,6 @@ dbControllers.getConnections = async (req, res, next) => {
 }
 
 dbControllers.deleteConnections = async (req, res, next) => {
-
   try {
     // req.body should contain two pieces of information: userid and the array of ports.
     const { userid, clusters } = req.body;
@@ -79,7 +78,7 @@ dbControllers.deleteConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while deleting connections from database',
       status: 500,
       message: "Couldn't delete from database"

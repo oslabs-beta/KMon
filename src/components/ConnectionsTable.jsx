@@ -205,7 +205,6 @@ const EnhancedTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = props.rows;
 
-  console.log('EnhancedTable - rows: ', rows);
   // Handles sorting request
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';

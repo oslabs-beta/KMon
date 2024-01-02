@@ -20,8 +20,8 @@ const Connections = () => {
 
   const { userInfo, updateUserInfo } = useAppContext();
 
-  // Using optional chaining operator to prevent errors when accessing property that might be undefined or null
-  const userID = userInfo?.userID;
+  // Took out the optional operator after thinking about it -- Accessing the connections page without userInfo may mean the app is being used without authorization; better that it throws an error and the app goes blank if userInfo is not defined
+  const userID = userInfo.userID;
 
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
@@ -97,7 +97,6 @@ const Connections = () => {
       }
       else
         try {
-          setDataIsFetching(true);
           //find new ID from rows;
           const getNewId = (rows) => {
             let maxId = 0;
@@ -136,6 +135,8 @@ const Connections = () => {
             apiSecret: apiSecret
           }
           // console.log("about to create config yamls")
+          setDataIsFetching(true);
+
           const response = await fetch(`${apiUrl}/api/createConnection`, {
             method: 'POST',
             headers: {
