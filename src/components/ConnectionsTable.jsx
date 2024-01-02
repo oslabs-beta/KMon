@@ -64,10 +64,10 @@ const headCells = [
     label: 'Name',
   },
   {
-    id: 'seedBrokers',
+    id: 'brokers',
     numeric: true,
     disablePadding: false,
-    label: 'Seed Brokers',
+    label: 'Brokers',
   },
   {
     id: 'created',
@@ -205,6 +205,7 @@ const EnhancedTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = props.rows;
 
+  console.log('EnhancedTable - rows: ', rows);
   // Handles sorting request
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -271,7 +272,7 @@ const EnhancedTable = (props) => {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
-                const seedBrokersStr = row.seedBrokers.join(', ')
+                const brokersStr = row.brokers.join(', ')
 
                 return (
                   <TableRow
@@ -301,7 +302,7 @@ const EnhancedTable = (props) => {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">{seedBrokersStr}</TableCell>
+                    <TableCell align="right">{brokersStr}</TableCell>
                     <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
                 );

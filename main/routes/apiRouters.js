@@ -4,9 +4,11 @@ const configControllers = require('../controllers/configControllers');
 const dbControllers = require('../controllers/dbControllers');
 
 
-router.post('/createConnection', configControllers.getPrometheusPorts, configControllers.updateGrafana, configControllers.updateDocker, dbControllers.saveConnection, (req, res) => {
+router.post('/createConnection', configControllers.getKafkaBrokers, configControllers.getPrometheusPorts, configControllers.updateGrafana, configControllers.updateDocker, dbControllers.saveConnection, (req, res) => {
 
-  res.status(200).send(JSON.stringify('Connection created!'))
+  const { brokers } = res.locals;
+
+  res.status(200).json(brokers)
 
 })
 

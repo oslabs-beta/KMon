@@ -1,4 +1,5 @@
 const db = require("../models/db");
+const bcrypt = require('bcrypt');
 
 const dbControllers = {};
 
@@ -10,17 +11,14 @@ const dbControllers = {};
 dbControllers.saveConnection = async (req, res, next) => {
 
   try {
-    const { id, name, seedBrokers, created, userID } = req.body;
+    const { id, name, created, userID, apiKey, apiSecret } = req.body;
+    const { brokers } = res.locals;
 
-    const seedBrokersJSON = JSON.stringify(seedBrokers);
-    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, seed_brokers, created_on) VALUES ($1, $2, $3, $4, $5)';
-    const values = [id, userID, name, seedBrokersJSON, created]
+    const brokersJSON = JSON.stringify(brokers);
+    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, brokers, created_on, api_key, api_secret) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+    const values = [id, userID, name, brokersJSON, created, apiKey, apiSecret]
 
-    const response = await db.query(query, values);
-
-    // console.log('dbController.saveConnections - response: ', '\n', response)
-
-    res.locals.response = response;
+    const dbResponse = await db.query(query, values);
 
     return next();
   }

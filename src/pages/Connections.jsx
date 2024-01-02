@@ -41,6 +41,7 @@ const Connections = () => {
   const [uriIsClicked, setUriIsClicked] = useState(false);
   const [uriHelperText, setUriHelperText] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [dataIsFetching, setDataIsFetching] = useState(false);
   const [formData, setFormData] = useState({
     clusterName: '',
     seedBrokers: [],
@@ -68,7 +69,7 @@ const Connections = () => {
       return {
         id: obj.cluster_id,
         name: obj.cluster_name,
-        seedBrokers: obj.seed_brokers,
+        brokers: obj.brokers,
         created: obj.created_on
       }
     })
@@ -96,6 +97,7 @@ const Connections = () => {
       }
       else
         try {
+          setDataIsFetching(true);
           //find new ID from rows;
           const getNewId = (rows) => {
             let maxId = 0;
@@ -106,20 +108,13 @@ const Connections = () => {
           }
           // local variables
           const id = getNewId(rows)
-          const { clusterName, seedBrokers } = formData;
+          const { clusterName, seedBrokers, apiKey, apiSecret } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
-          const createdDate = `${month}/${date}/${year}`
-
-          const newRow = {
-            id: id,
-            name: clusterName,
-            seedBrokers: seedBrokers,
-            created: createdDate
-          }
+          const createdDate = `${month + 1}/${date}/${year}`
 
           for (let row of rows) {
-            for (let broker of row.seedBrokers) {
+            for (let broker of row.brokers) {
               if (seedBrokers.includes(broker)) {
                 setAlertProps({
                   visibility: 'visible',
@@ -131,6 +126,15 @@ const Connections = () => {
               };
             };
           };
+
+          const newDbEntry = {
+            id: id,
+            name: clusterName,
+            seedBrokers: seedBrokers,
+            created: createdDate,
+            apiKey: apiKey,
+            apiSecret: apiSecret
+          }
           // console.log("about to create config yamls")
           const response = await fetch(`${apiUrl}/api/createConnection`, {
             method: 'POST',
@@ -138,13 +142,26 @@ const Connections = () => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              ...newRow,
+              ...newDbEntry,
               userID
             }),
           });
 
+          const data = await response.json();
+
+          const newRow = {
+            id: id,
+            name: clusterName,
+            brokers: data,
+            created: createdDate
+          }
+          // console.log('Connections - data: ', data);
+
           // Logic for creating new row when a server information is inputted and processed in back end.
           if (response.ok) {
+
+            setDataIsFetching(false);
+
             const currRows = [...rows];
             currRows.push(newRow);
             setRows(currRows);
@@ -168,10 +185,17 @@ const Connections = () => {
             setOpen(false)
 
           } else {
-            console.log('Failed to save credentials');
+            setDataIsFetching(false);
+            setAlertProps({
+              visibility: 'visible',
+              marginTop: '15px',
+              height: '100%',
+              message: 'Error while creating connections!'
+            })
+            console.error('Failed to save credentials');
           }
         } catch (error) {
-          console.log('Error in Credential Form: ', error);
+          console.error('Error in Credential Form: ', error);
         }
     }
   };
@@ -208,7 +232,7 @@ const Connections = () => {
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} portIsValid={[portIsValid, setPortIsValid]} portHelperText={[portHelperText, setportHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} uriIsValid={[uriIsValid, setUriIsValid]} uriHelperText={[uriHelperText, setUriHelperText]} submitting={[submitting, setSubmitting]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
+        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} portIsValid={[portIsValid, setPortIsValid]} portHelperText={[portHelperText, setportHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} uriIsValid={[uriIsValid, setUriIsValid]} uriHelperText={[uriHelperText, setUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
       <ConnectionsTable rows={[rows, setRows]} selected={[selected, setSelected]} handleDelete={handleDelete} />
     </Container>

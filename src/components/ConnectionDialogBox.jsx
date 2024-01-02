@@ -10,11 +10,13 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  LinearProgress,
   Stack,
   TextField,
   Chip,
   Alert,
   Grid,
+  linearProgressClasses,
 } from '@mui/material';
 import { styled } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
@@ -41,6 +43,7 @@ const ConnectionDialogBox = (props) => {
   // clear hard-coded faults for production
   // form states
   const [formData, setFormData] = props.formData;
+  const [dataIsFetching, setDataIsFetching] = props.dataIsFetching
   // alert props to display in case of invalid form Input
   const [alertProps, setAlertProps] = props.alertProps;
 
@@ -170,8 +173,12 @@ const ConnectionDialogBox = (props) => {
         }
 
         setFormData((prevFormData) => {
-          return { ...prevFormData, seedBrokers: [...seedBrokers, seedBroker] };
+          return {
+            ...prevFormData,
+            seedBrokers: [...seedBrokers, seedBroker]
+          };
         });
+
         setAlertProps({
           visibility: 'hidden',
           marginTop: '15px',
@@ -230,6 +237,9 @@ const ConnectionDialogBox = (props) => {
     );
   });
 
+  const loadingBar = () => {
+    return <linearProgress id="loadingBar" />;
+  }
 
   return (
     <React.Fragment>
@@ -301,7 +311,8 @@ const ConnectionDialogBox = (props) => {
             </Stack>
             <Grid
               container
-              className="tagStack"
+              key='tagGrid'
+              className="tagGrid"
               spacing={2}
               direction="row"
               sx={{
@@ -338,9 +349,11 @@ const ConnectionDialogBox = (props) => {
 
             </Stack>
             <Button type="submit" variant="contained">Submit</Button>
+
             <Alert id='portAlert' severity='error' variant='outlined' sx={{ ...alertProps }}>
               {alertProps.message}
             </Alert>
+
           </form>
           <Box
             noValidate
