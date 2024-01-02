@@ -124,34 +124,45 @@ const ConnectionDialogBox = (props) => {
 
     console.log('handleCheckUri - uri: ', uri);
 
-    if (uri.match(hostnameRegex)?.length === 1) {
-      console.log('correct match', uri.match(ipv4Regex), uri.match(hostnameRegex))
+    const isValidIP = (uri) => {
+      return uri.match(hostnameRegex)?.length === 1
+    }
+
+    const isValidHostName = (uri) => {
+      return uri.match(ipv4Regex)?.length === 1
+    }
+
+    const handleError = (uri) => {
+
+      if (!uri.match(ipv4Regex) && !uri.match(hostnameRegex)) {
+        // console.error('no match', uri.match(ipv4Regex), uri.match(hostnameRegex))
+        setUriIsValid(false);
+        setUriHelperText('Enter valid URI!');
+      }
+      else if (uri.match(ipv4Regex)?.length > 1) {
+        // console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
+        setUriIsValid(false);
+        setUriHelperText('Input one address at a time');
+      }
+      else if (uri.match(hostnameRegex)?.length > 1) {
+        // console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
+        setUriIsValid(false);
+        setUriHelperText('Input one address at a time');
+      }
+
+    }
+
+    if (isValidIP(uri) || isValidHostName(uri)) {
       setUriIsValid(true);
       setUriHelperText(null);
       return;
     }
-    if (uri.match(ipv4Regex)?.length === 1) {
-      console.log('correct match', uri.match(ipv4Regex), uri.match(hostnameRegex))
-      setUriIsValid(true);
-      setUriHelperText(null);
-      return;
-    }
-    if (!uri.match(ipv4Regex) && !uri.match(hostnameRegex)) {
-      console.error('no match', uri.match(ipv4Regex), uri.match(hostnameRegex))
-      setUriIsValid(false);
-      setUriHelperText('Enter valid URI!');
-    }
-    else if (uri.match(ipv4Regex)?.length > 1) {
-      console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
-      setUriIsValid(false);
-      setUriHelperText('Input one address at a time');
-    }
-    else if (uri.match(hostnameRegex)?.length > 1) {
-      console.error('too many matches', uri.match(ipv4Regex), uri.match(hostnameRegex))
-      setUriIsValid(false);
-      setUriHelperText('Input one address at a time');
-    }
+
+    handleError(uri);
+
   };
+
+
 
   const handleSeedBroker = (event) => {
     if (event.key === "Enter" || event.key === " ") {
