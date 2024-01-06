@@ -19,9 +19,10 @@ const Connections = () => {
   const theme = useTheme();
 
   const { userInfo, updateUserInfo } = useAppContext();
+  
+  // Took out the optional operator after thinking about it -- Accessing the connections page without userInfo may mean the app is being used without authorization; better that it throws an error and the app goes blank if userInfo is not defined
+  const userID = userInfo.userID;
 
-  // Using optional chaining operator to prevent errors when accessing property that might be undefined or null
-  const userID = userInfo?.userID;
 
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
@@ -29,15 +30,27 @@ const Connections = () => {
   };
 
   // State for child components;
-  const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState([]);
-  const [portIsClicked, setPortIsClicked] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [rows, setRows] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const [brokerPortIsValid, setBrokerPortIsValid] = useState(true);
+  const [controllerPortIsValid, setControllerPortIsValid] = useState(true);
+  const [portIsClicked, setPortIsClicked] = useState(false);
+  const [brokerPortHelperText, setBrokerPortHelperText] = useState(null);
+  const [controllerPortHelperText, setControllerPortHelperText] = useState(null);
+
+  const [brokerUriIsValid, setBrokerUriIsValid] = useState(true);
+  const [controllerUriIsValid, setControllerUriIsValid] = useState(true);
+  const [uriIsClicked, setUriIsClicked] = useState(false);
+  const [brokerUriHelperText, setBrokerUriHelperText] = useState(null);
+  const [controllerUriHelperText, setControllerUriHelperText] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [dataIsFetching, setDataIsFetching] = useState(false);
   const [formData, setFormData] = useState({
     clusterName: '',
-    serverURI: '',
-    ports: [],
+    controllers: [],
+    seedBrokers: [],
     apiKey: '',
     apiSecret: '',
   });
@@ -45,7 +58,7 @@ const Connections = () => {
     visibility: 'hidden',
     height: 0,
     message: ''
-  })
+  });
 
   // function for fetching connections from database.
   const loadConnections = async () => {
@@ -62,8 +75,7 @@ const Connections = () => {
       return {
         id: obj.cluster_id,
         name: obj.cluster_name,
-        uri: obj.cluster_uri,
-        ports: obj.ports,
+        brokers: obj.brokers,
         created: obj.created_on
       }
     })
@@ -81,12 +93,12 @@ const Connections = () => {
 
     if (!portIsClicked) {
       // check if form is valid, otherwise display alert.
-      if (!formData.clusterName || !formData.serverURI || !formData.ports.length) {
+      if (!formData.clusterName || !formData.seedBrokers.length) {
         setAlertProps({
           visibility: 'visible',
           marginTop: '15px',
           height: '100%',
-          message: 'Please provide cluster name, server URI, and port numbers'
+          message: 'Please provide cluster name and seed broker URIs.'
         })
       }
       else
@@ -99,50 +111,80 @@ const Connections = () => {
             }
             return maxId + 1;
           }
+          // local variables
           const id = getNewId(rows)
-          const { clusterName, serverURI, ports } = formData;
+          const { clusterName, controllers, seedBrokers, apiKey, apiSecret } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
-          const createdDate = `${month}/${date}/${year}`
-
-          const newRow = {
-            id: id,
-            name: clusterName,
-            uri: serverURI,
-            ports: ports,
-            created: createdDate
-          }
+          const createdDate = `${month + 1}/${date}/${year}`
 
           for (let row of rows) {
-            if (row.uri === serverURI) {
-              for (let port of row.ports) {
-                if (ports.includes(port)) {
-                  setAlertProps({
-                    visibility: 'visible',
-                    marginTop: '15px',
-                    height: '100%',
-                    message: 'Duplicate connection found!'
-                  })
-                  throw new Error('Duplicate connection detected')
-                };
+            for (let broker of row.brokers) {
+              if (seedBrokers.includes(broker)) {
+                setAlertProps({
+                  visibility: 'visible',
+                  marginTop: '15px',
+                  height: '100%',
+                  message: 'Duplicate found in existing connections!'
+                })
+                throw new Error('Duplicate connection detected')
               };
             };
+
+            for (let controller of row.controllers) {
+              if (controllers.includes(controller)) {
+                setAlertProps({
+                  visibility: 'visible',
+                  marginTop: '15px',
+                  height: '100%',
+                  message: 'Duplicate found in existing connections!'
+                })
+                throw new Error('Duplicate connection detected')
+              };
+            };
+
           };
 
+          const newDbEntry = {
+            id: id,
+            name: clusterName,
+            controllers: controllers,
+            seedBrokers: seedBrokers,
+            created: createdDate,
+            apiKey: apiKey,
+            apiSecret: apiSecret
+          }
+
           // console.log("about to create config yamls")
+          setDataIsFetching(true);
+
           const response = await fetch(`${apiUrl}/api/createConnection`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              ...newRow,
+              ...newDbEntry,
               userID
             }),
           });
 
+          const data = await response.json();
+
+          const newRow = {
+            id: id,
+            name: clusterName,
+            controllers: controllers,
+            brokers: data,
+            created: createdDate
+          }
+          // console.log('Connections - data: ', data);
+
           // Logic for creating new row when a server information is inputted and processed in back end.
           if (response.ok) {
+
+            setDataIsFetching(false);
+
             const currRows = [...rows];
             currRows.push(newRow);
             setRows(currRows);
@@ -150,8 +192,8 @@ const Connections = () => {
             setSubmitting(false);
             setFormData({
               clusterName: '',
-              serverURI: '',
-              ports: [],
+              controllers: [],
+              seedBrokers: [],
               apiKey: '',
               apiSecret: '',
             });
@@ -167,17 +209,24 @@ const Connections = () => {
             setOpen(false)
 
           } else {
-            console.log('Failed to save credentials');
+            setDataIsFetching(false);
+            setAlertProps({
+              visibility: 'visible',
+              marginTop: '15px',
+              height: '100%',
+              message: 'Error while creating connections!'
+            })
+            console.error('Failed to save credentials');
           }
         } catch (error) {
-          console.log('Error in Credential Form: ', error);
+          console.error('Error in Credential Form: ', error);
         }
     }
   };
 
   const handleDelete = async (event) => {
-    console.log(event.target);
-    console.log(selected);
+    // console.log(event.target);
+    // console.log(selected);
 
     try {
       const deleteInfo = {
@@ -207,9 +256,9 @@ const Connections = () => {
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox submitting={[submitting, setSubmitting]} open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
+        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} brokerPortIsValid={[brokerPortIsValid, setBrokerPortIsValid]} controllerPortIsValid={[controllerPortIsValid, setControllerPortIsValid]} brokerPortHelperText={[brokerPortHelperText, setBrokerPortHelperText]} controllerPortHelperText={[controllerPortHelperText, setControllerPortHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} brokerUriIsValid={[brokerUriIsValid, setBrokerUriIsValid]} controllerUriIsValid={[controllerUriIsValid, setControllerPortIsValid]} brokerUriHelperText={[brokerUriHelperText, setBrokerUriHelperText]} controllerUriHelperText={[controllerUriHelperText, setControllerUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
-      <ConnectionsTable rows={[rows, setRows]} handleDelete={handleDelete} selected={[selected, setSelected]} />
+      <ConnectionsTable rows={[rows, setRows]} selected={[selected, setSelected]} handleDelete={handleDelete} />
     </Container>
   );
 };

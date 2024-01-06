@@ -1,31 +1,30 @@
 const db = require("../models/db");
+const bcrypt = require('bcrypt');
 
 const dbControllers = {};
 
 // postgres - Connections:
-// db: clusterID, userID, clusterName, ports, created_on
+// db: clusterID, userID, clusterName, seedBrokers, created_on
 // primary key: clusterID + userID
 
 
 dbControllers.saveConnection = async (req, res, next) => {
 
   try {
-    const { id, name, uri, ports, created, userID } = req.body;
+    const { id, name, created, userID, apiKey, apiSecret, controllers } = req.body;
+    const { brokers } = res.locals;
 
-    const portsJSON = JSON.stringify(ports);
-    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, cluster_uri, ports, created_on) VALUES ($1, $2, $3, $4, $5, $6)';
-    const values = [id, userID, name, uri, portsJSON, created]
+    const brokersJSON = JSON.stringify(brokers);
+    const controllersJSON = JSON.stringify(controllers);
+    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, brokers, created_on, api_key, api_secret, controllers) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
+    const values = [id, userID, name, brokersJSON, created, apiKey, apiSecret, controllersJSON]
 
-    const response = await db.query(query, values);
-
-    // console.log('dbController.saveConnections - response: ', '\n', response)
-
-    res.locals.response = response;
+    await db.query(query, values);
 
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while saving connection to database',
       status: 500,
       message: "Couldn't save to database"
@@ -49,7 +48,7 @@ dbControllers.getConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while getting connections from database',
       status: 500,
       message: "Couldn't get from database"
@@ -59,7 +58,6 @@ dbControllers.getConnections = async (req, res, next) => {
 }
 
 dbControllers.deleteConnections = async (req, res, next) => {
-
   try {
     // req.body should contain two pieces of information: userid and the array of ports.
     const { userid, clusters } = req.body;
@@ -81,7 +79,7 @@ dbControllers.deleteConnections = async (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while deleting connections from database',
       status: 500,
       message: "Couldn't delete from database"
