@@ -11,12 +11,13 @@ const dbControllers = {};
 dbControllers.saveConnection = async (req, res, next) => {
 
   try {
-    const { id, name, created, userID, apiKey, apiSecret } = req.body;
+    const { id, name, created, userID, apiKey, apiSecret, controllers } = req.body;
     const { brokers } = res.locals;
 
     const brokersJSON = JSON.stringify(brokers);
-    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, brokers, created_on, api_key, api_secret) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-    const values = [id, userID, name, brokersJSON, created, apiKey, apiSecret]
+    const controllersJSON = JSON.stringify(controllers);
+    const query = 'INSERT INTO "Connections" (cluster_id, user_id, cluster_name, brokers, created_on, api_key, api_secret, controllers) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
+    const values = [id, userID, name, brokersJSON, created, apiKey, apiSecret, controllersJSON]
 
     await db.query(query, values);
 

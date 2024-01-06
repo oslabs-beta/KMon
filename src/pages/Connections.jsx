@@ -34,17 +34,22 @@ const Connections = () => {
   const [rows, setRows] = useState([]);
 
   const [open, setOpen] = useState(false);
-  const [portIsValid, setPortIsValid] = useState(true);
+  const [brokerPortIsValid, setBrokerPortIsValid] = useState(true);
+  const [controllerPortIsValid, setControllerPortIsValid] = useState(true);
   const [portIsClicked, setPortIsClicked] = useState(false);
-  const [portHelperText, setportHelperText] = useState(null);
+  const [brokerPortHelperText, setBrokerPortHelperText] = useState(null);
+  const [controllerPortHelperText, setControllerPortHelperText] = useState(null);
 
-  const [uriIsValid, setUriIsValid] = useState(true);
+  const [brokerUriIsValid, setBrokerUriIsValid] = useState(true);
+  const [controllerUriIsValid, setControllerUriIsValid] = useState(true);
   const [uriIsClicked, setUriIsClicked] = useState(false);
-  const [uriHelperText, setUriHelperText] = useState(null);
+  const [brokerUriHelperText, setBrokerUriHelperText] = useState(null);
+  const [controllerUriHelperText, setControllerUriHelperText] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [dataIsFetching, setDataIsFetching] = useState(false);
   const [formData, setFormData] = useState({
     clusterName: '',
+    controllers: [],
     seedBrokers: [],
     apiKey: '',
     apiSecret: '',
@@ -108,7 +113,7 @@ const Connections = () => {
           }
           // local variables
           const id = getNewId(rows)
-          const { clusterName, seedBrokers, apiKey, apiSecret } = formData;
+          const { clusterName, controllers, seedBrokers, apiKey, apiSecret } = formData;
           const currDateStr = new Date();
           const [month, date, year] = [currDateStr.getMonth(), currDateStr.getDate(), currDateStr.getFullYear().toString().slice(2)]
           const createdDate = `${month + 1}/${date}/${year}`
@@ -125,16 +130,31 @@ const Connections = () => {
                 throw new Error('Duplicate connection detected')
               };
             };
+
+            for (let controller of row.controllers) {
+              if (controllers.includes(controller)) {
+                setAlertProps({
+                  visibility: 'visible',
+                  marginTop: '15px',
+                  height: '100%',
+                  message: 'Duplicate found in existing connections!'
+                })
+                throw new Error('Duplicate connection detected')
+              };
+            };
+
           };
 
           const newDbEntry = {
             id: id,
             name: clusterName,
+            controllers: controllers,
             seedBrokers: seedBrokers,
             created: createdDate,
             apiKey: apiKey,
             apiSecret: apiSecret
           }
+
           // console.log("about to create config yamls")
           setDataIsFetching(true);
 
@@ -154,6 +174,7 @@ const Connections = () => {
           const newRow = {
             id: id,
             name: clusterName,
+            controllers: controllers,
             brokers: data,
             created: createdDate
           }
@@ -171,6 +192,7 @@ const Connections = () => {
             setSubmitting(false);
             setFormData({
               clusterName: '',
+              controllers: [],
               seedBrokers: [],
               apiKey: '',
               apiSecret: '',
@@ -234,7 +256,7 @@ const Connections = () => {
     <Container sx={containerStyle}>
       <div>
         <h1>Saved Connections</h1>
-        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} portIsValid={[portIsValid, setPortIsValid]} portHelperText={[portHelperText, setportHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} uriIsValid={[uriIsValid, setUriIsValid]} uriHelperText={[uriHelperText, setUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
+        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} brokerPortIsValid={[brokerPortIsValid, setBrokerPortIsValid]} controllerPortIsValid={[controllerPortIsValid, setControllerPortIsValid]} brokerPortHelperText={[brokerPortHelperText, setBrokerPortHelperText]} controllerPortHelperText={[controllerPortHelperText, setControllerPortHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} brokerUriIsValid={[brokerUriIsValid, setBrokerUriIsValid]} controllerUriIsValid={[controllerUriIsValid, setControllerPortIsValid]} brokerUriHelperText={[brokerUriHelperText, setBrokerUriHelperText]} controllerUriHelperText={[controllerUriHelperText, setControllerUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
       </div>
       <ConnectionsTable rows={[rows, setRows]} selected={[selected, setSelected]} handleDelete={handleDelete} />
     </Container>

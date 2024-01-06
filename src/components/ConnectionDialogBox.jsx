@@ -26,21 +26,26 @@ const ConnectionDialogBox = (props) => {
 
   /************** Component States ****************/
 
-  // states for port entry
-
-  /********** Need to refactor "port is clicked" and "port is valid" states to reflect changes to connection handling **********/
+  // states for port input
   const [open, setOpen] = props.open;
-  const [currPort, setCurrPort] = useState('');
-  const [portIsValid, setPortIsValid] = props.portIsValid;
+  const [currBrokerPort, setCurrBrokerPort] = useState('');
+  const [currControllerPort, setCurrControllerPort] = useState('');
+  const [brokerPortIsValid, setBrokerPortIsValid] = props.brokerPortIsValid;
+  const [controllerPortIsValid, setControllerPortIsValid] = props.brokerPortIsValid;
   const [portIsClicked, setPortIsClicked] = props.portIsClicked;
-  const [portHelperText, setPortHelperText] = props.portHelperText
-
-  const [currUri, setCurrUri] = useState('');
+  const [brokerPortHelperText, setBrokerPortHelperText] = props.brokerPortHelperText
+  const [controllerPortHelperText, setControllerPortHelperText] = props.controllerPortHelperText
+  // states for URI input
+  const [currBrokerUri, setCurrBrokerUri] = useState('');
+  const [currControllerUri, setCurrControllerUri] = useState('');
   const [uriIsClicked, setUriIsClicked] = props.uriIsClicked
-  const [uriIsValid, setUriIsValid] = props.uriIsValid
-  const [uriHelperText, setUriHelperText] = props.uriHelperText
+  const [brokerUriIsValid, setBrokerUriIsValid] = props.brokerUriIsValid
+  const [brokerUriHelperText, setBrokerUriHelperText] = props.brokerUriHelperText;
+  const [controllerUriIsValid, setControllerUriIsValid] = props.brokerPortIsValid;
+  const [controllerUriHelperText, setControllerUriHelperText] = props.controllerUriHelperText
   const [submitting, setSubmitting] = props.submitting;
-  // clear hard-coded faults for production
+  // state for differentiating between URI/Port inputs;
+  const [controllerIsClicked, setControllerIsClicked] = useState(false);
   // form states
   const [formData, setFormData] = props.formData;
   const [dataIsFetching, setDataIsFetching] = props.dataIsFetching
@@ -61,6 +66,7 @@ const ConnectionDialogBox = (props) => {
   // TO DO: 
   // - update api URI once hosted.
   const seedBrokers = formData.seedBrokers;
+  const controllers = formData.controllers;
   const handleSubmit = props.handleSubmit;
 
   const handleSubmitKey = (event) => {
@@ -68,9 +74,16 @@ const ConnectionDialogBox = (props) => {
     if (event.key === "Enter") {
       if (portIsClicked === true || uriIsClicked === true) {
         event.preventDefault();
-
       }
       else if (!seedBrokers.length) {
+        setAlertProps({
+          visibility: 'visible',
+          marginTop: '15px',
+          height: '100%',
+          message: 'At least one seed broker address needed'
+        })
+      }
+      else if (!controllers.length) {
         setAlertProps({
           visibility: 'visible',
           marginTop: '15px',
@@ -96,25 +109,37 @@ const ConnectionDialogBox = (props) => {
   const handleCheckPort = (event) => {
     // Allow ports to be entered with enter or space, and check for invalid inputs
     const portNum = event.target.value;
-    setCurrPort(portNum)
+    controllerIsClicked ? setCurrControllerPort(portNum) : setCurrBrokerPort(portNum)
 
     if (!Number(portNum) || portNum.length < 4 || portNum.length > 5) {
       if (Number(portNum) < 1028 || Number(portNum > 65535)) {
-        setPortIsValid(false);
-        setPortHelperText("Invalid Port Number")
-        return;
+        if (controllerIsClicked) {
+          setControllerPortIsValid(false);
+          setControllerPortHelperText('Invalid Port Number')
+          return;
+        }
+        else {
+          setBrokerPortIsValid(false);
+          setBrokerPortHelperText("Invalid Port Number")
+          return;
+        }
       }
     }
+
+    if (controllerIsClicked) {
+      setControllerPortIsValid(true);
+      setControllerPortHelperText(null);
+    }
     else {
-      setPortIsValid(true);
-      setPortHelperText(null);
+      setBrokerPortIsValid(true);
+      setBrokerPortHelperText(null);
     };
   };
 
   const handleCheckUri = (event) => {
 
     const uri = event.target.value
-    setCurrUri(uri);
+    controllerIsClicked ? setCurrControllerUri(uri) : setCurrBrokerUri(uri);
     const ipv4Regex = /(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/
     const hostnameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
@@ -127,22 +152,33 @@ const ConnectionDialogBox = (props) => {
     }
 
     if (isValidIP(uri) || isValidHostName(uri)) {
-      setUriIsValid(true);
-      setUriHelperText(null);
+      if (controllerIsClicked) {
+        setControllerUriIsValid(true);
+        setControllerUriHelperText(null);
+      }
+      else {
+        setBrokerUriIsValid(true);
+        setBrokerUriHelperText(null);
+      }
       return;
     }
-
-    setUriIsValid(false);
-    setUriHelperText('Enter valid URI!');
+    if (controllerIsClicked) {
+      setControllerUriIsValid(false);
+      setControllerUriHelperText('Enter valid URI!')
+    }
+    else {
+      setBrokerUriIsValid(false);
+      setBrokerUriHelperText('Enter valid URI!');
+    }
 
   };
   // combine port and uri into address
   const handleSeedBroker = (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      if (portIsValid && uriIsValid) {
+      if (brokerPortIsValid && brokerUriIsValid) {
         // form the new seedBroker address
-        const seedBroker = `${currUri}:${currPort}`;
+        const seedBroker = `${currBrokerUri}:${currBrokerPort}`;
         // check if it's already in the array of seedBrokers
         if (seedBrokers.includes(seedBroker)) {
           setAlertProps({
@@ -151,8 +187,8 @@ const ConnectionDialogBox = (props) => {
             height: '100%',
             message: 'Duplicate address detected.'
           })
-          setCurrPort('');
-          setCurrUri('');
+          setCurrBrokerPort('');
+          setCurrBrokerUri('');
           return;
         }
 
@@ -169,8 +205,46 @@ const ConnectionDialogBox = (props) => {
           height: '0',
           message: ''
         })
-        setCurrPort('');
-        setCurrUri('');
+        setCurrBrokerPort('');
+        setCurrBrokerUri('');
+      };
+    };
+  };
+
+  const handleController = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (controllerPortIsValid && controllerUriIsValid) {
+        // form the new seedBroker address
+        const controller = `${currControllerUri}:${currControllerPort}`;
+        // check if it's already in the array of seedBrokers
+        if (controllers.includes(controller)) {
+          setAlertProps({
+            visibility: 'visible',
+            marginTop: '15px',
+            height: '100%',
+            message: 'Duplicate address detected.'
+          })
+          setCurrControllerPort('');
+          setCurrControllerUri('');
+          return;
+        }
+
+        setFormData((prevFormData) => {
+          return {
+            ...prevFormData,
+            controllers: [...controllers, controller]
+          };
+        });
+
+        setAlertProps({
+          visibility: 'hidden',
+          marginTop: '15px',
+          height: '0',
+          message: ''
+        })
+        setCurrControllerPort('');
+        setCurrControllerUri('');
       };
     };
   };
@@ -178,20 +252,31 @@ const ConnectionDialogBox = (props) => {
   const handleDeleteChip = (event) => {
     const deleteChip = event.currentTarget.parentNode.firstChild
 
-    const deleteBroker = deleteChip.innerText
-
-    const newSeedBrokers = seedBrokers.filter((broker, index) => {
-      return broker !== deleteBroker
-    })
-    // setPorts([...newPorts])
-    setFormData((prevFormData) => {
-      return {
-        ...prevFormData,
-        seedBrokers: [...newSeedBrokers]
-      }
-    })
-    setHelperText(null);
-    // console.log('handleCheckPort - formData: ', formData)
+    const deleteAddress = deleteChip.innerText
+    if (controllerIsClicked) {
+      const newControllers = controllers.filter((controller, index) => {
+        return controller !== deleteAddress
+      })
+      setFormData((prevFormData) => {
+        return {
+          ...prevFormData,
+          controllers: [...newControllers]
+        }
+      })
+      setHelperText(null);
+    }
+    else {
+      const newSeedBrokers = seedBrokers.filter((broker, index) => {
+        return broker !== deleteBroker
+      })
+      setFormData((prevFormData) => {
+        return {
+          ...prevFormData,
+          seedBrokers: [...newSeedBrokers]
+        }
+      })
+      setHelperText(null);
+    }
   }
 
   /******** sub-Components *******/
@@ -199,11 +284,32 @@ const ConnectionDialogBox = (props) => {
   // render address Tags
   const brokerChips = seedBrokers.map((broker, index) => {
     return (
-      <Grid key={`gridItem${index}`}>
+      <Grid key={`brokerGridItem${index}`}>
         <Chip
           id={`chip${index}`}
           key={`broker${index}`}
           label={broker}
+          variant='filled'
+          onDelete={(e) => {
+            handleDeleteChip(e);
+          }}
+          sx={{
+            width: '100%',
+            marginLeft: 0,
+            marginRight: 0
+          }}
+        />
+      </Grid>
+    );
+  });
+
+  const controllerChips = controllers.map((controller, index) => {
+    return (
+      <Grid key={`controllerGridItem${index}`}>
+        <Chip
+          id={`chip${index}`}
+          key={`controller${index}`}
+          label={controller}
           variant='filled'
           onDelete={(e) => {
             handleDeleteChip(e);
@@ -252,6 +358,72 @@ const ConnectionDialogBox = (props) => {
               maxWidth: 417,
             }}>
               <TextField
+                id="cUri-input"
+                name="controllerURI"
+                label="Kafka Controller URI:"
+                variant="filled"
+                sx={{
+                  flexGrow: 3,
+                  width: "75%"
+                }}
+                onFocus={() => {
+                  setUriIsClicked(true);
+                  setControllerIsClicked(true);
+                }}
+                onBlur={() => {
+                  setUriIsClicked(false);
+                }}
+                error={!controllerUriIsValid}
+                helperText={controllerUriHelperText}
+                onChange={handleCheckUri}
+                value={currControllerUri}
+                onKeyDown={handleController}
+              />
+              <TextField
+                id="controllerPorts-input"
+                name="controllerPort"
+                label="Port:"
+                variant="filled"
+                sx={{
+                  flexGrow: 1,
+                  width: "25%"
+                }}
+                onFocus={() => {
+                  setPortIsClicked(true);
+                  setControllerIsClicked(true);
+                }}
+                onBlur={() => {
+                  setPortIsClicked(false);
+                }}
+                error={!controllerPortIsValid}
+                helperText={controllerPortHelperText}
+                onChange={handleCheckPort}
+                value={currControllerPort}
+                onKeyDown={handleController}
+              />
+            </Stack>
+            <Grid
+              container
+              key='controllerTagGrid'
+              className="tagGrid"
+              spacing={2}
+              direction="row"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gridAutoRows: true,
+                gridGap: '2px',
+                maxWidth: '417px',
+                marginLeft: 0,
+                marginBottom: '10px'
+              }}>
+              {controllerChips}
+            </Grid>
+            <Stack className='addressInputStack' spacing={2} direction="row" sx={{
+              marginBottom: 4,
+              maxWidth: 417,
+            }}>
+              <TextField
                 id="uri-input"
                 name="serverURI"
                 label="Kafka Seed Broker URI:"
@@ -262,19 +434,20 @@ const ConnectionDialogBox = (props) => {
                 }}
                 onFocus={() => {
                   setUriIsClicked(true);
+                  setControllerIsClicked(false);
                 }}
                 onBlur={() => {
                   setUriIsClicked(false);
                 }}
-                error={!uriIsValid}
-                helperText={uriHelperText}
+                error={!brokerUriIsValid}
+                helperText={brokerUriHelperText}
                 onChange={handleCheckUri}
-                value={currUri}
+                value={currBrokerUri}
                 onKeyDown={handleSeedBroker}
               />
               <TextField
-                id="ports-input"
-                name="port"
+                id="brokerPort-input"
+                name="brokerPort"
                 label="Port:"
                 variant="filled"
                 sx={{
@@ -283,14 +456,15 @@ const ConnectionDialogBox = (props) => {
                 }}
                 onFocus={() => {
                   setPortIsClicked(true);
+                  setControllerIsClicked(false);
                 }}
                 onBlur={() => {
                   setPortIsClicked(false);
                 }}
-                error={!portIsValid}
-                helperText={portHelperText}
+                error={!brokerPortIsValid}
+                helperText={brokerPortHelperText}
                 onChange={handleCheckPort}
-                value={currPort}
+                value={currBrokerPort}
                 onKeyDown={handleSeedBroker}
               />
             </Stack>

@@ -64,6 +64,12 @@ const headCells = [
     label: 'Name',
   },
   {
+    id: 'controllers',
+    numeric: true,
+    disablePadding: false,
+    label: 'Controllers',
+  },
+  {
     id: 'brokers',
     numeric: true,
     disablePadding: false,
@@ -271,6 +277,7 @@ const EnhancedTable = (props) => {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
+                const controllersStr = row.controllers.join(', ');
                 const brokersStr = row.brokers.join(', ')
 
                 return (
@@ -301,6 +308,7 @@ const EnhancedTable = (props) => {
                     >
                       {row.name}
                     </TableCell>
+                    <TableCell align="right">{controllersStr}</TableCell>
                     <TableCell align="right">{brokersStr}</TableCell>
                     <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
