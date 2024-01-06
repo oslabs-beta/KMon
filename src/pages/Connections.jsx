@@ -19,9 +19,10 @@ const Connections = () => {
   const theme = useTheme();
 
   const { userInfo, updateUserInfo } = useAppContext();
-
+  
   // Took out the optional operator after thinking about it -- Accessing the connections page without userInfo may mean the app is being used without authorization; better that it throws an error and the app goes blank if userInfo is not defined
   const userID = userInfo.userID;
+
 
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
