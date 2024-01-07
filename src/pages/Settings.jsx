@@ -7,9 +7,6 @@ import {
   Paper,
   TextField,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   Grid,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -37,6 +34,9 @@ const AlertSettings = () => {
     Slack: false,
     InApp: false,
   });
+  const [emailAddress, setEmailAddress] = useState('');
+  const [slackURL, setSlackURL] = useState('');
+
   // Provide feedback to the user once response is received from database
   const [settingsFeedback, setSettingsFeedback] = useState(null);
   // Slack URL and Email are required if the user has selected the checkboxes for them
@@ -90,42 +90,54 @@ const AlertSettings = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Check to see if any changes were made before API call
-    if (
-      !alertPreferences.Email &&
-      !alertPreferences.Slack &&
-      !alertPreferences.InApp
-    ) {
-      setSettingsFeedback('Select at least one alert preference.');
-      return;
-    }
-
     if (!password.trim()) {
       setSettingsFeedback('Enter the password to save preferences.');
       return;
     }
 
-    // If email required, extract the email address from the field. Otherwise, preferredEmail will be empty
-    const preferredEmail = isEmailRequired
-      ? document.getElementById('emailAddress').value
-      : '';
-
-    if (isEmailRequired && preferredEmail.length > MAX_EMAIL_LENGTH) {
+    // Check to see if any changes were made before API call
+    if (
+      alertPreferences.Email === savedPreferences.Email &&
+      alertPreferences.Slack === savedPreferences.Slack &&
+      alertPreferences.InApp === savedPreferences.InApp
+    ) {
       setSettingsFeedback(
-        'Please enter a valid email.'
+        'Preferences are already up to date, no changes were made.'
       );
       return;
     }
 
-    // If slack URL required, extract the slack URL from the field. Otherwise, slackURL will be empty
-    const slackURL = isSlackURLRequired
-      ? document.getElementById('slack').value
-      : '';
+    // Check to see if there are any selections before API call
+    if (
+      Object.keys(savedPreferences).filter((key) => savedPreferences[key]).length === 0 && 
+      !alertPreferences.Email &&
+      !alertPreferences.Slack &&
+      !alertPreferences.InApp
+    ) {
+      setSettingsFeedback('Select at least one alert preference.');
+      setPassword('');
+      return;
+    }
+
+    // If email required, use the email address. Otherwise, preferredEmail will be empty
+    // const preferredEmail = isEmailRequired
+    //   ? document.getElementById('emailAddress')?.value
+    //   : '';
+    const preferredEmail = isEmailRequired ? emailAddress : '';
+
+    if (isEmailRequired && preferredEmail.length > MAX_EMAIL_LENGTH) {
+      setSettingsFeedback('Please enter a valid email.');
+      return;
+    }
+
+    // If slack URL required, use the slack URL. Otherwise, slackURL will be empty
+    // const slackURL = isSlackURLRequired
+    //   ? document.getElementById('slack')?.value
+    //   : '';
+    const slackURL = isSlackURLRequired ? slackURL : '';
 
     if (isSlackURLRequired && slackURL.length > MAX_SLACK_URL_LENGTH) {
-      setSettingsFeedback(
-        'Please enter a valid URL.'
-      );
+      setSettingsFeedback('Please enter a valid URL.');
       return;
     }
 
@@ -149,8 +161,10 @@ const AlertSettings = () => {
         // console.log('Alert preferences saved successfully.');
         setSavedPreferences(alertPreferences);
         setSettingsFeedback('Alert preferences saved successfully.');
+        setPassword('');
       } else {
         setSettingsFeedback('Incorrect password. Please try again.');
+        setPassword('');
       }
     } catch (error) {
       console.error('Error while saving alert preferences:', error);
@@ -158,6 +172,7 @@ const AlertSettings = () => {
       setSettingsFeedback(
         `Error while saving alert preferences: ${response.status}`
       );
+      setPassword('');
     }
   };
 
@@ -178,9 +193,10 @@ const AlertSettings = () => {
                 elevation={1}
                 sx={{ padding: '15px', marginBottom: '10px' }}
               >
-                <Typography variant="h7" paddingBottom={'10px'}>
-                  {/* filter the keys to only include those with the truthy value */}
-                  Current Preferences: {Object.keys(savedPreferences)
+                <Typography variant="body1" paddingBottom={'10px'}>
+                  {/* filter the keys to only include those selected */}
+                  Current Preferences:{' '}
+                  {Object.keys(savedPreferences)
                     .filter((key) => savedPreferences[key])
                     .map((key) => `${key} Alerts`)
                     .join(', ')}
@@ -199,7 +215,7 @@ const AlertSettings = () => {
                     }
                     label={`Receive Email Alerts`}
                   />
-                  {alertPreferences['Email'] && (
+                  {alertPreferences['Email'] && !savedPreferences['Email'] && (
                     <TextField
                       id="emailAddress"
                       label="Enter email for email alerts"
@@ -207,6 +223,8 @@ const AlertSettings = () => {
                       margin="normal"
                       name="emailAddress"
                       sx={{ width: '100%' }}
+                      value={emailAddress}
+                      onChange={(e) => setEmailAddress(e.target.value)}
                       required={isEmailRequired}
                       aria-labelledby="emailAddressLabel"
                     />
@@ -224,7 +242,7 @@ const AlertSettings = () => {
                     }
                     label={`Receive Slack Alerts`}
                   />
-                  {alertPreferences['Slack'] && (
+                  {alertPreferences['Slack'] && !savedPreferences['Slack'] && (
                     <TextField
                       id="slack"
                       label="Enter Slack API URL for notifications"
@@ -232,6 +250,8 @@ const AlertSettings = () => {
                       margin="normal"
                       name="slackURL"
                       sx={{ width: '100%' }}
+                      value={slackURL}
+                      onChange={(e) => setSlackURL(e.target.value)}
                       required={isSlackURLRequired}
                       aria-labelledby="slackURLLabel"
                     />
