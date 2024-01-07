@@ -187,6 +187,10 @@ const AlertSettings = () => {
             <Typography variant="h4" paddingBottom={'10px'}>
               Alert Preferences
             </Typography>
+            {/* Disclaimer and Beta Alert */}
+            <Typography variant="body2" color="textSecondary" marginBottom={'15px'}> 
+            Note: Email and in-app alert functionalities are currently under development.
+            </Typography>
             <form onSubmit={handleSubmit}>
               {/* Current Preferences Section */}
               <Paper
