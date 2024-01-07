@@ -20,7 +20,8 @@ const Connections = () => {
 
   const { userInfo, updateUserInfo } = useAppContext();
 
-  const userID = userInfo.userID;
+  // Using optional chaining operator to prevent errors when accessing property that might be undefined or null
+  const userID = userInfo?.userID;
 
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
