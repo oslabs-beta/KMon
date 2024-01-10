@@ -236,9 +236,8 @@ describe('configControllers.updateDocker', () => {
     res.locals.prometheusPorts = {};
     res.locals.prometheusPorts.maxPort = maxPort;
     req.body.id = id;
-    req.body.name = 'test';;
-    req.body.uri = '1.2.3.4';
-    req.body.ports = ['1234', '2345', '3456'];
+    req.body.name = 'test';
+    req.body.seedBrokers = ['1.2.3.4:1234', 'demohost.com:2345', 'demo-kafka-cluster:3456'];
     ({ dockerCompose } = getMockConfigs());
   })
 
@@ -320,6 +319,8 @@ describe('configControllers.updateDocker', () => {
 
   it('should create an array of targets using the URI and Ports for creating prometheus yaml', () => {
 
+    const { seedBrokers } = req.body;
+
     fs.readFileSync.mockImplementation(() => { });
 
     yaml.load.mockReturnValue(dockerCompose);
@@ -332,7 +333,7 @@ describe('configControllers.updateDocker', () => {
           {
             job_name: 'test',
             static_configs: [
-              { targets: ['1.2.3.4:1234', '1.2.3.4:2345', '1.2.3.4:3456'] }
+              { targets: seedBrokers }
             ]
           }
         ]

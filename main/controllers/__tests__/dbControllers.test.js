@@ -65,12 +65,12 @@ describe('dbControllers.saveConnection', () => {
 
     db.query.mockResolvedValue('query made');
 
-    const { userID, name, uri, ports, created } = req.body;
-    const portsJSON = JSON.stringify(ports);
+    const { userID, name, seedBrokers, created } = req.body;
+    const seedBrokersJSON = JSON.stringify(seedBrokersJSON);
 
     await dbControllers.saveConnection(req, res, next);
 
-    expect(db.query.mock.calls[0][1]).toEqual([id, userID, name, uri, portsJSON, created]);
+    expect(db.query.mock.calls[0][1]).toEqual([id, userID, name, seedBrokersJSON, created]);
     expect(res.locals.response).toBe('query made')
 
   });
@@ -79,8 +79,8 @@ describe('dbControllers.saveConnection', () => {
 
     db.query.mockRejectedValue(new Error('Error in database'));
 
-    const { userID, name, uri, ports, created } = req.body;
-    const portsJSON = JSON.stringify(ports);
+    // const { userID, name, seedBrokers, created } = req.body;
+    // const seedBrokersJSON = JSON.stringify(seedBrokers);
 
     await dbControllers.saveConnection(req, res, next);
 
