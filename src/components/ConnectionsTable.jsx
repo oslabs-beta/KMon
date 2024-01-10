@@ -64,16 +64,16 @@ const headCells = [
     label: 'Name',
   },
   {
-    id: 'uri',
+    id: 'controllers',
     numeric: true,
     disablePadding: false,
-    label: 'Kafka Server URI',
+    label: 'Controllers',
   },
   {
-    id: 'ports',
+    id: 'brokers',
     numeric: true,
     disablePadding: false,
-    label: 'Ports',
+    label: 'Brokers',
   },
   {
     id: 'created',
@@ -277,7 +277,8 @@ const EnhancedTable = (props) => {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
-                const portsStr = row.ports.join(', ')
+                const controllersStr = row.controllers.join(', ');
+                const brokersStr = row.brokers.join(', ')
 
                 return (
                   <TableRow
@@ -307,8 +308,8 @@ const EnhancedTable = (props) => {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">{row.uri}</TableCell>
-                    <TableCell align="right">{portsStr}</TableCell>
+                    <TableCell align="right">{controllersStr}</TableCell>
+                    <TableCell align="right">{brokersStr}</TableCell>
                     <TableCell align="right">{row.created}</TableCell>
                   </TableRow>
                 );

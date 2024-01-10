@@ -5,16 +5,54 @@ const path = require('path');
 const { exec } = require('node:child_process');
 
 // external JS libraries for writing Kafka scripts and for writing YAML files
-const kafka = require('kafkajs');
+const { Kafka, logLevel } = require('kafkajs');
 const yaml = require('js-yaml');
 
 // not sure what this is...
 const { default: cluster } = require('cluster');
+const { config } = require('dotenv');
 
 const configControllers = {};
 
+configControllers.getKafkaBrokers = async (req, res, next) => {
+
+  try {
+    const { name, seedBrokers } = req.body;
+
+    const kafka = new Kafka({
+      clientId: `${name}`,
+      brokers: seedBrokers,
+      logLevel: logLevel.ERROR,
+    });
+
+    const kafkaAdmin = kafka.admin();
+
+    // getting list of all brokers in cluster from seed brokers
+    await kafkaAdmin.connect();
+
+    const clusterInfo = await kafkaAdmin.describeCluster();
+
+    const brokers = clusterInfo.brokers.map((broker) => {
+
+      return `${broker.host}:${broker.port}`;
+
+    });
+
+    res.locals.brokers = brokers;
+
+    return next();
+  }
+  catch (error) {
+    const err = Object.assign({}, {
+      log: 'Error occurred while discovering Kafka servers',
+      status: 404,
+      message: "Couldn't get Kafka servers"
+    }, error)
+    return next(err);
+  }
+}
+
 configControllers.getPrometheusPorts = (req, res, next) => {
-  // console.log('getting max Prometheus port number!')
   try {
     const dockerCompose = yaml.load(
       fs.readFileSync(
@@ -43,18 +81,17 @@ configControllers.getPrometheusPorts = (req, res, next) => {
     // console.log('got prometheus ports: ', res.locals.prometheusPorts)
 
     return next();
-  } catch {
-    const error = {
+  } catch (error) {
+    const err = Object.assign({
       log: 'Error occurred in configControllers.getPrometheusPorts middleware function',
       status: 500,
       message: { err: 'Error occurred while trying to identify ports' },
-    };
-    return next(error);
+    }, error);
+    return next(err);
   }
 };
 
 configControllers.updateGrafana = (req, res, next) => {
-  // console.log('creating Grafana Yamls!')
   try {
     const { id } = req.body;
     const datasourceDoc = yaml.load(fs.readFileSync(path.resolve(__dirname, '../../grafana/provisioning/datasources/datasource.yml'), 'utf-8'))
@@ -62,7 +99,6 @@ configControllers.updateGrafana = (req, res, next) => {
     // create dataSource object to append to yml files.
     // Only a single provisioning provider is necessary to provision the Grafana dashboard with multiple prometheus datasources, since we are using templating to allow users to pick which prometheus instance they will be pulling from.
     // If we want more separation, we will have to generate a new dashboard.json file for each dashboard we create.
-
 
     const newDatasource = {
       name: `prometheus${id}`,
@@ -102,14 +138,16 @@ configControllers.updateGrafana = (req, res, next) => {
   }
 };
 
-configControllers.updateDocker = (req, res, next) => {
+configControllers.updateDocker = async (req, res, next) => {
   // destructure ip and the port numbers from req.body and put this into the scrape-targets configuration
   // and the "cluster name" will be taken as the job name.
+  console.log('updating Docker')
   try {
-
-    const { id, name, uri, ports } = req.body;
+    const { brokers } = res.locals;
+    const { id, name } = req.body;
     const { maxPort } = res.locals.prometheusPorts;
 
+    console.log('updateDocker - res.locals.brokers: ', res.locals.brokers)
     // load dockerCompose file from YAML for editing.
     const dockerCompose = yaml.load(
       fs.readFileSync(
@@ -119,8 +157,6 @@ configControllers.updateDocker = (req, res, next) => {
     );
 
     // update docker compose services by adding new prometheus to grafana dependencies and adding entry to services.
-
-
     if (!dockerCompose.services.grafana.depends_on) {
       dockerCompose.services.grafana.depends_on = [`prometheus${id}`]
     } else {
@@ -138,11 +174,7 @@ configControllers.updateDocker = (req, res, next) => {
       ports: [`${maxPort === 0 ? 9090 : Number(maxPort) + 1}:9090`]
     };
 
-    // Defining new targets for scraping. Currently configured to map ports to URI for development cluster, but should be reconfigured for production environments to map IP addresses/URIs to new targets.
-    const newTargets = ports.map((port) => {
-      return `${uri}:${port}`;
-    });
-    // console.log('newTargets: ', newTargets);
+
 
     const newPromConfig = {
       global: { scrape_interval: '15s' },
@@ -159,7 +191,7 @@ configControllers.updateDocker = (req, res, next) => {
           job_name: name,
           static_configs: [
             {
-              targets: newTargets
+              targets: brokers
             },
           ],
         },
@@ -178,6 +210,7 @@ configControllers.updateDocker = (req, res, next) => {
 
     // write new files to directory
     // console.log('Writing files to directory')
+
     fs.writeFileSync(path.resolve(__dirname, '../../docker-compose.yml'), newDockerYml, 'utf-8');
     fs.writeFileSync(path.resolve(__dirname, `../../prometheus${id}.yml`), newPromYml, 'utf-8');
 
@@ -191,17 +224,19 @@ configControllers.updateDocker = (req, res, next) => {
           message: { error: 'Failed to update Prometheus instances' },
         });
       };
+      console.log('exiting updateDocker dockerCompose exec');
     });
+
 
     return next();
 
-  } catch {
-    const error = {
+  } catch (error) {
+    const err = Object.assign({
       log: 'Error occurred in configControllers.createConnection middleware function',
       status: 500,
-      message: { err: 'Error occurred while trying to create connection' },
-    };
-    return next(error);
+      message: { error: 'Error occurred while trying to create connection' },
+    }, error);
+    return next(err);
   };
 };
 
@@ -287,10 +322,10 @@ configControllers.deleteConnections = (req, res, next) => {
     return next();
   }
   catch (error) {
-    const err = Object.assign({}, {
+    const err = Object.assign({
       log: 'Error occurred while deleting connections from config files',
       status: 500,
-      message: "Couldn't delete from configurations"
+      message: { error: "Couldn't delete from configurations" }
     }, error)
     return next(err);
   };
