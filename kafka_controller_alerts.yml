@@ -1,0 +1,86 @@
+groups:
+  - name: Kafka Controller Alerts
+    rules:
+      - alert: KafkaControllerHighCpu
+        expr: kafka_controller_kafka_controller_stats_ProcessCpuTimeSec > 0.8
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'High CPU usage in Kafka Controller'
+
+      - alert: KafkaControllerHighMemory
+        expr: kafka_controller_kafka_controller_stats_MemUsageBytes > 1e9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High memory usage in Kafka Controller'
+
+      - alert: KafkaControllerOutOfSync
+        expr: kafka_controller_kafka_controller_stats_UnderReplicatedPartitions > 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Kafka Controller out-of-sync'
+      # Test rule for sending a random Slack message
+      - alert: TestRandomSlackMessage
+        expr: vector(1) # Always evaluates to 1, triggering the alert
+        labels:
+          severity: info
+        annotations:
+          summary: 'Test Slack Message'
+          description: 'This is a test Slack message triggered manually.'
+          slack_channel: '#test'
+          receiver: 'slack-notifications'
+      - alert: KafkaBrokerUnavailable
+        expr: absent(up{job="kafka"} == 1)
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka Broker Unavailable"
+          description: "No Kafka broker is up and running."
+      - alert: KafkaRequestHandlerLowIdle
+        expr: kafka_server_requesthandlerpool_idlepercent{job="kafka"} < 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka Request Handler Low Idle"
+          description: "Kafka Request Handler's idle percent is low, indicating high load."
+      - alert: KafkaLowMessageInRate
+        expr: rate(kafka_server_brokertopicmetrics_messagesin_total{job="kafka"}[5m]) < 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka Low Message In Rate"
+          description: "The rate of messages being produced to Kafka is low, which might indicate issues with producers."
+      - alert: KafkaLowConsumerFetchRate
+        expr: rate(kafka_server_brokertopicmetrics_bytesout_total{job="kafka"}[5m]) < 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka Low Consumer Fetch Rate"
+          description: "The rate of fetch requests from consumers is low, which might indicate issues with consumers."
+      - alert: KafkaIsrShrinks
+        expr: increase(kafka_server_replicamanager_isrshrinks_total{job="kafka"}[1h]) > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka ISR Shrinks"
+          description: "The In-Sync Replicas (ISR) set for partitions has shrunk, indicating potential issues."
+      - alert: KafkaJvmHighMemoryUsage
+        expr: (jvm_memory_bytes_used{job="kafka"} / jvm_memory_bytes_max{job="kafka"}) > 0.8
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High JVM Memory Usage"
+          description: "JVM memory usage is high, which could lead to crashes or degraded performance."
+
+
