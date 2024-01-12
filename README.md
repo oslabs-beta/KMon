@@ -1,1 +1,1 @@
-# KMon
+# KMon - Open Source Apache Kafka Monitoring
