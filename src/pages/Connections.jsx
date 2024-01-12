@@ -19,7 +19,7 @@ const Connections = () => {
   const theme = useTheme();
 
   const { userInfo, updateUserInfo } = useAppContext();
-  
+
   // Took out the optional operator after thinking about it -- Accessing the connections page without userInfo may mean the app is being used without authorization; better that it throws an error and the app goes blank if userInfo is not defined
   const userID = userInfo.userID;
 
@@ -75,6 +75,7 @@ const Connections = () => {
       return {
         id: obj.cluster_id,
         name: obj.cluster_name,
+        controllers: obj.controllers,
         brokers: obj.brokers,
         created: obj.created_on
       }
