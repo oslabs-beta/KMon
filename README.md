@@ -36,7 +36,7 @@ Must have Docker installed
 
 Clone our repo then run the following commands:
 ```sh
-docker network create
+docker network create monitoring
 npm i
 npm run build
 npm start
