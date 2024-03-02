@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useAppContext } from '.././AppContext.js';
+
 
 // TO DO: confirm apiUrl for production
 // API URL setup based on the environment
@@ -36,6 +38,7 @@ function SignUp(props) {
 
   // Destructuring onLogin from props for login status management
   const { onLogin } = props;
+  const { userInfo, updateUserInfo } = useAppContext();
 
   const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -143,21 +146,23 @@ function SignUp(props) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          // console.log('Signup successful. Navigating to /Overview...');
+          console.log('Signup successful. Navigating to /Overview...');
+          console.log('data', data);
+          updateUserInfo(data.user);
           onLogin();
           navigate('/Connections');
         }
       } else {
         const data = await response.json();
         setIsError(true);
-        // console.log('Sign up failed. Status:', response.status);
-        // console.log('Server Response:', data);
+        console.log('Sign up failed. Status:', response.status);
+        console.log('Server Response:', data);
         setApiErrorMessage('Account with this email already exists.');
       }
     } catch (error) {
       setIsError(true);
       // Log any errors that occur during the signup process
-      // console.log('Error in Signup Form: ', error);
+      console.log('Error in Signup Form: ', error);
     } finally {
       // Reset form data after submission
       setIsSubmitting(false);
