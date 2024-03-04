@@ -24,11 +24,14 @@ authControllers.createUser = async (req, res, next) => {
     const user_email_lowercase = user_email.toLowerCase();
 
     // Query to check if account with the provided email exists, and if so, return
-    const checkUserQuery = `SELECT * FROM "Users" WHERE user_email=$1`;
+    const checkUserQuery = `SELECT * FROM "users" WHERE user_email=$1`;
     const checkUserValues = [user_email];
+    console.log('user email');
+    console.log(user_email);
     const existingUser = await db.query(checkUserQuery, checkUserValues);
 
-    // console.log(existingUser)
+    console.log('EXISTING USER');
+    console.log(existingUser)
 
     if (existingUser.rows.length > 0) {
       return next({
@@ -45,11 +48,11 @@ authControllers.createUser = async (req, res, next) => {
     // Different queries to insert new user info depending on whether user has provided last name
     if (last_name) {
       signupQuery =
-        'INSERT INTO "Users" (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id';
+        'INSERT INTO "users" (first_name, last_name, user_email, user_password) VALUES ($1, $2, $3, $4) RETURNING user_id';
       signupValues = [first_name, last_name, user_email, hashedPassword];
     } else {
       signupQuery =
-        'INSERT INTO "Users" (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id';
+        'INSERT INTO "users" (first_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING user_id';
       signupValues = [first_name, user_email, hashedPassword];
     }
 
@@ -58,7 +61,7 @@ authControllers.createUser = async (req, res, next) => {
     console.log('saving user - result: ', result);
 
     const userID = result.rows[0].user_id;
-    // console.log('User successfully registered with ID:', userID);
+    console.log('User successfully registered with ID:', userID);
     res.locals.user = userID;
     return next();
   } catch (err) {
