@@ -31,7 +31,6 @@ function Sidebar() {
     '& .MuiDrawer-paper': {
       width: drawerWidth,
       boxSizing: 'border-box',
-      marginTop: '65px',
       }
     });
 
@@ -92,7 +91,7 @@ function Sidebar() {
         </List>
       </Box>
     </StyledDrawer>
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
+    {/* <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box> */}
   </Box>
 );
 };

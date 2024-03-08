@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   const containerStyle = {
     marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
+    marginTop: '10px',
   };
 
   const { selectedGraphs, setSelectedGraphs } = useAppContext();

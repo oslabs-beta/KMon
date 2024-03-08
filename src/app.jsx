@@ -90,8 +90,8 @@ const App = () => {
         <HashRouter>
           {isLoggedIn && (
             <>
-              <Header onLogout={handleLogout} />
-              <Sidebar />
+              {/* <Header onLogout={handleLogout} /> */}
+              {/* <Sidebar /> */}
             </>
           )}
           <Routes>
