@@ -12,6 +12,7 @@ import Signup from './pages/Signup.jsx';
 import Settings from './pages/Settings.jsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { deepPurple, indigo, grey, blueGrey } from '@mui/material/colors';
+import MiniDrawer from './components/ClosingSideBar.jsx';
 
 const theme = createTheme({
   palette: {
@@ -35,8 +36,8 @@ const theme = createTheme({
     defaultMargin: 8,
     largeMargin: 16,
     smallMargin: 4,
-    sideBarMargin: 30,
-    headerMargin: 3.75,
+    sideBarMargin: '10px',
+    headerMargin: '10px',
   },
   breakpoints: {
     values: {
@@ -88,36 +89,29 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <AppProvider>
         <HashRouter>
-          {isLoggedIn && (
-            <>
-              {/* <Header onLogout={handleLogout} /> */}
-              {/* <Sidebar /> */}
-            </>
-          )}
-          <Routes>
-            {isLoggedIn ? (
-              <>
+          {isLoggedIn ? (
+            <div style={{display: 'flex'}}>
+              <MiniDrawer/>
+              <Routes>
+                <>
                 <Route path="/Connections" element={<Connections />} />
                 <Route path="/Alerts" element={<Alerts />} />
                 <Route path="/Dashboard" element={<Dashboard />} />
                 {/* <Route path="/Overview" element={<Overview />} /> */}
                 <Route path="/Settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/Connections" />} />
-              </>
-            ) : (
+                </>
+              </Routes>
+            </div>
+          ) :
+            <Routes>
               <>
-                <Route
-                  path="/Login"
-                  element={<Login onLogin={handleLogin} />}
-                />
-                <Route
-                  path="/Signup"
-                  element={<Signup onLogin={handleLogin} />}
-                />
+                <Route path="/Login" element={<Login onLogin={handleLogin} />} />
+                <Route path="/Signup" element={<Signup onLogin={handleLogin} />} />
                 <Route path="*" element={<Navigate to="/Login" />} />
               </>
-            )}
-          </Routes>
+            </Routes>
+          }
         </HashRouter>
       </AppProvider>
     </ThemeProvider>

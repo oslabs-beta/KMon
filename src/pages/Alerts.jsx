@@ -10,8 +10,8 @@ import { Container } from '@mui/material';
 const Alerts = () => {
   const theme = useTheme();
   const containerStyle = {
-    marginLeft: theme.margins.sideBarMargin,
-    marginTop: theme.margins.headerMargin,
+    // marginLeft: theme.margins.sideBarMargin,
+    marginTop: '10px',
   };
 
   // showAlert determines if alerts should be shown

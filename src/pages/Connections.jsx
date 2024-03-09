@@ -8,13 +8,11 @@ import { useTheme } from '@mui/material/styles';
 import { useAppContext } from "../AppContext";
 import MiniDrawer from "../components/ClosingSideBar.jsx";
 
-
 // TO DO: confirm apiUrl for production
 const apiUrl =
   process.env.NODE_ENV === 'production'
     ? 'https://api.kmon.com'
     : 'http://localhost:3010';
-
 
 const Connections = () => {
   const theme = useTheme();
@@ -28,6 +26,8 @@ const Connections = () => {
   const containerStyle = {
     // marginLeft: theme.margins.sideBarMargin,
     marginTop: theme.margins.headerMargin,
+    paddingLeft: '16px',
+    paddingRight: '16px',
   };
 
   // State for child components;
@@ -255,16 +255,12 @@ const Connections = () => {
   }
 
   return (
-    <div style={{display: 'flex'}}>
-      <MiniDrawer/>
-      <div>YOOOO WHATS UP</div>
-    </div>
-    // <Container sx={containerStyle}>
-    //   <div>
-    //     <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} brokerPortIsValid={[brokerPortIsValid, setBrokerPortIsValid]} controllerPortIsValid={[controllerPortIsValid, setControllerPortIsValid]} brokerPortHelperText={[brokerPortHelperText, setBrokerPortHelperText]} controllerPortHelperText={[controllerPortHelperText, setControllerPortHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} brokerUriIsValid={[brokerUriIsValid, setBrokerUriIsValid]} controllerUriIsValid={[controllerUriIsValid, setControllerPortIsValid]} brokerUriHelperText={[brokerUriHelperText, setBrokerUriHelperText]} controllerUriHelperText={[controllerUriHelperText, setControllerUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
-    //   </div>
-    //   <ConnectionsTable rows={[rows, setRows]} selected={[selected, setSelected]} handleDelete={handleDelete} />
-    // </Container>
+    <Container sx={containerStyle}>
+      <div>
+        <ConnectionDialogBox open={[open, setOpen]} portIsClicked={[portIsClicked, setPortIsClicked]} brokerPortIsValid={[brokerPortIsValid, setBrokerPortIsValid]} controllerPortIsValid={[controllerPortIsValid, setControllerPortIsValid]} brokerPortHelperText={[brokerPortHelperText, setBrokerPortHelperText]} controllerPortHelperText={[controllerPortHelperText, setControllerPortHelperText]} uriIsClicked={[uriIsClicked, setUriIsClicked]} brokerUriIsValid={[brokerUriIsValid, setBrokerUriIsValid]} controllerUriIsValid={[controllerUriIsValid, setControllerPortIsValid]} brokerUriHelperText={[brokerUriHelperText, setBrokerUriHelperText]} controllerUriHelperText={[controllerUriHelperText, setControllerUriHelperText]} submitting={[submitting, setSubmitting]} dataIsFetching={[dataIsFetching, setDataIsFetching]} formData={[formData, setFormData]} handleSubmit={handleSubmit} alertProps={[alertProps, setAlertProps]} />
+      </div>
+      <ConnectionsTable rows={[rows, setRows]} selected={[selected, setSelected]} handleDelete={handleDelete} />
+    </Container>
   );
 };
 
