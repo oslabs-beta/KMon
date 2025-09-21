@@ -32,6 +32,14 @@ KMon is a Kafka monitoring tool compatible with **KRaft** mode clusters that all
 
 ## Get Started
 ### Prerequisites:
+.env format:
+```sh
+DB_URI=
+NODE_ENV=
+JWT_SECRET=
+SESSION_SECRET=
+```
+
 Must have Docker installed
 
 Clone our repo then run the following commands:
