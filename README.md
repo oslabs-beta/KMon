@@ -64,7 +64,7 @@ npm start
 Diana Alohkina — <a href='https://www.linkedin.com/in/diana-alokhina/'>LinkedIn</a> | <a href='https://github.com/dianalokada'>Github</a>    
 Elliot Cho — <a href='https://www.linkedin.com/in/elliot-hs-cho/'>LinkedIn</a> | <a href='https://github.com/echochs1'>Github</a>  
 Darryl Joo — <a href='https://www.linkedin.com/in/darryljoo/'>LinkedIn</a> | <a href='https://github.com/hjdjoo'>Github</a>  
-Hudson McLane — <a href='https://www.linkedin.com/in/hudson-mclane/'>LinkedIn</a> | <a href='https://github.com/redferret1'>Github</a>  
+hazel —  <a href='https://github.com/redferret1'>Github</a>  
 Lucy Wu — <a href='https://www.linkedin.com/in/lwu15/'>LinkedIn</a> | <a href='https://github.com/lwu15'>Github</a>
 
 
